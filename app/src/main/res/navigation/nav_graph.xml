@@ -58,7 +58,12 @@
         android:id="@+id/addItemFragment"
         android:name="com.example.servicemaintainreminder.ui.AddItemFragment"
         android:label="Add New Item"
-        tools:layout="@layout/fragment_add_item" />
+        tools:layout="@layout/fragment_add_item">
+        <argument
+            android:name="itemId"
+            android:defaultValue="-1L"
+            app:argType="long" />
+    </fragment>
 
     <fragment
         android:id="@+id/detailFragment"
@@ -68,6 +73,13 @@
         <argument
             android:name="itemId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_detailFragment_to_addItemFragment"
+            app:destination="@id/addItemFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment

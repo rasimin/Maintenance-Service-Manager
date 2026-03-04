@@ -7,126 +7,167 @@
     android:layout_marginHorizontal="20dp"
     android:layout_marginVertical="8dp"
     app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
     app:strokeWidth="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivItemIcon"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@android:color/transparent"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_slideshow"
-            app:tint="#A0A0A0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
-
-        <TextView
-            android:id="@+id/tvItemName"
-            android:layout_width="0dp"
+        <FrameLayout
+            android:id="@+id/flStatusHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:textColor="#222222"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/statusIndicator"
-            app:layout_constraintStart_toEndOf="@id/ivItemIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="AC Ruang Tamu" />
-
-        <TextView
-            android:id="@+id/tvCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="#777777"
-            android:textSize="13sp"
-            app:layout_constraintStart_toStartOf="@id/tvItemName"
-            app:layout_constraintTop_toBottomOf="@id/tvItemName"
-            tools:text="Electronics" />
-
-        <LinearLayout
-            android:id="@+id/llNextService"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            app:layout_constraintStart_toStartOf="@id/tvItemName"
-            app:layout_constraintTop_toBottomOf="@id/tvCategory">
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="16dp"
+            android:background="#FDF4F4">
 
             <TextView
+                android:id="@+id/tvActiveStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="NEXT SERVICE"
-                android:textColor="#888888"
+                android:layout_gravity="start"
                 android:textSize="10sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.05" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@android:drawable/ic_menu_my_calendar"
-                    app:tint="@color/brand_primary" />
-
-                <TextView
-                    android:id="@+id/tvNextServiceDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/brand_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    tools:text="07 Mar 2026" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cvStatusBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="#FDF4F4">
+                tools:text="Active"
+                tools:textColor="#2ECC71" />
 
             <TextView
                 android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
+                android:layout_gravity="end"
                 android:textColor="@color/brand_primary"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold"
                 tools:text="2 days left" />
-        </com.google.android.material.card.MaterialCardView>
+        </FrameLayout>
 
-        <View
-            android:id="@+id/statusIndicator"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:alpha="0.8"
-            android:background="@drawable/bg_circle_indicator"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:backgroundTint="@color/status_safe" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivItemIcon"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@android:color/transparent"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_slideshow"
+                app:tint="#A0A0A0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+
+            <TextView
+                android:id="@+id/tvItemName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textColor="#222222"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivItemIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="AC Ruang Tamu" />
+
+            <TextView
+                android:id="@+id/tvCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#777777"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="@id/tvItemName"
+                app:layout_constraintTop_toBottomOf="@id/tvItemName"
+                tools:text="Electronics" />
+
+            <LinearLayout
+                android:id="@+id/llNextService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tvItemName"
+                app:layout_constraintTop_toBottomOf="@id/tvCategory">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NEXT SERVICE"
+                    android:textColor="#888888"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@android:drawable/ic_menu_my_calendar"
+                        app:tint="@color/brand_primary" />
+
+                    <TextView
+                        android:id="@+id/tvNextServiceDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textColor="@color/brand_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="07 Mar 2026" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddRecord"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="0dp"
+                android:text="Record"
+                android:textColor="@color/brand_primary"
+                android:textSize="10sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#1A6C4CFF"
+                app:cornerRadius="6dp"
+                app:layout_constraintBottom_toBottomOf="@id/llNextService"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEdit"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="0dp"
+                android:text="Edit"
+                android:textColor="#777777"
+                android:textSize="10sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#1A000000"
+                app:cornerRadius="6dp"
+                app:layout_constraintBottom_toBottomOf="@id/llNextService"
+                app:layout_constraintEnd_toStartOf="@+id/btnAddRecord"
+                android:layout_marginEnd="6dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

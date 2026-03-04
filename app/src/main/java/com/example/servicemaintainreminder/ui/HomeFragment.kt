@@ -91,7 +91,8 @@ class HomeFragment : Fragment() {
         viewModel.allItems.value?.let { items ->
             val currentTime = System.currentTimeMillis()
             val oneMonthInMs = 30L * 24 * 60 * 60 * 1000L
-            val upcoming = items.filter { it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
+            // Filter only active items for upcoming maintenance list
+            val upcoming = items.filter { it.isActive && it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
                 .sortedBy { it.nextServiceDate }
             adapter.submitList(upcoming)
         }
@@ -111,18 +112,20 @@ class HomeFragment : Fragment() {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
                 val oneWeekInMs = 7 * 24 * 60 * 60 * 1000L
+                // Filter only active items
                 val urgent = items.filter { 
-                    it.nextServiceDate - currentTime in 0..oneWeekInMs 
+                    it.isActive && it.nextServiceDate - currentTime in 0..oneWeekInMs 
                 }
                 binding.tvUpcomingHeader.text = "Urgent Maintenance"
                 adapter.submitList(urgent.sortedBy { it.nextServiceDate })
             }
         }
 
-        binding.cardHistory.setOnClickListener {
+        binding.cardOverdue.setOnClickListener {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
-                val overdue = items.filter { it.nextServiceDate < currentTime }
+                // Filter only active items
+                val overdue = items.filter { it.isActive && it.nextServiceDate < currentTime }
                 binding.tvUpcomingHeader.text = "Overdue Items"
                 adapter.submitList(overdue.sortedBy { it.nextServiceDate })
             }
@@ -135,12 +138,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateDashboard(items: List<com.example.servicemaintainreminder.data.Item>) {
-        val total = items.size
+        // Only count active items for the dashboard counters
+        val activeItems = items.filter { it.isActive }
+        val total = activeItems.size
         val currentTime = System.currentTimeMillis()
         val oneWeekInMs = 7 * 24 * 60 * 60 * 1000L
 
-        val upcoming = items.count { it.nextServiceDate - currentTime in 0..oneWeekInMs }
-        val overdue = items.count { it.nextServiceDate < currentTime }
+        val upcoming = activeItems.count { it.nextServiceDate - currentTime in 0..oneWeekInMs }
+        val overdue = activeItems.count { it.nextServiceDate < currentTime }
 
         binding.tvTotalItems.text = total.toString()
         binding.tvUpcomingService.text = upcoming.toString()

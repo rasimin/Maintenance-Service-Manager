@@ -57,6 +57,7 @@
                     app:submitBackground="@android:color/transparent"
                     app:searchHintIcon="@null"
                     app:searchIcon="@android:drawable/ic_menu_search"
+                    app:iconTint="#F5A623"
                     app:queryHint="Search devices..." />
             </com.google.android.material.card.MaterialCardView>
 
@@ -156,7 +157,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardHistory"
+                    android:id="@+id/cardOverdue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -176,8 +177,8 @@
                         <ImageView
                             android:layout_width="32dp"
                             android:layout_height="32dp"
-                            android:src="@drawable/ic_history"
-                            app:tint="@color/icon_history" />
+                            android:src="@android:drawable/stat_notify_error"
+                            app:tint="@color/status_error" />
                         <TextView
                             android:id="@+id/tvOverdueService"
                             android:layout_width="wrap_content"
@@ -191,7 +192,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="History"
+                            android:text="Overdue"
                             android:textColor="@color/text_grey"
                             android:textSize="12sp" />
                     </LinearLayout>

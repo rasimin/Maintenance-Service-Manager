@@ -2,6 +2,7 @@ package com.example.servicemaintainreminder.ui
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.servicemaintainreminder.R
 import com.example.servicemaintainreminder.data.Item
@@ -54,6 +56,24 @@ class DetailFragment : Fragment() {
         binding.fabAddHistory.setOnClickListener {
             showAddHistoryDialog()
         }
+
+        binding.swActiveDetail.setOnCheckedChangeListener { _, isChecked ->
+            currentItem?.let { item ->
+                if (item.isActive != isChecked) {
+                    val updatedItem = item.copy(isActive = isChecked)
+                    viewModel.updateItem(updatedItem)
+                    Toast.makeText(requireContext(), "Device status updated", Toast.LENGTH_SHORT).show()
+                }
+            }
+            updateActiveLabel(isChecked)
+        }
+
+        binding.btnEditDetail.setOnClickListener {
+            currentItem?.let { item ->
+                val action = DetailFragmentDirections.actionDetailFragmentToAddItemFragment(item.id)
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun loadInterstitialAd() {
@@ -86,8 +106,14 @@ class DetailFragment : Fragment() {
         binding.tvDetailLastService.text = DateUtil.formatDate(item.lastServiceDate)
         binding.tvDetailInterval.text = "${item.serviceIntervalValue} ${item.serviceIntervalUnit}"
         binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
+        binding.swActiveDetail.isChecked = item.isActive
+        updateActiveLabel(item.isActive)
         
         updateStatusIndicator(item.nextServiceDate)
+    }
+
+    private fun updateActiveLabel(isActive: Boolean) {
+        binding.tvActiveLabel.text = if (isActive) "Active" else "Inactive"
     }
 
     private fun updateStatusIndicator(nextDate: Long) {
@@ -99,14 +125,17 @@ class DetailFragment : Fragment() {
             daysDiff < 0 -> {
                 binding.tvStatusIndicator.text = "❗ Overdue"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_error))
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AE74C3C")) // Soft red
             }
             daysDiff <= 7 -> {
                 binding.tvStatusIndicator.text = "⚠ Maintenance Soon"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_warning))
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AF5A623")) // Soft orange
             }
             else -> {
                 binding.tvStatusIndicator.text = "✅ Scheduled"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_safe))
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1A2ECC71")) // Soft green
             }
         }
     }

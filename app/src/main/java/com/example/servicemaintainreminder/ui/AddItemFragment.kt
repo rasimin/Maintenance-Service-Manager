@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.databinding.FragmentAddItemBinding
 import com.example.servicemaintainreminder.util.DateUtil
@@ -20,7 +21,10 @@ class AddItemFragment : Fragment() {
     private var _binding: FragmentAddItemBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by viewModels()
+    private val args: AddItemFragmentArgs by navArgs()
     private var selectedDate: Long = System.currentTimeMillis()
+    private var isEditMode = false
+    private var itemToEdit: Item? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,8 +40,29 @@ class AddItemFragment : Fragment() {
         setupSpinners()
         setupDatePicker()
 
+        isEditMode = args.itemId != -1L
+        if (isEditMode) {
+            setupEditMode()
+        }
+
         binding.btnSave.setOnClickListener {
             saveItem()
+        }
+    }
+
+    private fun setupEditMode() {
+        binding.btnSave.text = "Update Item"
+        viewModel.allItems.observe(viewLifecycleOwner) { items ->
+            itemToEdit = items.find { it.id == args.itemId }
+            itemToEdit?.let { item ->
+                binding.etName.setText(item.name)
+                binding.spinnerCategory.setText(item.category, false)
+                binding.etIntervalValue.setText(item.serviceIntervalValue.toString())
+                binding.spinnerIntervalUnit.setText(item.serviceIntervalUnit, false)
+                binding.etNote.setText(item.note)
+                selectedDate = item.lastServiceDate
+                binding.etLastServiceDate.setText(DateUtil.formatDate(selectedDate))
+            }
         }
     }
 
@@ -55,6 +80,7 @@ class AddItemFragment : Fragment() {
         binding.etLastServiceDate.setText(DateUtil.formatDate(selectedDate))
         binding.etLastServiceDate.setOnClickListener {
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = selectedDate
             DatePickerDialog(
                 requireContext(),
                 { _, year, month, dayOfMonth ->
@@ -84,18 +110,31 @@ class AddItemFragment : Fragment() {
         val intervalValue = intervalValueStr.toInt()
         val nextServiceDate = DateUtil.getNextServiceDate(selectedDate, intervalValue, intervalUnit)
 
-        val item = Item(
-            name = name,
-            category = category,
-            lastServiceDate = selectedDate,
-            serviceIntervalValue = intervalValue,
-            serviceIntervalUnit = intervalUnit,
-            nextServiceDate = nextServiceDate,
-            note = note
-        )
-
-        viewModel.insertItem(item)
-        Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()
+        if (isEditMode && itemToEdit != null) {
+            val updatedItem = itemToEdit!!.copy(
+                name = name,
+                category = category,
+                lastServiceDate = selectedDate,
+                serviceIntervalValue = intervalValue,
+                serviceIntervalUnit = intervalUnit,
+                nextServiceDate = nextServiceDate,
+                note = note
+            )
+            viewModel.updateItem(updatedItem)
+            Toast.makeText(requireContext(), "Item updated successfully", Toast.LENGTH_SHORT).show()
+        } else {
+            val newItem = Item(
+                name = name,
+                category = category,
+                lastServiceDate = selectedDate,
+                serviceIntervalValue = intervalValue,
+                serviceIntervalUnit = intervalUnit,
+                nextServiceDate = nextServiceDate,
+                note = note
+            )
+            viewModel.insertItem(newItem)
+            Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()
+        }
         findNavController().navigateUp()
     }
 

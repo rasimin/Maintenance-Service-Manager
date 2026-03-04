@@ -40,7 +40,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add New Maintenance Item"
+                        android:text="Item Maintenance Details"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -99,6 +99,16 @@
                             android:textColor="@color/black"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchActive"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Device Active Status"
+                        android:checked="true"
+                        android:textColor="@color/black"
+                        app:useMaterialThemeColors="true" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilLastServiceDate"

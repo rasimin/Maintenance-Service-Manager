@@ -13,5 +13,6 @@ data class Item(
     val serviceIntervalValue: Int,
     val serviceIntervalUnit: String, // "Days" or "Months"
     val nextServiceDate: Long,
-    val note: String = ""
+    val note: String = "",
+    val isActive: Boolean = true
 )
