@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        android:textColorHint="#616161"
+        app:hintTextColor="@color/primary"
+        app:boxStrokeColor="@color/primary"
+        app:boxBackgroundColor="@color/white"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etHistoryDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Cost"
+        android:textColorHint="#616161"
+        app:hintTextColor="@color/primary"
+        app:boxStrokeColor="@color/primary"
+        app:boxBackgroundColor="@color/white"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etHistoryCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Maintenance Date"
+        android:textColorHint="#616161"
+        app:hintTextColor="@color/primary"
+        app:boxStrokeColor="@color/primary"
+        app:boxBackgroundColor="@color/white"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etHistoryDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:clickable="true"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="blue_tosca_dark">#0091B9</color>
+    <color name="cyan_tosca">#00ACC1</color>
+    <color name="blue_light">#8BAEF0</color>
+    <color name="blue_dark">#004E9B</color>
+    <color name="orange_bright">#FF6500</color>
+    <color name="orange_light">#FFE0B2</color>
+    <color name="yellow_bright">#FFD500</color>
+
+    <!-- UI Gradient Colors -->
+    <color name="gradient_start">#1A237E</color> <!-- Dark Blue -->
+    <color name="gradient_end">#4A148C</color>   <!-- Purple -->
+
+    <!-- Semantic UI Colors -->
+    <color name="primary">#1A237E</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#3949AB</color>
+
+    <color name="secondary">#7C4DFF</color>
+    <color name="on_secondary">#FFFFFF</color>
+
+    <color name="background">#EBF3FF</color> <!-- Consistent Light Blue Background -->
+    <color name="surface">#FFFFFF</color>
+    <color name="on_surface">#1A1C1E</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray_light">#F1F1F1</color>
+    <color name="text_hint">#616161</color>
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:background="@drawable/bg_main_gradient">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivProfile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+
+    <LinearLayout
+        android:id="@+id/llGreeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/ivProfile"
+        app:layout_constraintStart_toEndOf="@id/ivProfile"
+        app:layout_constraintTop_toTopOf="@id/ivProfile">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hi, Alex"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivNotification"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@android:drawable/ic_popup_reminder"
+        app:layout_constraintBottom_toBottomOf="@id/ivProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivProfile"
+        app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

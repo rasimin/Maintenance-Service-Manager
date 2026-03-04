@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.servicemaintainreminder.ui.HomeFragment"
+        android:label="Service Reminder"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_addItemFragment"
+            app:destination="@id/addItemFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_devicesFragment"
+            app:destination="@id/devicesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/devicesFragment"
+        android:name="com.example.servicemaintainreminder.ui.DevicesFragment"
+        android:label="My Devices"
+        tools:layout="@layout/fragment_devices">
+        <action
+            android:id="@+id/action_devicesFragment_to_detailFragment"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_devicesFragment_to_addItemFragment"
+            app:destination="@id/addItemFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addItemFragment"
+        android:name="com.example.servicemaintainreminder.ui.AddItemFragment"
+        android:label="Add New Item"
+        tools:layout="@layout/fragment_add_item" />
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.servicemaintainreminder.ui.DetailFragment"
+        android:label="Item Detail"
+        tools:layout="@layout/fragment_detail">
+        <argument
+            android:name="itemId"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.servicemaintainreminder.ui.HistoryFragment"
+        android:label="Service History"
+        tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.example.servicemaintainreminder.FirstFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_first">
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/SecondFragment"
+        android:name="com.example.servicemaintainreminder.SecondFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_second">
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
+    </fragment>
+
+</navigation>
