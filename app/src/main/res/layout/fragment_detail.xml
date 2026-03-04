@@ -14,6 +14,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header">
 
@@ -28,14 +29,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="#E0E0E0">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="#FEFEFE"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -43,8 +44,8 @@
                         android:id="@+id/tvDetailName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:textSize="24sp"
+                        android:textColor="#222222"
+                        android:textSize="22sp"
                         android:textStyle="bold"
                         tools:text="AC Ruang Tamu" />
 
@@ -52,72 +53,193 @@
                         android:id="@+id/tvDetailCategory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/primary"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/brand_primary"
+                        android:textSize="14sp"
+                        tools:text="Category: Kendaraan" />
+
+                    <TextView
+                        android:id="@+id/tvStatusIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:background="@drawable/bg_status_badge"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        tools:text="Category: AC" />
+                        tools:text="✅ Scheduled"
+                        tools:textColor="#2ECC71" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/bg_next_service_rounded"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.1"
+                            android:text="NEXT MAINTENANCE"
+                            android:textColor="#888888"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvDetailNextService"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/brand_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            tools:text="05 Mar 2026" />
+                    </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginVertical="16dp"
-                        android:background="#EEEEEE" />
+                        android:layout_marginVertical="20dp"
+                        android:background="#F0F0F0" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Details rows... -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="NEXT MAINTENANCE"
-                        android:textColor="#757575"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1"/>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_menu_my_calendar"
+                            app:tint="#888888" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Last Service"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvDetailLastService"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#333333"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:text="04 Mar 2026" />
+                        </LinearLayout>
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvDetailNextService"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        tools:text="15 Jul 2026" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/stat_notify_sync"
+                            app:tint="#888888" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Interval"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvDetailInterval"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#333333"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:text="1 Day" />
+                        </LinearLayout>
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvDetailLastService"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:textColor="#424242"
-                        android:textSize="14sp"
-                        tools:text="Last Service: 15 Jan 2026" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_menu_save"
+                            app:tint="#888888" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Maintenance Cost"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvDetailTotalCost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#333333"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:text="Rp 2.000" />
+                        </LinearLayout>
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvDetailInterval"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/llNoteContainer"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#424242"
-                        android:textSize="14sp"
-                        tools:text="Interval: 6 Months" />
-
-                    <TextView
-                        android:id="@+id/tvDetailTotalCost"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="#424242"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        tools:text="Total Maintenance Cost: $500.00" />
-
-                    <TextView
-                        android:id="@+id/tvDetailNote"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:textColor="#616161"
-                        android:textSize="14sp"
-                        android:fontStyle="italic"
-                        tools:text="Note: Pastikan cuci filter luar." />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            app:tint="#888888" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Note"
+                                android:textColor="#888888"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvDetailNote"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#333333"
+                                android:textSize="15sp"
+                                tools:text="Optional notes..." />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -135,8 +257,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_history" />
+
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/llEmptyHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="#D1D1D1" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="No maintenance history yet.\nTap the button below to add your first service record."
+                    android:textColor="#888888"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -146,13 +294,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="72dp"
-        android:text="Add History Maintenance"
+        android:layout_marginBottom="32dp"
+        android:text="Add Maintenance Record"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="@color/primary"
+        app:backgroundTint="@color/brand_primary"
         app:iconTint="@color/white"
-        app:icon="@android:drawable/ic_input_add" />
+        app:icon="@android:drawable/ic_input_add"
+        app:cornerRadius="24dp"
+        app:elevation="6dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

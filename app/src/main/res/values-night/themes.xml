@@ -1,24 +1,37 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.ServiceMaintainReminder" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Force dark mode to use the same light colors for a consistent look -->
-        <item name="colorPrimary">@color/gradient_start</item>
+    <!-- Force light mode for everything even in dark mode -->
+    <style name="Base.Theme.ServiceMaintainReminder" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorPrimaryContainer">@color/brand_secondary</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
 
-        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
         <item name="colorOnSecondary">@color/white</item>
 
         <item name="android:windowBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceVariant">@color/input_bg</item>
+        <item name="colorOnSurfaceVariant">@color/text_grey</item>
 
         <!-- Status bar and navigation bar -->
-        <item name="android:statusBarColor">@color/gradient_start</item>
+        <item name="android:statusBarColor">@color/brand_primary</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
 
-        <!-- Smooth transitions and elevations -->
+        <!-- Use a custom light dialog theme -->
+        <item name="materialAlertDialogTheme">@style/App.Dialog.Light</item>
+        <item name="alertDialogTheme">@style/App.Dialog.Light</item>
+
         <item name="elevationOverlayEnabled">false</item>
+    </style>
+
+    <style name="App.Dialog.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/text_grey</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:background">@color/surface</item>
     </style>
 </resources>

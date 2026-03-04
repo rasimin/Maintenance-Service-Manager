@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:padding="20dp"
+    android:background="@color/background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Maintenance Details"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Description"
-        android:textColorHint="#616161"
-        app:hintTextColor="@color/primary"
-        app:boxStrokeColor="@color/primary"
-        app:boxBackgroundColor="@color/white"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        app:boxBackgroundColor="@color/input_bg"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:hintTextColor="@color/brand_primary">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etHistoryDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -29,17 +43,21 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Cost"
-        android:textColorHint="#616161"
-        app:hintTextColor="@color/primary"
-        app:boxStrokeColor="@color/primary"
-        app:boxBackgroundColor="@color/white"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        app:boxBackgroundColor="@color/input_bg"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:hintTextColor="@color/brand_primary">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etHistoryCost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -48,18 +66,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Maintenance Date"
-        android:textColorHint="#616161"
-        app:hintTextColor="@color/primary"
-        app:boxStrokeColor="@color/primary"
-        app:boxBackgroundColor="@color/white"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        app:boxBackgroundColor="@color/input_bg"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="1dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:hintTextColor="@color/brand_primary">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etHistoryDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="false"
             android:clickable="true"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

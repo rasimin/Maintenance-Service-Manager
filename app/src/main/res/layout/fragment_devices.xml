@@ -12,41 +12,81 @@
         layout="@layout/view_header"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchViewDevices"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/searchCard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="@drawable/bg_search_view_rounded"
-        android:elevation="4dp"
-        app:iconifiedByDefault="false"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        app:queryHint="Search your devices..." />
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#E8EAED"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchViewDevices"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:iconifiedByDefault="false"
+            app:queryBackground="@android:color/transparent"
+            app:submitBackground="@android:color/transparent"
+            app:searchHintIcon="@null"
+            app:searchIcon="@android:drawable/ic_menu_search"
+            app:iconTint="#F5A623"
+            app:queryHint="Search device or maintenance" />
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllDevices"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:clipToPadding="false"
-        android:paddingBottom="120dp"
+        android:paddingBottom="100dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchViewDevices"
+        app:layout_constraintTop_toBottomOf="@id/searchCard"
         tools:listitem="@layout/item_service_list" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <LinearLayout
+        android:id="@+id/llEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:tint="#D1D1D1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="No devices yet.\nAdd your first maintenance reminder."
+            android:textColor="@color/text_grey"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-        android:text="Add New Device"
-        android:textColor="@color/white"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="@color/primary"
-        app:iconTint="@color/white"
-        app:icon="@android:drawable/ic_input_add" />
+        app:backgroundTint="@color/brand_primary"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/white"
+        app:elevation="6dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

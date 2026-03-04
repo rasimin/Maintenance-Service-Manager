@@ -14,7 +14,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
+            android:paddingBottom="24dp"
             android:animateLayoutChanges="true">
 
             <include
@@ -22,13 +22,12 @@
                 layout="@layout/view_header"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Bold Title -->
             <TextView
                 android:id="@+id/tvMainTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="Manage Your\nMaintenance Easily"
                 android:textColor="@color/white"
                 android:textSize="28sp"
@@ -37,67 +36,79 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/header" />
 
-            <!-- Search Bar -->
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/searchView"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchCardHome"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginHorizontal="16dp"
-                android:background="@drawable/bg_search_view_rounded"
-                app:iconifiedByDefault="false"
-                app:layout_constraintTop_toBottomOf="@id/tvMainTitle"
-                app:queryHint="Search devices..." />
+                android:layout_height="48dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="20dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#E8EAED"
+                app:strokeWidth="0dp"
+                app:layout_constraintTop_toBottomOf="@id/tvMainTitle">
 
-            <!-- Feature Cards -->
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:iconifiedByDefault="false"
+                    app:queryBackground="@android:color/transparent"
+                    app:submitBackground="@android:color/transparent"
+                    app:searchHintIcon="@null"
+                    app:searchIcon="@android:drawable/ic_menu_search"
+                    app:queryHint="Search devices..." />
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:id="@+id/llFeatures"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="20dp"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/searchView">
+                app:layout_constraintTop_toBottomOf="@id/searchCardHome">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardMyDevices"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="0dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="16dp">
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/ic_devices"
-                            app:tint="@color/primary" />
+                            app:tint="@color/icon_devices" />
                         <TextView
                             android:id="@+id/tvTotalItems"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="8dp"
                             android:text="0"
                             android:textColor="@color/black"
-                            android:textSize="14sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="My Devices"
-                            android:textColor="@color/on_surface"
-                            android:textSize="11sp" />
+                            android:textColor="@color/text_grey"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -105,41 +116,42 @@
                     android:id="@+id/cardUpcoming"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="0dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="16dp">
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/ic_upcoming"
-                            app:tint="@color/secondary" />
+                            app:tint="@color/icon_upcoming" />
                         <TextView
                             android:id="@+id/tvUpcomingService"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="8dp"
                             android:text="0"
-                            android:textColor="#FF9800"
-                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="Upcoming"
-                            android:textColor="@color/on_surface"
-                            android:textSize="11sp" />
+                            android:textColor="@color/text_grey"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -152,46 +164,46 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:strokeWidth="0dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="16dp">
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:src="@drawable/ic_history"
-                            app:tint="#4CAF50" />
+                            app:tint="@color/icon_history" />
                         <TextView
                             android:id="@+id/tvOverdueService"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="8dp"
                             android:text="0"
-                            android:textColor="#F44336"
-                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="History"
-                            android:textColor="@color/on_surface"
-                            android:textSize="11sp" />
+                            android:textColor="@color/text_grey"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Upcoming Maintenance Section -->
             <RelativeLayout
                 android:id="@+id/rlUpcomingHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="20dp"
                 app:layout_constraintTop_toBottomOf="@id/llFeatures">
 
                 <TextView
@@ -219,6 +231,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="12dp"
                 android:orientation="horizontal"
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -240,6 +254,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
                 app:adSize="BANNER"
                 app:adUnitId="ca-app-pub-3940256099942544/6300978111"
                 app:layout_constraintEnd_toEndOf="parent"

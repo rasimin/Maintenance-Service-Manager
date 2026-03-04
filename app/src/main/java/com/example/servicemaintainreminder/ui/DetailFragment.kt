@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -20,6 +22,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import java.text.NumberFormat
 import java.util.*
 
 class DetailFragment : Fragment() {
@@ -80,18 +83,46 @@ class DetailFragment : Fragment() {
         binding.tvDetailName.text = item.name
         binding.tvDetailCategory.text = "Category: ${item.category}"
         binding.tvDetailNextService.text = DateUtil.formatDate(item.nextServiceDate)
-        binding.tvDetailLastService.text = "Last Service: ${DateUtil.formatDate(item.lastServiceDate)}"
-        binding.tvDetailInterval.text = "Interval: ${item.serviceIntervalValue} ${item.serviceIntervalUnit}"
-        binding.tvDetailNote.text = if (item.note.isNotEmpty()) "Note: ${item.note}" else ""
+        binding.tvDetailLastService.text = DateUtil.formatDate(item.lastServiceDate)
+        binding.tvDetailInterval.text = "${item.serviceIntervalValue} ${item.serviceIntervalUnit}"
+        binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
+        
+        updateStatusIndicator(item.nextServiceDate)
+    }
+
+    private fun updateStatusIndicator(nextDate: Long) {
+        val currentTime = System.currentTimeMillis()
+        val timeDiff = nextDate - currentTime
+        val daysDiff = timeDiff / (24 * 60 * 60 * 1000)
+
+        when {
+            daysDiff < 0 -> {
+                binding.tvStatusIndicator.text = "❗ Overdue"
+                binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_error))
+            }
+            daysDiff <= 7 -> {
+                binding.tvStatusIndicator.text = "⚠ Maintenance Soon"
+                binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_warning))
+            }
+            else -> {
+                binding.tvStatusIndicator.text = "✅ Scheduled"
+                binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_safe))
+            }
+        }
     }
 
     private fun observeHistory(itemId: Long) {
         viewModel.getHistory(itemId).observe(viewLifecycleOwner) { history ->
             historyAdapter.submitList(history)
             
+            // Toggle empty state visibility
+            binding.llEmptyHistory.isVisible = history.isEmpty()
+            binding.rvHistory.isVisible = history.isNotEmpty()
+            
             // Calculate and display total cost
             val totalCost = history.sumOf { it.cost }
-            binding.tvDetailTotalCost.text = "Total Maintenance Cost: Rp ${String.format("%,.2f", totalCost)}"
+            val format = NumberFormat.getInstance(Locale("in", "ID"))
+            binding.tvDetailTotalCost.text = "Rp ${format.format(totalCost.toLong())}"
         }
     }
 
@@ -122,7 +153,7 @@ class DetailFragment : Fragment() {
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Add Service History")
+            .setTitle("Add Maintenance Record")
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
                 val desc = etDesc.text.toString()
@@ -145,7 +176,6 @@ class DetailFragment : Fragment() {
         viewModel.addHistory(history)
         
         currentItem?.let { item ->
-            // If the added history is newer than current last service date, update item
             if (date >= item.lastServiceDate) {
                 val nextDate = DateUtil.getNextServiceDate(
                     date,
@@ -160,10 +190,10 @@ class DetailFragment : Fragment() {
             }
         }
         
-        Toast.makeText(requireContext(), "History added", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Record added", Toast.LENGTH_SHORT).show()
         
         mInterstitialAd?.show(requireActivity())
-        loadInterstitialAd() // Reload for next time
+        loadInterstitialAd()
     }
 
     override fun onDestroyView() {

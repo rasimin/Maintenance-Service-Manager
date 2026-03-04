@@ -1,62 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="280dp"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivItemIcon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@color/gray_light"
-            android:padding="12dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@android:color/transparent"
+            android:padding="8dp"
             android:src="@android:drawable/ic_menu_preferences"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
-            app:tint="@color/primary" />
+            app:tint="#A0A0A0"
+            android:layout_gravity="center_vertical"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvItemName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Air Conditioner"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Air Conditioner" />
 
             <TextView
                 android:id="@+id/tvServiceType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Cleaning"
-                android:textColor="#757575"
-                android:textSize="14sp" />
+                android:textColor="@color/text_grey"
+                android:textSize="13sp"
+                tools:text="Cleaning" />
 
             <TextView
                 android:id="@+id/tvNextDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Next: Oct 24, 2023"
-                android:textColor="@color/primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textColor="@color/brand_primary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="Next: 05 Mar 2026" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

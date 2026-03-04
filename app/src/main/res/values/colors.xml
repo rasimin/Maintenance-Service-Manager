@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Brand Colors -->
-    <color name="blue_tosca_dark">#0091B9</color>
-    <color name="cyan_tosca">#00ACC1</color>
-    <color name="blue_light">#8BAEF0</color>
-    <color name="blue_dark">#004E9B</color>
-    <color name="orange_bright">#FF6500</color>
-    <color name="orange_light">#FFE0B2</color>
-    <color name="yellow_bright">#FFD500</color>
+    <color name="brand_primary">#6C4CFF</color>
+    <color name="brand_secondary">#4B3EFF</color>
+    <color name="brand_dark">#2B2E83</color>
 
-    <!-- UI Gradient Colors -->
-    <color name="gradient_start">#1A237E</color> <!-- Dark Blue -->
-    <color name="gradient_end">#4A148C</color>   <!-- Purple -->
+    <!-- UI Improvements Colors -->
+    <color name="header_start">#5B5BD6</color>
+    <color name="header_end">#7A6FF0</color>
 
-    <!-- Semantic UI Colors -->
-    <color name="primary">#1A237E</color>
-    <color name="on_primary">#FFFFFF</color>
-    <color name="primary_container">#3949AB</color>
+    <!-- Status Badge Colors -->
+    <color name="status_overdue">#E74C3C</color>
+    <color name="status_error">#E74C3C</color>
+    <color name="status_soon">#F5A623</color>
+    <color name="status_warning">#F5A623</color>
+    <color name="status_safe">#2ECC71</color>
 
-    <color name="secondary">#7C4DFF</color>
-    <color name="on_secondary">#FFFFFF</color>
+    <!-- Icon Colors -->
+    <color name="icon_devices">#4C6FFF</color>
+    <color name="icon_upcoming">#F5A623</color>
+    <color name="icon_history">#2ECC71</color>
 
-    <color name="background">#EBF3FF</color> <!-- Consistent Light Blue Background -->
+    <!-- Category Indicators -->
+    <color name="cat_vehicle">#4C6FFF</color>
+    <color name="cat_electronics">#00B894</color>
+    <color name="cat_appliance">#F39C12</color>
+
+    <!-- UI Colors -->
+    <color name="background">#F8F9FA</color>
     <color name="surface">#FFFFFF</color>
     <color name="on_surface">#1A1C1E</color>
+    <color name="input_bg">#F8F9FB</color>
+    <color name="border_light">#EAEAEA</color>
+    <color name="text_grey">#777777</color>
+    <color name="text_hint">#888888</color>
+    <color name="error">#E74C3C</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="gray_light">#F1F1F1</color>
-    <color name="text_hint">#616161</color>
+    <color name="transparent">#00000000</color>
 </resources>
