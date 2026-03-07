@@ -38,6 +38,10 @@
         android:name="com.example.servicemaintainreminder.ui.DevicesFragment"
         android:label="My Devices"
         tools:layout="@layout/fragment_devices">
+        <argument
+            android:name="filterType"
+            android:defaultValue="All"
+            app:argType="string" />
         <action
             android:id="@+id/action_devicesFragment_to_detailFragment"
             app:destination="@id/detailFragment"

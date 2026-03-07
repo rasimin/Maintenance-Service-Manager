@@ -100,7 +100,7 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.cardMyDevices.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment()
+            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment("All")
             findNavController().navigate(action)
         }
 
@@ -125,9 +125,14 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Pindah ke halaman My Devices
+        // Pindah ke halaman My Devices otomatis sesuai filter
         binding.tvViewAll.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment()
+            val filterType = when (binding.tvUpcomingHeader.text.toString()) {
+                "Overdue Items" -> "Overdue"
+                "Urgent Maintenance", "Upcoming Maintenance" -> "Upcoming"
+                else -> "All"
+            }
+            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment(filterType)
             findNavController().navigate(action)
         }
 

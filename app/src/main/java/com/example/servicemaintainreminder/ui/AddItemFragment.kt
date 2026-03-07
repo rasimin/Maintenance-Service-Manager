@@ -134,6 +134,7 @@ class AddItemFragment : Fragment() {
                 name = name,
                 category = category,
                 lastServiceDate = selectedDate,
+                originalLastServiceDate = selectedDate,
                 serviceIntervalValue = intervalValue,
                 serviceIntervalUnit = intervalUnit,
                 nextServiceDate = nextServiceDate,

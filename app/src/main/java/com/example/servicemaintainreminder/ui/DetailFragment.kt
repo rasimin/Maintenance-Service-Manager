@@ -231,6 +231,31 @@ class DetailFragment : Fragment() {
             .setMessage("Yakin ingin menghapus catatan servis ini?\n\n\"${history.description}\"")
             .setPositiveButton("Ya, Hapus") { _, _ ->
                 viewModel.deleteHistory(history)
+                
+                // Recalculate schedule if this was the latest history
+                currentItem?.let { item ->
+                    // Find remaining histories excluding the one being deleted
+                    val remainingHistory = historyAdapter.currentList.filter { it.id != history.id }
+                    if (remainingHistory.isNotEmpty()) {
+                        // Find the most recent date from the remaining history
+                        val latestHistoryDate = remainingHistory.maxOf { it.serviceDate }
+                        
+                        // If the current item's service date logic was driven by this maxDate, update it
+                        val nextDate = DateUtil.getNextServiceDate(latestHistoryDate, item.serviceIntervalValue, item.serviceIntervalUnit)
+                        viewModel.updateItem(item.copy(
+                            lastServiceDate = latestHistoryDate, 
+                            nextServiceDate = nextDate
+                        ))
+                    } else {
+                        // Revert to originalLastServiceDate since history is empty
+                        val originalNextDate = DateUtil.getNextServiceDate(item.originalLastServiceDate, item.serviceIntervalValue, item.serviceIntervalUnit)
+                        viewModel.updateItem(item.copy(
+                            lastServiceDate = item.originalLastServiceDate,
+                            nextServiceDate = originalNextDate
+                        ))
+                    }
+                }
+
                 Toast.makeText(requireContext(), "Riwayat dihapus", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Batal") { dialog, _ ->

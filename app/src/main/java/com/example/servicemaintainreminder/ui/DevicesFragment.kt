@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.servicemaintainreminder.R
@@ -31,6 +32,7 @@ class DevicesFragment : Fragment() {
     private var _binding: FragmentDevicesBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by viewModels()
+    private val args: DevicesFragmentArgs by navArgs()
     private lateinit var adapter: ItemAdapterVertical
     
     private var allItemsList: List<Item> = emptyList()
@@ -70,6 +72,12 @@ class DevicesFragment : Fragment() {
     }
 
     private fun setupFilters() {
+        when (args.filterType) {
+            "Upcoming" -> binding.chipGroupFilters.check(R.id.chipUpcoming)
+            "Overdue" -> binding.chipGroupFilters.check(R.id.chipOverdue)
+            else -> binding.chipGroupFilters.check(R.id.chipAll)
+        }
+
         binding.chipGroupFilters.setOnCheckedChangeListener { _, checkedId ->
             applyFilters(checkedId, binding.searchViewDevices.query?.toString())
         }

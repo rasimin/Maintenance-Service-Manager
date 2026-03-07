@@ -10,6 +10,7 @@ data class Item(
     val name: String,
     val category: String,
     val lastServiceDate: Long,
+    val originalLastServiceDate: Long = 0L,
     val serviceIntervalValue: Int,
     val serviceIntervalUnit: String, // "Days" or "Months"
     val nextServiceDate: Long,
