@@ -1,42 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors -->
-    <color name="brand_primary">#6C4CFF</color>
-    <color name="brand_secondary">#4B3EFF</color>
-    <color name="brand_dark">#2B2E83</color>
+    <!-- Brand Colors (Indigo Modern) -->
+    <color name="brand_primary">#6366F1</color>
+    <color name="brand_secondary">#4F46E5</color>
 
-    <!-- UI Improvements Colors -->
-    <color name="header_start">#5B5BD6</color>
-    <color name="header_end">#7A6FF0</color>
-
-    <!-- Status Badge Colors -->
-    <color name="status_overdue">#E74C3C</color>
-    <color name="status_error">#E74C3C</color>
-    <color name="status_soon">#F5A623</color>
-    <color name="status_warning">#F5A623</color>
-    <color name="status_safe">#2ECC71</color>
-
-    <!-- Icon Colors -->
-    <color name="icon_devices">#4C6FFF</color>
-    <color name="icon_upcoming">#F5A623</color>
-    <color name="icon_history">#2ECC71</color>
-
-    <!-- Category Indicators -->
-    <color name="cat_vehicle">#4C6FFF</color>
-    <color name="cat_electronics">#00B894</color>
-    <color name="cat_appliance">#F39C12</color>
-
-    <!-- UI Colors -->
-    <color name="background">#F8F9FA</color>
+    <!-- UI Surface Colors (Updated to Elegant Matte Blue-Purple) -->
+    <color name="background">#F0F3FF</color>
     <color name="surface">#FFFFFF</color>
-    <color name="on_surface">#1A1C1E</color>
-    <color name="input_bg">#F8F9FB</color>
-    <color name="border_light">#EAEAEA</color>
-    <color name="text_grey">#777777</color>
-    <color name="text_hint">#888888</color>
-    <color name="error">#E74C3C</color>
-
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+
+    <!-- Typography -->
+    <color name="text_primary">#1E1B4B</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_tertiary">#64748B</color>
+    <color name="text_placeholder">#94A3B8</color>
+
+    <!-- Status Colors -->
+    <color name="success">#10B981</color>
+    <color name="warning">#F59E0B</color>
+    <color name="danger">#EF4444</color>
+    <color name="devices_blue">#3B82F6</color>
+
+    <!-- Status & Dash Backgrounds -->
+    <color name="status_safe">#10B981</color>
+    <color name="status_safe_bg">#DCFCE7</color>
+    <color name="status_warning">#F59E0B</color>
+    <color name="status_warning_bg">#FFEDD5</color>
+    <color name="status_error">#EF4444</color>
+    <color name="status_error_bg">#FEE2E2</color>
+
+    <!-- Redundant/Legacy Color Aliases for compatibility -->
+    <color name="danger_bg">#FEE2E2</color>
+    <color name="warning_bg">#FFEDD5</color>
+    <color name="stats_blue_bg">#E0E7FF</color>
+    <color name="stats_orange_bg">#FFEDD5</color>
+    <color name="stats_red_bg">#FEE2E2</color>
+
+    <!-- Header Gradients (Biru Ungu Elegant) -->
+    <color name="header_start">#6366F1</color>
+    <color name="header_end">#8B5CF6</color>
+
+    <!-- Decorative -->
+    <color name="divider">#E2E8F0</color>
+    <color name="border_light">#E2E8F0</color>
+    <color name="glass_white">#26FFFFFF</color>
+    <color name="glass_border">#33FFFFFF</color>
     <color name="transparent">#00000000</color>
+
+    <!-- Compatibility Aliases -->
+    <color name="on_surface">#1E1B4B</color>
+    <color name="text_grey">#475569</color>
+    <color name="input_bg">#FFFFFF</color>
+    <color name="bg_start">#F0F3FF</color>
+    <color name="bg_end">#E0E7FF</color>
 </resources>

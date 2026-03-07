@@ -91,7 +91,6 @@ class HomeFragment : Fragment() {
         viewModel.allItems.value?.let { items ->
             val currentTime = System.currentTimeMillis()
             val oneMonthInMs = 30L * 24 * 60 * 60 * 1000L
-            // Filter only active items for upcoming maintenance list
             val upcoming = items.filter { it.isActive && it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
                 .sortedBy { it.nextServiceDate }
             adapter.submitList(upcoming)
@@ -100,19 +99,14 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.cardMyDevices.setOnClickListener {
-            it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
-                it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).withEndAction {
-                    val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment()
-                    findNavController().navigate(action)
-                }.start()
-            }.start()
+            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment()
+            findNavController().navigate(action)
         }
 
         binding.cardUpcoming.setOnClickListener {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
                 val oneWeekInMs = 7 * 24 * 60 * 60 * 1000L
-                // Filter only active items
                 val urgent = items.filter { 
                     it.isActive && it.nextServiceDate - currentTime in 0..oneWeekInMs 
                 }
@@ -124,7 +118,6 @@ class HomeFragment : Fragment() {
         binding.cardOverdue.setOnClickListener {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
-                // Filter only active items
                 val overdue = items.filter { it.isActive && it.nextServiceDate < currentTime }
                 binding.tvUpcomingHeader.text = "Overdue Items"
                 adapter.submitList(overdue.sortedBy { it.nextServiceDate })
@@ -135,10 +128,14 @@ class HomeFragment : Fragment() {
             binding.tvUpcomingHeader.text = "Upcoming Maintenance"
             loadUpcomingItems()
         }
+
+        binding.fabAddHome.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToAddItemFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun updateDashboard(items: List<com.example.servicemaintainreminder.data.Item>) {
-        // Only count active items for the dashboard counters
         val activeItems = items.filter { it.isActive }
         val total = activeItems.size
         val currentTime = System.currentTimeMillis()

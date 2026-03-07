@@ -1,28 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:animateLayoutChanges="true">
+    android:background="@color/background">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/view_header"
-        app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
+        <include
+            android:id="@+id/header"
+            layout="@layout/view_header" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Filter Section -->
+            <HorizontalScrollView
+                android:id="@+id/hsvFilters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="24dp"
+                android:scrollbars="none"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupFilters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleLine="true"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipAll"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="All" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipUpcoming"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Upcoming" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipOverdue"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Overdue" />
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="24dp"
+                        android:layout_marginHorizontal="8dp"
+                        android:background="@color/divider" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipVehicle"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vehicle" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipElectronics"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Electronics" />
+
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAllDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false"
+                android:paddingBottom="20dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/hsvFilters"
+                tools:listitem="@layout/item_service_list" />
+
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/llEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/hsvFilters">
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    app:tint="@color/divider" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="No devices found for this filter."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Search Bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#E8EAED"
+        android:layout_height="54dp"
+        android:layout_marginHorizontal="24dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="27dp"
+        app:cardElevation="12dp"
+        android:translationZ="12dp"
         app:strokeWidth="0dp"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        app:layout_anchor="@id/appBarLayout"
+        app:layout_anchorGravity="bottom">
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchViewDevices"
@@ -30,63 +155,20 @@
             android:layout_height="match_parent"
             app:iconifiedByDefault="false"
             app:queryBackground="@android:color/transparent"
-            app:submitBackground="@android:color/transparent"
-            app:searchHintIcon="@null"
-            app:searchIcon="@android:drawable/ic_menu_search"
-            app:iconTint="#F5A623"
-            app:queryHint="Search device or maintenance" />
+            app:queryHint="Cari perangkat..."
+            app:searchIcon="@android:drawable/ic_menu_search" />
     </com.google.android.material.card.MaterialCardView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAllDevices"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:clipToPadding="false"
-        android:paddingBottom="100dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
-        tools:listitem="@layout/item_service_list" />
-
-    <LinearLayout
-        android:id="@+id/llEmptyState"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
-        tools:visibility="visible">
-
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@android:drawable/ic_menu_gallery"
-            app:tint="#D1D1D1" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="No devices yet.\nAdd your first maintenance reminder."
-            android:textColor="@color/text_grey"
-            android:textSize="15sp" />
-    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="24dp"
+        android:layout_gravity="bottom|end"
         app:backgroundTint="@color/brand_primary"
         app:srcCompat="@android:drawable/ic_input_add"
         app:tint="@color/white"
-        app:elevation="6dp" />
+        app:elevation="8dp"
+        app:borderWidth="0dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
