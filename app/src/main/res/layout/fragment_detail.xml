@@ -21,6 +21,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollViewDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -315,6 +316,58 @@
                             </LinearLayout>
                         </LinearLayout>
 
+                        <!-- Row 3: Estimated Cost -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:baselineAligned="false">
+
+                            <!-- Estimated Cost -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:padding="4dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Estimated Cost / Svc"
+                                    android:textColor="#8E44AD"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/bg_status_badge"
+                                    android:backgroundTint="#F5EEF8"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="3dp" />
+
+                                <TextView
+                                    android:id="@+id/tvDetailEstimatedCost"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:textColor="#1A1A2E"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    tools:text="Rp 0" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="10dp"
+                                android:layout_height="0dp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:padding="4dp"
+                                android:gravity="end" />
+                        </LinearLayout>
+
                         <!-- Note Row -->
                         <LinearLayout
                             android:id="@+id/llNoteContainer"
@@ -368,21 +421,46 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Maintenance History"
-                    android:textColor="#1A1A2E"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Maintenance History"
+                        android:textColor="#1A1A2E"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
-                <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="← swipe to delete"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddHistory"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="← swipe to delete"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="0dp"
+                    android:text="Add"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    app:backgroundTint="@color/brand_primary"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconSize="14dp"
+                    app:iconTint="@color/white" />
 
             </LinearLayout>
 
@@ -432,18 +510,17 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- FAB Add Maintenance -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabAddHistory"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddHistoryMini"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:layout_gravity="bottom|end"
-        android:text="Add Maintenance"
-        android:textColor="@color/white"
+        android:visibility="invisible"
+        android:src="@android:drawable/ic_input_add"
         app:backgroundTint="@color/brand_primary"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="@color/white"
-        app:elevation="8dp" />
+        app:tint="@color/white"
+        app:elevation="4dp"
+        app:fabSize="mini" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

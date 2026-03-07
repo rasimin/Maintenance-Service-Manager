@@ -15,5 +15,6 @@ data class Item(
     val serviceIntervalUnit: String, // "Days" or "Months"
     val nextServiceDate: Long,
     val note: String = "",
+    val estimatedCost: Double = 0.0,
     val isActive: Boolean = true
 )

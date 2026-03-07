@@ -67,6 +67,10 @@ class AddItemFragment : Fragment() {
                 binding.etIntervalValue.setText(item.serviceIntervalValue.toString())
                 binding.spinnerIntervalUnit.setText(item.serviceIntervalUnit, false)
                 binding.etNote.setText(item.note)
+                binding.switchActive.isChecked = item.isActive
+                val costStr = if (item.estimatedCost > 0) item.estimatedCost.toLong().toString() else ""
+                binding.etEstimatedCost.setText(costStr)
+
                 selectedDate = item.lastServiceDate
                 binding.etLastServiceDate.setText(DateUtil.formatDate(selectedDate))
             }
@@ -108,6 +112,7 @@ class AddItemFragment : Fragment() {
         val intervalValueStr = binding.etIntervalValue.text.toString()
         val intervalUnit = binding.spinnerIntervalUnit.text.toString()
         val note = binding.etNote.text.toString()
+        val costStr = binding.etEstimatedCost.text.toString().trim()
 
         if (name.isEmpty() || category.isEmpty() || intervalValueStr.isEmpty() || intervalUnit.isEmpty()) {
             Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
@@ -116,6 +121,7 @@ class AddItemFragment : Fragment() {
 
         val intervalValue = intervalValueStr.toInt()
         val nextServiceDate = DateUtil.getNextServiceDate(selectedDate, intervalValue, intervalUnit)
+        val estimatedCost = if (costStr.isNotEmpty()) costStr.toDouble() else 0.0
 
         if (isEditMode && itemToEdit != null) {
             val updatedItem = itemToEdit!!.copy(
@@ -125,7 +131,9 @@ class AddItemFragment : Fragment() {
                 serviceIntervalValue = intervalValue,
                 serviceIntervalUnit = intervalUnit,
                 nextServiceDate = nextServiceDate,
-                note = note
+                note = note,
+                estimatedCost = estimatedCost,
+                isActive = binding.switchActive.isChecked
             )
             viewModel.updateItem(updatedItem)
             Toast.makeText(requireContext(), "Item updated successfully", Toast.LENGTH_SHORT).show()
@@ -138,7 +146,9 @@ class AddItemFragment : Fragment() {
                 serviceIntervalValue = intervalValue,
                 serviceIntervalUnit = intervalUnit,
                 nextServiceDate = nextServiceDate,
-                note = note
+                note = note,
+                estimatedCost = estimatedCost,
+                isActive = binding.switchActive.isChecked
             )
             viewModel.insertItem(newItem)
             Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()

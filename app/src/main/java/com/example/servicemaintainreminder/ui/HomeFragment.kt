@@ -10,8 +10,24 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.servicemaintainreminder.R
+import com.example.servicemaintainreminder.data.Item
+import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentHomeBinding
+import com.example.servicemaintainreminder.util.DateUtil
 import com.google.android.gms.ads.AdRequest
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.LinearLayout
+import android.widget.TextView
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.*
+
+data class CostDetail(
+    val itemName: String,
+    val itemCategory: String,
+    val cost: Double,
+    val serviceDate: Long
+)
 
 class HomeFragment : Fragment() {
 
@@ -19,6 +35,8 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by viewModels()
     private lateinit var adapter: ItemAdapter
+    private var allItemsList: List<Item> = emptyList()
+    private var allHistoryList: List<ServiceHistory> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,14 +94,22 @@ class HomeFragment : Fragment() {
 
     private fun setupObservers() {
         binding.progressBar.isVisible = true
+        
         viewModel.allItems.observe(viewLifecycleOwner) { items ->
+            allItemsList = items
             binding.progressBar.isVisible = false
             binding.rvItems.isVisible = true
             updateDashboard(items)
+            updateCostEstimations()
             
             if (binding.tvUpcomingHeader.text == "Upcoming Maintenance") {
                 loadUpcomingItems()
             }
+        }
+
+        viewModel.allHistory.observe(viewLifecycleOwner) { history ->
+            allHistoryList = history
+            updateCostEstimations()
         }
     }
     
@@ -170,6 +196,149 @@ class HomeFragment : Fragment() {
         binding.tvTotalItems.text = total.toString()
         binding.tvUpcomingService.text = upcoming.toString()
         binding.tvOverdueService.text = overdue.toString()
+    }
+
+    private fun updateCostEstimations() {
+        if (allItemsList.isEmpty()) {
+            binding.tvMonth1Cost.text = "-"
+            binding.tvMonth2Cost.text = "-"
+            binding.tvMonth3Cost.text = "-"
+            return
+        }
+
+        // 1. Calculate average cost per item using historical data, fallback to estimatedCost
+        val itemAverageCost = mutableMapOf<Long, Double>()
+        for (item in allItemsList) {
+            val itemHistory = allHistoryList.filter { it.itemId == item.id }
+            val avgCost = if (itemHistory.isNotEmpty()) {
+                itemHistory.sumOf { it.cost } / itemHistory.size 
+            } else {
+                item.estimatedCost
+            }
+            itemAverageCost[item.id] = avgCost
+        }
+
+        // 2. Setup Months
+        val calendar = Calendar.getInstance()
+        val currentMonth = calendar.get(Calendar.MONTH)
+        val currentYear = calendar.get(Calendar.YEAR)
+
+        val months = DoubleArray(3) { 0.0 }
+        val monthNames = Array(3) { "" }
+        val monthFormats = SimpleDateFormat("MMMM", Locale.getDefault())
+        
+        // Hold detail data for popup
+        val monthDetails = Array(3) { mutableListOf<CostDetail>() }
+
+        for (i in 0..2) {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.MONTH, i)
+            monthNames[i] = monthFormats.format(cal.time)
+        }
+
+        // 3. Project future services
+        val activeItems = allItemsList.filter { it.isActive }
+
+        for (item in activeItems) {
+            val avgCost = itemAverageCost[item.id] ?: 0.0
+            if (avgCost == 0.0) continue // Cannot estimate if no history
+
+            var simulatedNextDate = item.nextServiceDate
+            
+            // Loop sequentially into the future
+            var maxLoops = 20
+            while(maxLoops > 0) {
+                maxLoops--
+                val svcCal = Calendar.getInstance()
+                svcCal.timeInMillis = simulatedNextDate
+
+                val svcYear = svcCal.get(Calendar.YEAR)
+                val svcMonth = svcCal.get(Calendar.MONTH)
+
+                // Calculate month difference relative to logic's current month
+                val monthDiff = (svcYear - currentYear) * 12 + (svcMonth - currentMonth)
+
+                if (monthDiff > 2) {
+                    break // Beyond our 3 month window
+                }
+
+                if (monthDiff < 0) {
+                    months[0] += avgCost // Overdue goes to current month
+                    monthDetails[0].add(CostDetail(item.name, item.category, avgCost, simulatedNextDate))
+                } else if (monthDiff <= 2) {
+                    months[monthDiff] += avgCost
+                    monthDetails[monthDiff].add(CostDetail(item.name, item.category, avgCost, simulatedNextDate))
+                }
+
+                simulatedNextDate = DateUtil.getNextServiceDate(simulatedNextDate, item.serviceIntervalValue, item.serviceIntervalUnit)
+            }
+        }
+
+        binding.tvMonth1Name.text = monthNames[0]
+        binding.tvMonth2Name.text = monthNames[1]
+        binding.tvMonth3Name.text = monthNames[2]
+
+        val format = NumberFormat.getInstance(Locale("in", "ID"))
+        val formatCost = { cost: Double ->
+            if (cost == 0.0) "-" else "Rp ${format.format(cost.toLong())}"
+        }
+
+        binding.tvMonth1Cost.text = formatCost(months[0])
+        binding.tvMonth2Cost.text = formatCost(months[1])
+        binding.tvMonth3Cost.text = formatCost(months[2])
+
+        // Add Click Listeners for Pop up
+        binding.cvMonth1.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[0]}", monthDetails[0], months[0]) }
+        binding.cvMonth2.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[1]}", monthDetails[1], months[1]) }
+        binding.cvMonth3.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[2]}", monthDetails[2], months[2]) }
+    }
+
+    private fun showCostDetailDialog(
+        title: String,
+        details: List<CostDetail>,
+        totalCost: Double
+    ) {
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_estimated_cost_detail, null)
+        dialog.setContentView(dialogView)
+
+        val tvTitle = dialogView.findViewById<TextView>(R.id.tvDialogMonthTitle)
+        val tvTotal = dialogView.findViewById<TextView>(R.id.tvDialogTotalCost)
+        val container = dialogView.findViewById<LinearLayout>(R.id.llCostDetailContainer)
+        val btnClose = dialogView.findViewById<View>(R.id.btnDialogClose)
+
+        tvTitle.text = "Estimasi Cost: $title"
+        
+        val format = NumberFormat.getInstance(Locale("in", "ID"))
+        tvTotal.text = "Rp ${format.format(totalCost.toLong())}"
+
+        if (details.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "Tidak ada jadwal servis yang butuh biaya estimasi di bulan ini."
+                textSize = 13f
+                setPadding(0, 16, 0, 16)
+            }
+            container.addView(emptyTv)
+        } else {
+            for (item in details) {
+                val rowView = layoutInflater.inflate(R.layout.item_cost_detail_row, container, false)
+                
+                val tvName = rowView.findViewById<TextView>(R.id.tvDetailItemName)
+                val tvCategory = rowView.findViewById<TextView>(R.id.tvDetailItemCategory)
+                val tvCost = rowView.findViewById<TextView>(R.id.tvDetailItemCost)
+
+                tvName.text = item.itemName
+                
+                val formattedDate = DateUtil.formatDate(item.serviceDate)
+                tvCategory.text = "${item.itemCategory} • $formattedDate"
+                tvCost.text = "Rp ${format.format(item.cost.toLong())}"
+
+                container.addView(rowView)
+            }
+        }
+
+        btnClose.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     private fun loadAds() {

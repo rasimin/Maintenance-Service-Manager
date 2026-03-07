@@ -64,8 +64,20 @@ class DetailFragment : Fragment() {
         }
         binding.header.tvHeaderTitle.text = "Detail"
 
-        binding.fabAddHistory.setOnClickListener {
+        binding.btnAddHistory.setOnClickListener {
             showAddHistoryDialog()
+        }
+        binding.fabAddHistoryMini.setOnClickListener {
+            showAddHistoryDialog()
+        }
+
+        binding.nestedScrollViewDetail.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            // Munculkan Mini FAB jika di-scroll ke bawah lebih dari 400px
+            if (scrollY > 400) {
+                binding.fabAddHistoryMini.show()
+            } else {
+                binding.fabAddHistoryMini.hide()
+            }
         }
 
         binding.swActiveDetail.setOnCheckedChangeListener { _, isChecked ->
@@ -115,6 +127,10 @@ class DetailFragment : Fragment() {
         binding.tvDetailNextService.text = DateUtil.formatDate(item.nextServiceDate)
         binding.tvDetailLastService.text = DateUtil.formatDate(item.lastServiceDate)
         binding.tvDetailInterval.text = "${item.serviceIntervalValue} ${item.serviceIntervalUnit}"
+        
+        val format = NumberFormat.getInstance(Locale("in", "ID"))
+        binding.tvDetailEstimatedCost.text = if (item.estimatedCost > 0) "Rp ${format.format(item.estimatedCost.toLong())}" else "Rp 0"
+        
         binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
 
         // Update switch without triggering listener
