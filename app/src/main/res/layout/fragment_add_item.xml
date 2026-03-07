@@ -8,12 +8,14 @@
 
     <include
         android:id="@+id/header"
-        layout="@layout/view_header"
+        layout="@layout/view_header_back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header">
 
@@ -21,15 +23,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
+            <!-- Form Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -37,108 +43,159 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <!-- Card Title -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item Maintenance Details"
-                        android:textColor="@color/black"
-                        android:textSize="20sp"
+                        android:text="Item Details"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Track and schedule your device maintenance easily."
-                        android:textColor="@color/text_grey"
-                        android:textSize="13sp" />
+                        android:layout_marginTop="2dp"
+                        android:text="Fill in the maintenance information below"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
 
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="20dp"
+                        android:background="@color/divider" />
+
+                    <!-- ── Item Name ── -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilName"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
                         android:hint="Item Name"
-                        app:boxBackgroundColor="@color/input_bg"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="1dp"
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:hintTextColor="@color/brand_primary">
+                        app:boxStrokeColor="@color/input_stroke_color"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="1.5dp"
+                        app:hintTextColor="@color/brand_primary"
+                        app:startIconDrawable="@drawable/ic_input_edit"
+                        app:startIconTint="@color/brand_primary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/black"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_placeholder"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- ── Category ── -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilCategory"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:hint="Category"
-                        app:boxBackgroundColor="@color/input_bg"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="1dp"
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:hintTextColor="@color/brand_primary">
+                        app:boxStrokeColor="@color/input_stroke_color"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="1.5dp"
+                        app:hintTextColor="@color/brand_primary"
+                        app:startIconDrawable="@drawable/ic_input_category"
+                        app:startIconTint="@color/brand_primary">
+
                         <AutoCompleteTextView
                             android:id="@+id/spinnerCategory"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="none"
-                            android:textColor="@color/black"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchActive"
+                    <!-- ── Active Status Switch ── -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Device Active Status"
-                        android:checked="true"
-                        android:textColor="@color/black"
-                        app:useMaterialThemeColors="true" />
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_status_badge"
+                        android:backgroundTint="#F5F7FF"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp">
 
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_lock_idle_charging"
+                            app:tint="@color/brand_primary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:text="Device Active Status"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchActive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            app:thumbTint="@color/white"
+                            app:trackTint="@color/brand_primary"
+                            app:useMaterialThemeColors="false" />
+                    </LinearLayout>
+
+                    <!-- ── Last Service Date ── -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilLastServiceDate"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:hint="Last Service Date"
-                        app:boxBackgroundColor="@color/input_bg"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="1dp"
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:hintTextColor="@color/brand_primary">
+                        app:boxStrokeColor="@color/input_stroke_color"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="1.5dp"
+                        app:hintTextColor="@color/brand_primary"
+                        app:startIconDrawable="@drawable/ic_input_calendar"
+                        app:startIconTint="@color/brand_primary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etLastServiceDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:focusable="false"
                             android:clickable="true"
-                            android:textColor="@color/black"
+                            android:focusable="false"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_placeholder"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- ── Interval + Unit Row ── -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:orientation="horizontal">
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -148,20 +205,24 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="Interval"
-                            app:boxBackgroundColor="@color/input_bg"
-                            app:boxStrokeWidth="0dp"
-                            app:boxStrokeWidthFocused="1dp"
                             app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
                             app:boxCornerRadiusTopEnd="12dp"
                             app:boxCornerRadiusTopStart="12dp"
-                            app:hintTextColor="@color/brand_primary">
+                            app:boxStrokeColor="@color/input_stroke_color"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="1.5dp"
+                            app:hintTextColor="@color/brand_primary"
+                            app:startIconDrawable="@drawable/ic_input_info"
+                            app:startIconTint="@color/brand_primary">
+
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etIntervalValue"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number"
-                                android:textColor="@color/black"
+                                android:textColor="@color/text_primary"
+                                android:textColorHint="@color/text_placeholder"
                                 android:textSize="14sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -173,66 +234,76 @@
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
                             android:hint="Unit"
-                            app:boxBackgroundColor="@color/input_bg"
-                            app:boxStrokeWidth="0dp"
-                            app:boxStrokeWidthFocused="1dp"
                             app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
                             app:boxCornerRadiusTopEnd="12dp"
                             app:boxCornerRadiusTopStart="12dp"
+                            app:boxStrokeColor="@color/input_stroke_color"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="1.5dp"
                             app:hintTextColor="@color/brand_primary">
+
                             <AutoCompleteTextView
                                 android:id="@+id/spinnerIntervalUnit"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="none"
-                                android:textColor="@color/black"
+                                android:textColor="@color/text_primary"
                                 android:textSize="14sp" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
+                    <!-- ── Note ── -->
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="14dp"
                         android:hint="Note (Optional)"
-                        app:boxBackgroundColor="@color/input_bg"
-                        app:boxStrokeWidth="0dp"
-                        app:boxStrokeWidthFocused="1dp"
                         app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:hintTextColor="@color/brand_primary">
+                        app:boxStrokeColor="@color/input_stroke_color"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="1.5dp"
+                        app:hintTextColor="@color/brand_primary"
+                        app:startIconDrawable="@drawable/ic_input_edit"
+                        app:startIconTint="@color/brand_primary">
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etNote"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="top"
-                            android:minLines="4"
-                            android:hint="Optional notes..."
-                            android:textColor="@color/black"
+                            android:minLines="3"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_placeholder"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <Button
+                    <!-- ── Save Button ── -->
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSave"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="32dp"
+                        android:layout_marginTop="28dp"
                         android:text="Save Item"
                         android:textAllCaps="false"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold"
-                        app:cornerRadius="14dp"
-                        android:backgroundTint="@color/brand_primary"
                         android:textColor="@color/white"
-                        android:elevation="4dp" />
+                        app:backgroundTint="@color/brand_primary"
+                        app:cornerRadius="14dp"
+                        app:icon="@android:drawable/ic_menu_save"
+                        app:iconTint="@color/white"
+                        app:iconGravity="textStart"
+                        app:elevation="4dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

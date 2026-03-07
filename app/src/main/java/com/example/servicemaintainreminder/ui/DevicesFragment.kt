@@ -52,7 +52,13 @@ class DevicesFragment : Fragment() {
         setupObservers()
         setupFilters()
         setupSwipeToDelete()
-        
+
+        // Setup header back button & title
+        binding.ivBackButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        binding.tvHeaderTitle.text = "My Devices"
+
         binding.fabAddDevice.setOnClickListener {
             findNavController().navigate(R.id.action_devicesFragment_to_addItemFragment)
         }
@@ -67,29 +73,23 @@ class DevicesFragment : Fragment() {
     private fun applyFilters(checkedChipId: Int, searchQuery: String?) {
         var filteredList = allItemsList
 
-        // 1. Filter by Status/Category Chip
+        // 1. Filter by Status Chip
         filteredList = when (checkedChipId) {
-            R.id.chipUpcoming -> filteredList.filter { 
+            R.id.chipUpcoming -> filteredList.filter {
                 val diff = it.nextServiceDate - System.currentTimeMillis()
                 it.isActive && diff in 0..(7 * 24 * 60 * 60 * 1000L) // Next 7 days
             }
-            R.id.chipOverdue -> filteredList.filter { 
-                it.isActive && it.nextServiceDate < System.currentTimeMillis() 
-            }
-            R.id.chipVehicle -> filteredList.filter { 
-                it.category.lowercase().contains("veh") || it.category.lowercase().contains("ken") 
-            }
-            R.id.chipElectronics -> filteredList.filter { 
-                it.category.lowercase().contains("ele") 
+            R.id.chipOverdue -> filteredList.filter {
+                it.isActive && it.nextServiceDate < System.currentTimeMillis()
             }
             else -> filteredList // All
         }
 
         // 2. Filter by Search Query
         if (!searchQuery.isNullOrEmpty()) {
-            filteredList = filteredList.filter { 
-                it.name.contains(searchQuery, ignoreCase = true) || 
-                it.category.contains(searchQuery, ignoreCase = true) 
+            filteredList = filteredList.filter {
+                it.name.contains(searchQuery, ignoreCase = true) ||
+                it.category.contains(searchQuery, ignoreCase = true)
             }
         }
 

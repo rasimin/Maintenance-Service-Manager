@@ -40,9 +40,6 @@ class ItemAdapterVertical(
             binding.tvCategory.text = item.category
             binding.tvNextServiceDate.text = DateUtil.formatDate(item.nextServiceDate)
 
-            // Update Active/Inactive Status Label
-            binding.tvActiveStatus.text = if (item.isActive) "Active" else "Inactive"
-
             // Set Category Icon
             val iconRes = when (item.category.lowercase()) {
                 "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
@@ -59,52 +56,66 @@ class ItemAdapterVertical(
                 // ACTIVE STATE STYLING
                 binding.root.alpha = 1.0f
                 binding.ivItemIcon.alpha = 1.0f
-                binding.tvItemName.setTextColor(Color.parseColor("#222222"))
-                binding.tvCategory.setTextColor(Color.parseColor("#777777"))
-                binding.tvActiveStatus.setTextColor(Color.parseColor("#2ECC71"))
-                
-                // Update Status Badge and Text Color based on date
+                binding.tvItemName.setTextColor(Color.parseColor("#1A1A2E"))
+                binding.tvCategory.setTextColor(Color.parseColor("#8A8A9A"))
+                binding.tvNextServiceDate.setTextColor(
+                    ContextCompat.getColor(binding.root.context, R.color.brand_primary)
+                )
+
+                // Update accent bar color and status badge based on urgency
                 when {
                     daysDiff < 0 -> {
+                        // Overdue - red accent
+                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#E74C3C"))
                         binding.tvStatus.text = "Overdue"
-                        binding.tvStatus.setTextColor(ContextCompat.getColor(binding.root.context, R.color.status_error))
-                        binding.flStatusHeader.setBackgroundColor(Color.parseColor("#1AE74C3C")) // Soft red
+                        binding.tvStatus.setTextColor(
+                            ContextCompat.getColor(binding.root.context, R.color.status_error)
+                        )
+                        binding.tvStatus.backgroundTintList =
+                            ContextCompat.getColorStateList(binding.root.context, R.color.stats_red_bg)
                     }
-                    daysDiff <= 3 -> {
-                        binding.tvStatus.text = if (daysDiff == 0) "Today" else "$daysDiff days left"
-                        binding.tvStatus.setTextColor(ContextCompat.getColor(binding.root.context, R.color.status_warning))
-                        binding.flStatusHeader.setBackgroundColor(Color.parseColor("#1AF5A623")) // Soft orange
+                    daysDiff <= 7 -> {
+                        // Urgent - orange accent
+                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#F5A623"))
+                        binding.tvStatus.text = if (daysDiff == 0) "Today!" else "$daysDiff days left"
+                        binding.tvStatus.setTextColor(
+                            ContextCompat.getColor(binding.root.context, R.color.status_warning)
+                        )
+                        binding.tvStatus.backgroundTintList =
+                            ContextCompat.getColorStateList(binding.root.context, R.color.stats_orange_bg)
                     }
                     else -> {
+                        // Safe - green accent
+                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#2ECC71"))
                         binding.tvStatus.text = "$daysDiff days left"
-                        binding.tvStatus.setTextColor(ContextCompat.getColor(binding.root.context, R.color.status_safe))
-                        binding.flStatusHeader.setBackgroundColor(Color.parseColor("#1A2ECC71")) // Soft green
+                        binding.tvStatus.setTextColor(
+                            ContextCompat.getColor(binding.root.context, R.color.status_safe)
+                        )
+                        binding.tvStatus.backgroundTintList =
+                            ContextCompat.getColorStateList(binding.root.context, R.color.status_safe_bg)
                     }
                 }
-                
+
                 binding.btnAddRecord.isEnabled = true
                 binding.btnAddRecord.alpha = 1.0f
             } else {
                 // INACTIVE STATE STYLING (Grayed out)
-                binding.root.alpha = 0.8f
+                binding.root.alpha = 0.75f
                 binding.ivItemIcon.alpha = 0.5f
-                
-                // Gray colors
-                val grayText = Color.parseColor("#9E9E9E")
-                val lightGrayBg = Color.parseColor("#F5F5F5")
-                
+
+                val grayText = Color.parseColor("#AAAABC")
                 binding.tvItemName.setTextColor(grayText)
                 binding.tvCategory.setTextColor(grayText)
-                binding.tvActiveStatus.setTextColor(grayText)
-                binding.tvStatus.setTextColor(grayText)
                 binding.tvNextServiceDate.setTextColor(grayText)
-                
-                binding.tvStatus.text = "Disabled"
-                binding.flStatusHeader.setBackgroundColor(lightGrayBg)
-                
-                // Disable record button for inactive items
+                binding.viewAccentBar.setBackgroundColor(Color.parseColor("#CCCCCC"))
+
+                binding.tvStatus.text = "Inactive"
+                binding.tvStatus.setTextColor(grayText)
+                binding.tvStatus.backgroundTintList =
+                    ContextCompat.getColorStateList(binding.root.context, R.color.divider)
+
                 binding.btnAddRecord.isEnabled = false
-                binding.btnAddRecord.alpha = 0.5f
+                binding.btnAddRecord.alpha = 0.4f
             }
 
             binding.btnEdit.setOnClickListener {
@@ -115,7 +126,7 @@ class ItemAdapterVertical(
                 onAddRecordClick(item)
             }
 
-            binding.root.setOnClickListener { 
+            binding.root.setOnClickListener {
                 it.animate().scaleX(0.98f).scaleY(0.98f).setDuration(100).withEndAction {
                     it.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).withEndAction {
                         onItemClick(item)

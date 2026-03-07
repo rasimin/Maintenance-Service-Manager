@@ -2,140 +2,133 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="260dp"
+    android:layout_width="210dp"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="12dp"
+    android:layout_marginVertical="8dp"
     android:layout_marginHorizontal="8dp"
     app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="28dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/divider"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#DDE1FF"
     app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <!-- Status Badge -->
-        <TextView
-            android:id="@+id/tvStatusLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_status_badge"
-            android:backgroundTint="@color/status_safe_bg"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:text="Aman"
-            android:textColor="@color/status_safe"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Circular Icon Background -->
+        <!-- Colored top accent strip: merah/oranye/hijau sesuai status -->
         <View
-            android:id="@+id/viewIconBg"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_circle_indicator"
-            android:backgroundTint="@color/stats_blue_bg"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/viewTopAccent"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@color/status_safe" />
 
-        <ImageView
-            android:id="@+id/ivItemIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_devices"
-            app:layout_constraintBottom_toBottomOf="@id/viewIconBg"
-            app:layout_constraintEnd_toEndOf="@id/viewIconBg"
-            app:layout_constraintStart_toStartOf="@id/viewIconBg"
-            app:layout_constraintTop_toTopOf="@id/viewIconBg"
-            app:tint="@color/brand_primary" />
-
-        <!-- Device Info -->
-        <TextView
-            android:id="@+id/tvItemName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/viewIconBg"
-            tools:text="MacBook Pro M2" />
-
-        <TextView
-            android:id="@+id/tvServiceType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvItemName"
-            tools:text="Elektronik" />
-
-        <!-- Date Info -->
         <LinearLayout
-            android:id="@+id/llDateInfo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toStartOf="@+id/tvProgressPercent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvServiceType">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_upcoming"
-                app:tint="@color/text_tertiary" />
-
-            <TextView
-                android:id="@+id/tvNextDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:textColor="@color/text_tertiary"
-                android:textSize="11sp"
-                tools:text="Servis: 20 Des 2025" />
-        </LinearLayout>
-
-        <!-- Progress Percentage Text -->
-        <TextView
-            android:id="@+id/tvProgressPercent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/llDateInfo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/llDateInfo"
-            tools:text="70%" />
-
-        <!-- Modern Progress Bar -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progressMaintenance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:progress="70"
-            app:indicatorColor="@color/brand_primary"
-            app:layout_constraintTop_toBottomOf="@id/llDateInfo"
-            app:trackColor="@color/divider"
-            app:trackCornerRadius="4dp"
-            app:trackThickness="6dp" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Header: icon + days left badge -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Icon circle -->
+                <FrameLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_circle_indicator"
+                    android:backgroundTint="@color/white">
+
+                    <ImageView
+                        android:id="@+id/ivItemIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_devices"
+                        app:tint="@color/brand_primary" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Days Left badge — background solid agar tidak transparan -->
+                <TextView
+                    android:id="@+id/tvStatusLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_status_badge"
+                    android:backgroundTint="@color/status_safe_bg"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    android:text="-- days"
+                    android:textColor="@color/status_safe"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    tools:ignore="SmallSp" />
+            </LinearLayout>
+
+            <!-- Device name -->
+            <TextView
+                android:id="@+id/tvItemName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="AC Ruang Tamu" />
+
+            <!-- Category -->
+            <TextView
+                android:id="@+id/tvServiceType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                tools:text="Elektronik" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                android:background="#EAECf8" />
+
+            <!-- Date row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_upcoming"
+                    app:tint="@color/brand_primary" />
+
+                <TextView
+                    android:id="@+id/tvNextDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="10sp"
+                    tools:text="06 Apr 2026" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

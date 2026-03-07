@@ -13,9 +13,70 @@
         android:background="@android:color/transparent"
         app:elevation="0dp">
 
-        <include
-            android:id="@+id/header"
-            layout="@layout/view_header" />
+        <!-- Gradient Header with Back + Title + Search integrated -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_gradient"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="20dp">
+
+            <!-- Row 1: Back Button + Title -->
+            <ImageView
+                android:id="@+id/ivBackButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle_indicator"
+                android:backgroundTint="@color/glass_white"
+                android:padding="10dp"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="My Devices"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginHorizontal="8dp"
+                app:layout_constraintStart_toEndOf="@id/ivBackButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/ivBackButton"
+                app:layout_constraintBottom_toBottomOf="@id/ivBackButton" />
+
+            <!-- Row 2: Search Bar embedded in header -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchCard"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/glass_white"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/glass_border"
+                app:strokeWidth="1dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ivBackButton">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/searchViewDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:iconifiedByDefault="false"
+                    app:queryBackground="@android:color/transparent"
+                    app:queryHint="Cari perangkat..."
+                    app:searchIcon="@android:drawable/ic_menu_search" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -30,14 +91,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Filter Section -->
+            <!-- Filter Chips -->
             <HorizontalScrollView
                 android:id="@+id/hsvFilters"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="16dp"
                 android:clipToPadding="false"
-                android:paddingHorizontal="24dp"
+                android:paddingHorizontal="16dp"
                 android:scrollbars="none"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -71,26 +132,6 @@
                         android:layout_height="wrap_content"
                         android:text="Overdue" />
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="24dp"
-                        android:layout_marginHorizontal="8dp"
-                        android:background="@color/divider" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipVehicle"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vehicle" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipElectronics"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Electronics" />
-
                 </com.google.android.material.chip.ChipGroup>
             </HorizontalScrollView>
 
@@ -98,7 +139,7 @@
                 android:id="@+id/rvAllDevices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
                 android:paddingBottom="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -117,47 +158,25 @@
                 app:layout_constraintTop_toBottomOf="@id/hsvFilters">
 
                 <ImageView
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:src="@android:drawable/ic_menu_gallery"
-                    app:tint="@color/divider" />
+                    android:alpha="0.4"
+                    app:tint="@color/brand_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:text="No devices found for this filter."
+                    android:text="No devices found"
                     android:textColor="@color/text_secondary"
                     android:textSize="15sp" />
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Search Bar -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/searchCard"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:layout_marginHorizontal="24dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="27dp"
-        app:cardElevation="12dp"
-        android:translationZ="12dp"
-        app:strokeWidth="0dp"
-        app:layout_anchor="@id/appBarLayout"
-        app:layout_anchorGravity="bottom">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewDevices"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:iconifiedByDefault="false"
-            app:queryBackground="@android:color/transparent"
-            app:queryHint="Cari perangkat..."
-            app:searchIcon="@android:drawable/ic_menu_search" />
-    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDevice"

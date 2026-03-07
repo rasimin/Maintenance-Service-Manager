@@ -2,7 +2,9 @@ package com.example.servicemaintainreminder.ui
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.servicemaintainreminder.R
 import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
@@ -50,8 +54,15 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        setupSwipeToDelete()
         loadInterstitialAd()
         observeItem()
+
+        // Setup header back button & title
+        binding.header.ivBackButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        binding.header.tvHeaderTitle.text = "Detail"
 
         binding.fabAddHistory.setOnClickListener {
             showAddHistoryDialog()
@@ -65,7 +76,6 @@ class DetailFragment : Fragment() {
                     Toast.makeText(requireContext(), "Device status updated", Toast.LENGTH_SHORT).show()
                 }
             }
-            updateActiveLabel(isChecked)
         }
 
         binding.btnEditDetail.setOnClickListener {
@@ -101,41 +111,44 @@ class DetailFragment : Fragment() {
 
     private fun bindItemDetails(item: Item) {
         binding.tvDetailName.text = item.name
-        binding.tvDetailCategory.text = "Category: ${item.category}"
+        binding.tvDetailCategory.text = item.category
         binding.tvDetailNextService.text = DateUtil.formatDate(item.nextServiceDate)
         binding.tvDetailLastService.text = DateUtil.formatDate(item.lastServiceDate)
         binding.tvDetailInterval.text = "${item.serviceIntervalValue} ${item.serviceIntervalUnit}"
         binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
-        binding.swActiveDetail.isChecked = item.isActive
-        updateActiveLabel(item.isActive)
-        
-        updateStatusIndicator(item.nextServiceDate)
-    }
 
-    private fun updateActiveLabel(isActive: Boolean) {
-        binding.tvActiveLabel.text = if (isActive) "Active" else "Inactive"
+        // Update switch without triggering listener
+        binding.swActiveDetail.setOnCheckedChangeListener(null)
+        binding.swActiveDetail.isChecked = item.isActive
+        binding.swActiveDetail.setOnCheckedChangeListener { _, isChecked ->
+            if (item.isActive != isChecked) {
+                viewModel.updateItem(item.copy(isActive = isChecked))
+                Toast.makeText(requireContext(), "Device status updated", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        updateStatusIndicator(item.nextServiceDate)
     }
 
     private fun updateStatusIndicator(nextDate: Long) {
         val currentTime = System.currentTimeMillis()
-        val timeDiff = nextDate - currentTime
-        val daysDiff = timeDiff / (24 * 60 * 60 * 1000)
+        val daysDiff = (nextDate - currentTime) / (24 * 60 * 60 * 1000)
 
         when {
             daysDiff < 0 -> {
                 binding.tvStatusIndicator.text = "❗ Overdue"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_error))
-                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AE74C3C")) // Soft red
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AE74C3C"))
             }
             daysDiff <= 7 -> {
                 binding.tvStatusIndicator.text = "⚠ Maintenance Soon"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_warning))
-                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AF5A623")) // Soft orange
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AF5A623"))
             }
             else -> {
                 binding.tvStatusIndicator.text = "✅ Scheduled"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_safe))
-                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1A2ECC71")) // Soft green
+                binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1A2ECC71"))
             }
         }
     }
@@ -143,12 +156,10 @@ class DetailFragment : Fragment() {
     private fun observeHistory(itemId: Long) {
         viewModel.getHistory(itemId).observe(viewLifecycleOwner) { history ->
             historyAdapter.submitList(history)
-            
-            // Toggle empty state visibility
+
             binding.llEmptyHistory.isVisible = history.isEmpty()
             binding.rvHistory.isVisible = history.isNotEmpty()
-            
-            // Calculate and display total cost
+
             val totalCost = history.sumOf { it.cost }
             val format = NumberFormat.getInstance(Locale("in", "ID"))
             binding.tvDetailTotalCost.text = "Rp ${format.format(totalCost.toLong())}"
@@ -160,38 +171,110 @@ class DetailFragment : Fragment() {
         binding.rvHistory.adapter = historyAdapter
     }
 
+    // ── Swipe to Delete ──────────────────────────────────────────────────────
+    private fun setupSwipeToDelete() {
+        val deleteBackground = ColorDrawable(Color.parseColor("#E74C3C"))
+        val deleteIcon = ContextCompat.getDrawable(requireContext(), android.R.drawable.ic_menu_delete)
+        val iconMarginDp = (24 * resources.displayMetrics.density).toInt()
+
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
+            override fun onMove(
+                rv: RecyclerView,
+                vh: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val history = historyAdapter.currentList[position]
+                showDeleteConfirmDialog(history, position)
+            }
+
+            override fun onChildDraw(
+                c: Canvas, rv: RecyclerView, vh: RecyclerView.ViewHolder,
+                dX: Float, dY: Float, actionState: Int, isActive: Boolean
+            ) {
+                val itemView = vh.itemView
+                val itemHeight = itemView.bottom - itemView.top
+
+                if (dX > 0) {
+                    // Red background
+                    deleteBackground.setBounds(
+                        itemView.left, itemView.top,
+                        itemView.left + dX.toInt(), itemView.bottom
+                    )
+                    deleteBackground.draw(c)
+
+                    // Trash icon
+                    deleteIcon?.let { icon ->
+                        val iconHeight = icon.intrinsicHeight
+                        val iconWidth = icon.intrinsicWidth
+                        val iconTop = itemView.top + (itemHeight - iconHeight) / 2
+                        val iconBottom = iconTop + iconHeight
+                        val iconLeft = itemView.left + iconMarginDp
+                        val iconRight = iconLeft + iconWidth
+                        icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        icon.setTint(Color.WHITE)
+                        icon.draw(c)
+                    }
+                }
+                super.onChildDraw(c, rv, vh, dX, dY, actionState, isActive)
+            }
+        }
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.rvHistory)
+    }
+
+    private fun showDeleteConfirmDialog(history: ServiceHistory, position: Int) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("🗑 Hapus Riwayat")
+            .setMessage("Yakin ingin menghapus catatan servis ini?\n\n\"${history.description}\"")
+            .setPositiveButton("Ya, Hapus") { _, _ ->
+                viewModel.deleteHistory(history)
+                Toast.makeText(requireContext(), "Riwayat dihapus", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                historyAdapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    // ── Add History Dialog ───────────────────────────────────────────────────
     private fun showAddHistoryDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_history, null)
         val etDesc = dialogView.findViewById<EditText>(R.id.etHistoryDesc)
         val etCost = dialogView.findViewById<EditText>(R.id.etHistoryCost)
         val etDate = dialogView.findViewById<EditText>(R.id.etHistoryDate)
-        
+
         selectedHistoryDate = System.currentTimeMillis()
         etDate.setText(DateUtil.formatDate(selectedHistoryDate))
-        
+
         etDate.setOnClickListener {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = selectedHistoryDate
-            
             DatePickerDialog(requireContext(), { _, year, month, dayOfMonth ->
-                val selectedCalendar = Calendar.getInstance()
-                selectedCalendar.set(year, month, dayOfMonth)
-                selectedHistoryDate = selectedCalendar.timeInMillis
+                val selected = Calendar.getInstance()
+                selected.set(year, month, dayOfMonth)
+                selectedHistoryDate = selected.timeInMillis
                 etDate.setText(DateUtil.formatDate(selectedHistoryDate))
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Add Maintenance Record")
+            .setTitle("Tambah Catatan Servis")
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("Simpan") { _, _ ->
                 val desc = etDesc.text.toString()
                 val costStr = etCost.text.toString()
                 if (desc.isNotEmpty() && costStr.isNotEmpty()) {
                     saveHistory(desc, costStr.toDouble(), selectedHistoryDate)
+                } else {
+                    Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Batal", null)
             .show()
     }
 
@@ -203,24 +286,16 @@ class DetailFragment : Fragment() {
             cost = cost
         )
         viewModel.addHistory(history)
-        
+
         currentItem?.let { item ->
             if (date >= item.lastServiceDate) {
-                val nextDate = DateUtil.getNextServiceDate(
-                    date,
-                    item.serviceIntervalValue,
-                    item.serviceIntervalUnit
-                )
-                val updatedItem = item.copy(
-                    lastServiceDate = date,
-                    nextServiceDate = nextDate
-                )
-                viewModel.updateItem(updatedItem)
+                val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
+                viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
             }
         }
-        
-        Toast.makeText(requireContext(), "Record added", Toast.LENGTH_SHORT).show()
-        
+
+        Toast.makeText(requireContext(), "Catatan servis disimpan ✓", Toast.LENGTH_SHORT).show()
+
         mInterstitialAd?.show(requireActivity())
         loadInterstitialAd()
     }

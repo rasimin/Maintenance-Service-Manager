@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.ItemHistoryBinding
-import com.example.servicemaintainreminder.util.DateUtil
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
-class HistoryAdapter : ListAdapter<ServiceHistory, HistoryAdapter.HistoryViewHolder>(DiffCallback) {
+class HistoryAdapter(
+    private val onDeleteClick: (ServiceHistory) -> Unit = {}
+) : ListAdapter<ServiceHistory, HistoryAdapter.HistoryViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         return HistoryViewHolder(
@@ -29,10 +31,20 @@ class HistoryAdapter : ListAdapter<ServiceHistory, HistoryAdapter.HistoryViewHol
 
     inner class HistoryViewHolder(private val binding: ItemHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(history: ServiceHistory) {
-            binding.tvHistoryDate.text = DateUtil.formatDate(history.serviceDate)
+            // Format day and month separately for the badge
+            val dateObj = Date(history.serviceDate)
+            val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
+            val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
+            binding.tvHistoryDay.text = dayFormat.format(dateObj)
+            binding.tvHistoryMonth.text = monthFormat.format(dateObj).uppercase()
+
+            // Full date stored in hidden view (used by swipe helper if needed)
+            binding.tvHistoryDate.text = android.text.format.DateFormat.format("dd MMM yyyy", dateObj)
+
             binding.tvHistoryDescription.text = history.description
-            
+
             val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
             binding.tvHistoryCost.text = format.format(history.cost)
         }

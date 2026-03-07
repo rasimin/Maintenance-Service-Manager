@@ -40,4 +40,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun addHistory(history: ServiceHistory) = viewModelScope.launch {
         repository.insertHistory(history)
     }
+
+    fun deleteHistory(history: ServiceHistory) = viewModelScope.launch {
+        repository.deleteHistory(history)
+    }
 }

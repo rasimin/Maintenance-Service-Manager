@@ -41,6 +41,13 @@ class AddItemFragment : Fragment() {
         setupDatePicker()
 
         isEditMode = args.itemId != -1L
+
+        // Setup header back button & title
+        binding.header.ivBackButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+        binding.header.tvHeaderTitle.text = if (isEditMode) "Edit Item" else "Add Item"
+
         if (isEditMode) {
             setupEditMode()
         }
