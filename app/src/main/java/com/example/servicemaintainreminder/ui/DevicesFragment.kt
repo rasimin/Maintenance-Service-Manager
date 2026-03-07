@@ -35,6 +35,11 @@ class DevicesFragment : Fragment() {
     
     private var allItemsList: List<Item> = emptyList()
     private var selectedHistoryDate: Long = System.currentTimeMillis()
+    private var currentSortMode = SortMode.NAME_ASC
+
+    enum class SortMode {
+        NAME_ASC, DATE_ASC, DATE_DESC
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,6 +73,29 @@ class DevicesFragment : Fragment() {
         binding.chipGroupFilters.setOnCheckedChangeListener { _, checkedId ->
             applyFilters(checkedId, binding.searchViewDevices.query?.toString())
         }
+
+        binding.btnSort.setOnClickListener {
+            val options = arrayOf("Name (A-Z)", "Closest Service Date", "Furthest Service Date")
+            val checkedItem = when (currentSortMode) {
+                SortMode.NAME_ASC -> 0
+                SortMode.DATE_ASC -> 1
+                SortMode.DATE_DESC -> 2
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Sort by")
+                .setSingleChoiceItems(options, checkedItem) { dialog, which ->
+                    currentSortMode = when (which) {
+                        0 -> SortMode.NAME_ASC
+                        1 -> SortMode.DATE_ASC
+                        2 -> SortMode.DATE_DESC
+                        else -> SortMode.NAME_ASC
+                    }
+                    applyFilters(binding.chipGroupFilters.checkedChipId, binding.searchViewDevices.query?.toString())
+                    dialog.dismiss()
+                }
+                .show()
+        }
     }
 
     private fun applyFilters(checkedChipId: Int, searchQuery: String?) {
@@ -93,8 +121,15 @@ class DevicesFragment : Fragment() {
             }
         }
 
-        adapter.submitList(filteredList.sortedBy { it.name })
-        binding.llEmptyState.isVisible = filteredList.isEmpty()
+        // 3. Apply Current Sort
+        val finalSortedList = when (currentSortMode) {
+            SortMode.NAME_ASC -> filteredList.sortedBy { it.name.lowercase(Locale.getDefault()) }
+            SortMode.DATE_ASC -> filteredList.sortedBy { it.nextServiceDate }
+            SortMode.DATE_DESC -> filteredList.sortedByDescending { it.nextServiceDate }
+        }
+
+        adapter.submitList(finalSortedList)
+        binding.llEmptyState.isVisible = finalSortedList.isEmpty()
     }
 
     private fun setupObservers() {

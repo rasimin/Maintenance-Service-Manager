@@ -268,7 +268,7 @@
                         app:boxStrokeWidth="1dp"
                         app:boxStrokeWidthFocused="1.5dp"
                         app:hintTextColor="@color/brand_primary"
-                        app:startIconDrawable="@drawable/ic_input_edit"
+                        app:startIconDrawable="@drawable/ic_input_note"
                         app:startIconTint="@color/brand_primary">
 
                         <com.google.android.material.textfield.TextInputEditText

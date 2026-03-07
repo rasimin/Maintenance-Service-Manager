@@ -45,7 +45,7 @@
                 android:textStyle="bold"
                 android:gravity="center"
                 android:layout_marginHorizontal="8dp"
-                app:layout_constraintStart_toEndOf="@id/ivBackButton"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/ivBackButton"
                 app:layout_constraintBottom_toBottomOf="@id/ivBackButton" />
@@ -56,11 +56,10 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/glass_white"
+                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/glass_border"
-                app:strokeWidth="1dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ivBackButton">
@@ -72,7 +71,8 @@
                     app:iconifiedByDefault="false"
                     app:queryBackground="@android:color/transparent"
                     app:queryHint="Cari perangkat..."
-                    app:searchIcon="@android:drawable/ic_menu_search" />
+                    app:searchHintIcon="@null"
+                    app:searchIcon="@drawable/ic_search_clean" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -91,49 +91,84 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Filter Chips -->
-            <HorizontalScrollView
-                android:id="@+id/hsvFilters"
+            <!-- Filter Chips & Sort -->
+            <LinearLayout
+                android:id="@+id/llFiltersAndSort"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:clipToPadding="false"
                 android:paddingHorizontal="16dp"
-                android:scrollbars="none"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupFilters"
-                    android:layout_width="wrap_content"
+                <HorizontalScrollView
+                    android:id="@+id/hsvFilters"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:singleLine="true"
-                    app:singleSelection="true"
-                    app:selectionRequired="true">
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:scrollbars="none">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipAll"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupFilters"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="All" />
+                        app:singleLine="true"
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipUpcoming"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Upcoming" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipAll"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="All" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipOverdue"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Overdue" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipUpcoming"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Upcoming" />
 
-                </com.google.android.material.chip.ChipGroup>
-            </HorizontalScrollView>
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipOverdue"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Overdue" />
+
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="24dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="@color/divider" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSort"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="12dp"
+                    android:text="Sort"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_menu_sort_by_size"
+                    app:iconTint="@color/brand_primary"
+                    app:iconSize="16dp"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp" />
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAllDevices"
@@ -143,7 +178,7 @@
                 android:clipToPadding="false"
                 android:paddingBottom="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/hsvFilters"
+                app:layout_constraintTop_toBottomOf="@id/llFiltersAndSort"
                 tools:listitem="@layout/item_service_list" />
 
             <!-- Empty State -->
@@ -155,7 +190,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/hsvFilters">
+                app:layout_constraintTop_toBottomOf="@id/llFiltersAndSort">
 
                 <ImageView
                     android:layout_width="120dp"

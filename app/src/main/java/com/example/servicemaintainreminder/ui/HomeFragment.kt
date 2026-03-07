@@ -93,6 +93,7 @@ class HomeFragment : Fragment() {
             val oneMonthInMs = 30L * 24 * 60 * 60 * 1000L
             val upcoming = items.filter { it.isActive && it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
                 .sortedBy { it.nextServiceDate }
+                .take(10) // Maksimal muncul 10 card
             adapter.submitList(upcoming)
         }
     }
@@ -124,10 +125,27 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Pindah ke halaman My Devices
         binding.tvViewAll.setOnClickListener {
-            binding.tvUpcomingHeader.text = "Upcoming Maintenance"
-            loadUpcomingItems()
+            val action = HomeFragmentDirections.actionHomeFragmentToDevicesFragment()
+            findNavController().navigate(action)
         }
+
+        // Highlight View All ketika mentok scroll ke kanan
+        binding.rvItems.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                // Cek jika tidak bisa scroll ke kanan lagi (mentok) dan scroll berhenti
+                if (!recyclerView.canScrollHorizontally(1) && newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE) {
+                    binding.tvViewAll.animate()
+                        .scaleX(1.3f).scaleY(1.3f)
+                        .setDuration(150)
+                        .withEndAction {
+                            binding.tvViewAll.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start()
+                        }.start()
+                }
+            }
+        })
 
         binding.fabAddHome.setOnClickListener {
             val action = HomeFragmentDirections.actionHomeFragmentToAddItemFragment()

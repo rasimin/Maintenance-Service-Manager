@@ -329,7 +329,8 @@
             app:iconifiedByDefault="false"
             app:queryBackground="@android:color/transparent"
             app:queryHint="Cari perangkat..."
-            app:searchIcon="@android:drawable/ic_menu_search" />
+            app:searchHintIcon="@null"
+            app:searchIcon="@drawable/ic_search_clean" />
     </com.google.android.material.card.MaterialCardView>
 
     <!-- FAB -->

@@ -1,5 +1,6 @@
 package com.example.servicemaintainreminder.ui
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -66,7 +67,7 @@ class ItemAdapterVertical(
                 when {
                     daysDiff < 0 -> {
                         // Overdue - red accent
-                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#E74C3C"))
+                        binding.viewAccentBar.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E74C3C"))
                         binding.tvStatus.text = "Overdue"
                         binding.tvStatus.setTextColor(
                             ContextCompat.getColor(binding.root.context, R.color.status_error)
@@ -76,7 +77,7 @@ class ItemAdapterVertical(
                     }
                     daysDiff <= 7 -> {
                         // Urgent - orange accent
-                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#F5A623"))
+                        binding.viewAccentBar.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F5A623"))
                         binding.tvStatus.text = if (daysDiff == 0) "Today!" else "$daysDiff days left"
                         binding.tvStatus.setTextColor(
                             ContextCompat.getColor(binding.root.context, R.color.status_warning)
@@ -86,7 +87,7 @@ class ItemAdapterVertical(
                     }
                     else -> {
                         // Safe - green accent
-                        binding.viewAccentBar.setBackgroundColor(Color.parseColor("#2ECC71"))
+                        binding.viewAccentBar.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#2ECC71"))
                         binding.tvStatus.text = "$daysDiff days left"
                         binding.tvStatus.setTextColor(
                             ContextCompat.getColor(binding.root.context, R.color.status_safe)
@@ -107,7 +108,7 @@ class ItemAdapterVertical(
                 binding.tvItemName.setTextColor(grayText)
                 binding.tvCategory.setTextColor(grayText)
                 binding.tvNextServiceDate.setTextColor(grayText)
-                binding.viewAccentBar.setBackgroundColor(Color.parseColor("#CCCCCC"))
+                binding.viewAccentBar.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CCCCCC"))
 
                 binding.tvStatus.text = "Inactive"
                 binding.tvStatus.setTextColor(grayText)

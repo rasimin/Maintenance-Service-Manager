@@ -22,8 +22,11 @@
             android:id="@+id/viewAccentBar"
             android:layout_width="4dp"
             android:layout_height="0dp"
-            android:background="#2ECC71"
+            android:background="@drawable/bg_rounded_accent"
+            android:backgroundTint="#2ECC71"
             android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
