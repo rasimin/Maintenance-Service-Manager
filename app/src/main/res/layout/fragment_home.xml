@@ -267,6 +267,10 @@
                     android:layout_centerVertical="true"
                     android:text="View All"
                     android:textColor="@color/brand_primary"
+                    android:drawableEnd="@drawable/ic_arrow_right"
+                    android:drawablePadding="2dp"
+                    app:drawableTint="@color/brand_primary"
+                    android:gravity="center_vertical"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -296,152 +300,14 @@
                 app:layout_constraintTop_toBottomOf="@id/rvItems" />
 
             <!-- Estimated Cost Section -->
-            <LinearLayout
-                android:id="@+id/llEstimatedCost"
+            <include
+                android:id="@+id/layoutCostDashboard"
+                layout="@layout/layout_cost_dashboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:layout_marginHorizontal="24dp"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/rvItems">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Estimated Cost"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:weightSum="3">
-
-                    <!-- Month 1 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cvMonth1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/divider"
-                        app:strokeWidth="1dp">
-                        
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <TextView
-                                android:id="@+id/tvMonth1Name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Mar"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-                            <TextView
-                                android:id="@+id/tvMonth1Cost"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Rp 0"
-                                android:textColor="@color/text_primary"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Month 2 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cvMonth2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/divider"
-                        app:strokeWidth="1dp">
-                        
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <TextView
-                                android:id="@+id/tvMonth2Name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Apr"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-                            <TextView
-                                android:id="@+id/tvMonth2Cost"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Rp 0"
-                                android:textColor="@color/text_primary"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Month 3 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cvMonth3"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/divider"
-                        app:strokeWidth="1dp">
-                        
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <TextView
-                                android:id="@+id/tvMonth3Name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="May"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
-                            <TextView
-                                android:id="@+id/tvMonth3Cost"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Rp 0"
-                                android:textColor="@color/text_primary"
-                                android:textSize="13sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/rvItems" />
 
             <com.google.android.gms.ads.AdView
                 android:id="@+id/adView"
@@ -451,7 +317,7 @@
                 android:layout_marginBottom="16dp"
                 app:adSize="BANNER"
                 app:adUnitId="ca-app-pub-3940256099942544/6300978111"
-                app:layout_constraintTop_toBottomOf="@id/llEstimatedCost" />
+                app:layout_constraintTop_toBottomOf="@id/layoutCostDashboard" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

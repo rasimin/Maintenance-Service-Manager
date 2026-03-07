@@ -199,10 +199,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateCostEstimations() {
+        val dash = binding.layoutCostDashboard
         if (allItemsList.isEmpty()) {
-            binding.tvMonth1Cost.text = "-"
-            binding.tvMonth2Cost.text = "-"
-            binding.tvMonth3Cost.text = "-"
+            dash.tvEstMonth1Cost.text = "-"
+            dash.tvEstMonth2Cost.text = "-"
+            dash.tvEstMonth3Cost.text = "-"
+            dash.tvRealMonth1Cost.text = "-"
+            dash.tvRealMonth2Cost.text = "-"
+            dash.tvRealMonth3Cost.text = "-"
             return
         }
 
@@ -225,7 +229,7 @@ class HomeFragment : Fragment() {
 
         val months = DoubleArray(3) { 0.0 }
         val monthNames = Array(3) { "" }
-        val monthFormats = SimpleDateFormat("MMMM", Locale.getDefault())
+        val monthFormats = SimpleDateFormat("MMM", Locale.getDefault())
         
         // Hold detail data for popup
         val monthDetails = Array(3) { mutableListOf<CostDetail>() }
@@ -273,24 +277,97 @@ class HomeFragment : Fragment() {
                 simulatedNextDate = DateUtil.getNextServiceDate(simulatedNextDate, item.serviceIntervalValue, item.serviceIntervalUnit)
             }
         }
+        
+        // 4. Calculate Realized Cost
+        val realMonthNames = Array(3) { "" }
+        for (i in 0..2) {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.MONTH, i - 2)
+            realMonthNames[i] = monthFormats.format(cal.time)
+        }
+        
+        val realMonths = DoubleArray(3) { 0.0 }
+        val realDetails = Array(3) { mutableListOf<CostDetail>() }
+        
+        for (history in allHistoryList) {
+            val item = allItemsList.find { it.id == history.itemId } ?: continue
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = history.serviceDate
 
-        binding.tvMonth1Name.text = monthNames[0]
-        binding.tvMonth2Name.text = monthNames[1]
-        binding.tvMonth3Name.text = monthNames[2]
+            val hYear = cal.get(Calendar.YEAR)
+            val hMonth = cal.get(Calendar.MONTH)
 
-        val format = NumberFormat.getInstance(Locale("in", "ID"))
-        val formatCost = { cost: Double ->
-            if (cost == 0.0) "-" else "Rp ${format.format(cost.toLong())}"
+            val monthDiff = (hYear - currentYear) * 12 + (hMonth - currentMonth)
+            val targetIndex = monthDiff + 2
+            
+            if (targetIndex in 0..2) {
+                realMonths[targetIndex] += history.cost
+                realDetails[targetIndex].add(CostDetail(item.name, item.category, history.cost, history.serviceDate))
+            }
         }
 
-        binding.tvMonth1Cost.text = formatCost(months[0])
-        binding.tvMonth2Cost.text = formatCost(months[1])
-        binding.tvMonth3Cost.text = formatCost(months[2])
+        // 5. Update UI
+        val formatCost = { cost: Double ->
+            if (cost == 0.0) "-" 
+            else {
+                if (cost >= 1_000_000) {
+                    val m = cost / 1_000_000.0
+                    if (m % 1.0 == 0.0) "Rp ${m.toInt()}M" else String.format(Locale.US, "Rp %.1fM", m)
+                } else if (cost >= 1_000) {
+                    val k = cost / 1_000.0
+                    if (k % 1.0 == 0.0) "Rp ${k.toInt()}K" else String.format(Locale.US, "Rp %.1fK", k)
+                } else {
+                    "Rp ${cost.toInt()}"
+                }
+            }
+        }
+
+        dash.tvEstMonth1Name.text = monthNames[0]
+        dash.tvEstMonth2Name.text = monthNames[1]
+        dash.tvEstMonth3Name.text = monthNames[2]
+        
+        dash.tvEstMonth1Cost.text = formatCost(months[0])
+        dash.tvEstMonth2Cost.text = formatCost(months[1])
+        dash.tvEstMonth3Cost.text = formatCost(months[2])
+
+        dash.tvRealMonth1Name.text = realMonthNames[0]
+        dash.tvRealMonth2Name.text = realMonthNames[1]
+        dash.tvRealMonth3Name.text = realMonthNames[2]
+        
+        dash.tvRealMonth1Cost.text = formatCost(realMonths[0])
+        dash.tvRealMonth2Cost.text = formatCost(realMonths[1])
+        dash.tvRealMonth3Cost.text = formatCost(realMonths[2])
+        
+        // Chart text labels
+        dash.tvChartEstMonth1.text = monthNames[0]
+        dash.tvChartEstMonth2.text = monthNames[1]
+        dash.tvChartEstMonth3.text = monthNames[2]
+        
+        dash.tvChartRealMonth1.text = realMonthNames[0]
+        dash.tvChartRealMonth2.text = realMonthNames[1]
+        dash.tvChartRealMonth3.text = realMonthNames[2]
+
+        // Setup Charts
+        dash.chartEstimated.setChartMode(false)
+        dash.chartEstimated.dataPoints = listOf(months[0].toFloat(), months[1].toFloat(), months[2].toFloat())
+
+        dash.chartRealized.setChartMode(true)
+        dash.chartRealized.dataPoints = listOf(realMonths[0].toFloat(), realMonths[1].toFloat(), realMonths[2].toFloat())
 
         // Add Click Listeners for Pop up
-        binding.cvMonth1.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[0]}", monthDetails[0], months[0]) }
-        binding.cvMonth2.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[1]}", monthDetails[1], months[1]) }
-        binding.cvMonth3.setOnClickListener { showCostDetailDialog("Bulan ${monthNames[2]}", monthDetails[2], months[2]) }
+        val clickEst1 = View.OnClickListener { showCostDetailDialog("Estimasi ${monthNames[0]}", monthDetails[0], months[0]) }
+        dash.llEstMonth1.setOnClickListener(clickEst1); dash.vEstBar1.setOnClickListener(clickEst1)
+        val clickEst2 = View.OnClickListener { showCostDetailDialog("Estimasi ${monthNames[1]}", monthDetails[1], months[1]) }
+        dash.llEstMonth2.setOnClickListener(clickEst2); dash.vEstBar2.setOnClickListener(clickEst2)
+        val clickEst3 = View.OnClickListener { showCostDetailDialog("Estimasi ${monthNames[2]}", monthDetails[2], months[2]) }
+        dash.llEstMonth3.setOnClickListener(clickEst3); dash.vEstBar3.setOnClickListener(clickEst3)
+        
+        val clickReal1 = View.OnClickListener { showCostDetailDialog("Realisasi ${realMonthNames[0]}", realDetails[0], realMonths[0]) }
+        dash.llRealMonth1.setOnClickListener(clickReal1); dash.vRealBar1.setOnClickListener(clickReal1)
+        val clickReal2 = View.OnClickListener { showCostDetailDialog("Realisasi ${realMonthNames[1]}", realDetails[1], realMonths[1]) }
+        dash.llRealMonth2.setOnClickListener(clickReal2); dash.vRealBar2.setOnClickListener(clickReal2)
+        val clickReal3 = View.OnClickListener { showCostDetailDialog("Realisasi ${realMonthNames[2]}", realDetails[2], realMonths[2]) }
+        dash.llRealMonth3.setOnClickListener(clickReal3); dash.vRealBar3.setOnClickListener(clickReal3)
     }
 
     private fun showCostDetailDialog(
@@ -307,7 +384,7 @@ class HomeFragment : Fragment() {
         val container = dialogView.findViewById<LinearLayout>(R.id.llCostDetailContainer)
         val btnClose = dialogView.findViewById<View>(R.id.btnDialogClose)
 
-        tvTitle.text = "Estimasi Cost: $title"
+        tvTitle.text = title
         
         val format = NumberFormat.getInstance(Locale("in", "ID"))
         tvTotal.text = "Rp ${format.format(totalCost.toLong())}"

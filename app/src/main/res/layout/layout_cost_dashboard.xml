@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llCostDashboardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Card 1: Estimated Maintenance Cost -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estimated Maintenance Cost"
+                android:textColor="#1A1A2E"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+
+                    <!-- Headers -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- M1 -->
+                        <LinearLayout
+                            android:id="@+id/llEstMonth1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvEstMonth1Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="March"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvEstMonth1Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                        
+                        <!-- Divider -->
+                        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0" android:layout_marginVertical="4dp"/>
+
+                        <!-- M2 -->
+                        <LinearLayout
+                            android:id="@+id/llEstMonth2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvEstMonth2Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="April"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvEstMonth2Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                        
+                        <!-- Divider -->
+                        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0" android:layout_marginVertical="4dp"/>
+
+                        <!-- M3 -->
+                        <LinearLayout
+                            android:id="@+id/llEstMonth3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvEstMonth3Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="May"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvEstMonth3Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.example.servicemaintainreminder.ui.views.CostChartView
+                            android:id="@+id/chartEstimated"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:layout_marginTop="12dp" />
+                        
+                        <!-- Invisible click overlays for bars -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="132dp"
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
+                            <View android:id="@+id/vEstBar1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                            <View android:id="@+id/vEstBar2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                            <View android:id="@+id/vEstBar3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                        </LinearLayout>
+                    </FrameLayout>
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="-4dp"
+                        android:paddingHorizontal="24dp">
+                        
+                        <TextView
+                            android:id="@+id/tvChartEstMonth1"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                        <TextView
+                            android:id="@+id/tvChartEstMonth2"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                        <TextView
+                            android:id="@+id/tvChartEstMonth3"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+
+        <!-- Card 2: Realized Cost -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Realized Cost"
+                android:textColor="#1A1A2E"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+
+                    <!-- Headers -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <!-- M1 -->
+                        <LinearLayout
+                            android:id="@+id/llRealMonth1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvRealMonth1Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="March"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvRealMonth1Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                        
+                        <!-- Divider -->
+                        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0" android:layout_marginVertical="4dp"/>
+
+                        <!-- M2 -->
+                        <LinearLayout
+                            android:id="@+id/llRealMonth2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvRealMonth2Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="April"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvRealMonth2Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                        
+                        <!-- Divider -->
+                        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0" android:layout_marginVertical="4dp"/>
+
+                        <!-- M3 -->
+                        <LinearLayout
+                            android:id="@+id/llRealMonth3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?selectableItemBackground">
+                            <TextView
+                                android:id="@+id/tvRealMonth3Name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="May"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp" />
+                            <TextView
+                                android:id="@+id/tvRealMonth3Cost"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Rp 0"
+                                android:textColor="#1A1A2E"
+                                android:textStyle="bold"
+                                android:textSize="13sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.example.servicemaintainreminder.ui.views.CostChartView
+                            android:id="@+id/chartRealized"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:layout_marginTop="12dp" />
+
+                        <!-- Invisible click overlays for bars -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="132dp"
+                            android:orientation="horizontal"
+                            android:baselineAligned="false">
+                            <View android:id="@+id/vRealBar1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                            <View android:id="@+id/vRealBar2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                            <View android:id="@+id/vRealBar3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackground" />
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="-4dp"
+                        android:paddingHorizontal="24dp">
+                        
+                        <TextView
+                            android:id="@+id/tvChartRealMonth1"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                        <TextView
+                            android:id="@+id/tvChartRealMonth2"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                        <TextView
+                            android:id="@+id/tvChartRealMonth3"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:layout_height="wrap_content"
+                            android:textSize="9sp"
+                            android:textColor="@color/text_placeholder"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </LinearLayout>
