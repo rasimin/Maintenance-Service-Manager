@@ -39,6 +39,15 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
             binding.tvServiceType.text = item.category
             binding.tvNextDate.text = "Servis: ${DateUtil.formatDate(item.nextServiceDate)}"
 
+            // Set Category Icon
+            val iconRes = when (item.category.lowercase()) {
+                "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
+                "electronics", "elektronik" -> android.R.drawable.ic_menu_preferences
+                else -> android.R.drawable.ic_menu_slideshow
+            }
+            binding.ivItemIcon.setImageResource(iconRes)
+
+
             // Hitung sisa hari
             val currentTime = System.currentTimeMillis()
             val msLeft = item.nextServiceDate - currentTime

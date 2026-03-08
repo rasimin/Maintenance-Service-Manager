@@ -9,13 +9,12 @@
     android:paddingBottom="8dp"
     android:background="@color/white">
 
-
-    <!-- Service Description -->
+    <!-- Service Date -->
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Service Description"
+        android:hint="Service Date"
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
@@ -24,13 +23,15 @@
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="1.5dp"
         app:hintTextColor="@color/brand_primary"
-        app:startIconDrawable="@drawable/ic_input_edit"
+        app:startIconDrawable="@drawable/ic_input_calendar"
         app:startIconTint="@color/brand_primary">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etHistoryDesc"
+            android:id="@+id/etHistoryDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_placeholder"
             android:textSize="14sp" />
@@ -64,13 +65,13 @@
             android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Service Date -->
+    <!-- Service Description -->
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:hint="Service Date"
+        android:hint="Service Description"
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
@@ -79,15 +80,13 @@
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="1.5dp"
         app:hintTextColor="@color/brand_primary"
-        app:startIconDrawable="@drawable/ic_input_calendar"
+        app:startIconDrawable="@drawable/ic_input_edit"
         app:startIconTint="@color/brand_primary">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etHistoryDate"
+            android:id="@+id/etHistoryDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="false"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_placeholder"
             android:textSize="14sp" />

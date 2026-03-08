@@ -38,6 +38,7 @@ class DevicesFragment : Fragment() {
     private var allItemsList: List<Item> = emptyList()
     private var selectedHistoryDate: Long = System.currentTimeMillis()
     private var currentSortMode = SortMode.NAME_ASC
+    private var savedScrollY: Int = 0
 
     enum class SortMode {
         NAME_ASC, DATE_ASC, DATE_DESC
@@ -136,7 +137,14 @@ class DevicesFragment : Fragment() {
             SortMode.DATE_DESC -> filteredList.sortedByDescending { it.nextServiceDate }
         }
 
-        adapter.submitList(finalSortedList)
+        adapter.submitList(finalSortedList) {
+            if (savedScrollY > 0) {
+                binding.nestedScrollViewDevices.post {
+                    binding.nestedScrollViewDevices.scrollTo(0, savedScrollY)
+                    savedScrollY = 0
+                }
+            }
+        }
         binding.llEmptyState.isVisible = finalSortedList.isEmpty()
     }
 
@@ -260,6 +268,7 @@ class DevicesFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        savedScrollY = binding.nestedScrollViewDevices.scrollY
         super.onDestroyView()
         _binding = null
     }

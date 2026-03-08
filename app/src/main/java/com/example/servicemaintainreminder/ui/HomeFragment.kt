@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.navigation.fragment.findNavController
 import com.example.servicemaintainreminder.R
 import com.example.servicemaintainreminder.data.Item
@@ -37,6 +38,10 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: ItemAdapter
     private var allItemsList: List<Item> = emptyList()
     private var allHistoryList: List<ServiceHistory> = emptyList()
+    private var recyclerViewState: android.os.Parcelable? = null
+
+    private lateinit var searchOverlayAdapter: SearchOverlayAdapter
+    private var searchResults: List<Item> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,26 +70,46 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupSearchView() {
-        binding.searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
+        searchOverlayAdapter = SearchOverlayAdapter(emptyList()) { item ->
+            binding.rvSearchOverlay.isVisible = false
+            binding.searchDivider.isVisible = false
+            binding.searchView.clearFocus()
+            binding.searchView.setQuery("", false)
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(item.id)
+            findNavController().navigate(action)
+        }
+        binding.rvSearchOverlay.adapter = searchOverlayAdapter
+        binding.rvSearchOverlay.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                v.animate().scaleX(1.02f).scaleY(1.02f).setDuration(200).start()
+                binding.searchCardHome.animate().scaleX(1.02f).scaleY(1.02f).setDuration(200).start()
             } else {
-                v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start()
+                binding.searchCardHome.animate().scaleX(1.0f).scaleY(1.0f).setDuration(200).start()
+                if (binding.searchView.query.isNullOrEmpty()) {
+                    binding.rvSearchOverlay.isVisible = false
+                    binding.searchDivider.isVisible = false
+                }
             }
         }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let { query ->
-                    if (query.isEmpty()) {
-                        binding.tvUpcomingHeader.text = "Upcoming Maintenance"
-                        loadUpcomingItems()
+                if (newText.isNullOrEmpty()) {
+                    binding.rvSearchOverlay.isVisible = false
+                    binding.searchDivider.isVisible = false
+                } else {
+                    searchResults = allItemsList.filter {
+                        it.name.contains(newText, ignoreCase = true) || it.category.contains(newText, ignoreCase = true)
+                    }.take(5)
+                    if (searchResults.isNotEmpty()) {
+                        searchOverlayAdapter.submitList(searchResults)
+                        binding.rvSearchOverlay.isVisible = true
+                        binding.searchDivider.isVisible = true
                     } else {
-                        viewModel.searchItems(query).observe(viewLifecycleOwner) { items ->
-                            binding.tvUpcomingHeader.text = "Search Results"
-                            adapter.submitList(items)
-                        }
+                        binding.rvSearchOverlay.isVisible = false
+                        binding.searchDivider.isVisible = false
                     }
                 }
                 return true
@@ -120,7 +145,12 @@ class HomeFragment : Fragment() {
             val upcoming = items.filter { it.isActive && it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
                 .sortedBy { it.nextServiceDate }
                 .take(10) // Maksimal muncul 10 card
-            adapter.submitList(upcoming)
+            adapter.submitList(upcoming) {
+                recyclerViewState?.let {
+                    binding.rvItems.layoutManager?.onRestoreInstanceState(it)
+                    recyclerViewState = null
+                }
+            }
         }
     }
 
@@ -424,6 +454,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        recyclerViewState = binding.rvItems.layoutManager?.onSaveInstanceState()
         super.onDestroyView()
         _binding = null
     }
