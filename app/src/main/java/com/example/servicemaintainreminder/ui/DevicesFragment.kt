@@ -25,6 +25,11 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDevicesBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.TextView
+import android.graphics.Paint
+import android.graphics.Typeface
+import java.text.NumberFormat
 import java.util.*
 
 class DevicesFragment : Fragment() {
@@ -59,7 +64,7 @@ class DevicesFragment : Fragment() {
         setupSearchView()
         setupObservers()
         setupFilters()
-        setupSwipeToDelete()
+        setupSwipeActions()
 
         // Setup header back button & title
         binding.ivBackButton.setOnClickListener {
@@ -182,35 +187,74 @@ class DevicesFragment : Fragment() {
         binding.rvAllDevices.adapter = adapter
     }
 
-    private fun setupSwipeToDelete() {
-        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-            private val background = ColorDrawable(Color.parseColor("#FFE5E5"))
-            private val deleteIcon = ContextCompat.getDrawable(requireContext(), android.R.drawable.ic_menu_delete)
-            private val intrinsicWidth = deleteIcon?.intrinsicWidth ?: 0
-            private val intrinsicHeight = deleteIcon?.intrinsicHeight ?: 0
+    private fun setupSwipeActions() {
+        val textPaint = Paint().apply {
+            color = Color.parseColor("#27AE60")
+            textSize = 14f * resources.displayMetrics.scaledDensity
+            isAntiAlias = true
+            typeface = Typeface.DEFAULT_BOLD
+            textAlign = Paint.Align.RIGHT
+        }
+
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT) {
+            private val bgDelete = ColorDrawable(Color.parseColor("#FFE5E5"))
+            private val bgDone = ColorDrawable(Color.parseColor("#E8F8F0"))
+            private val iconDelete = ContextCompat.getDrawable(requireContext(), android.R.drawable.ic_menu_delete)
+
+            override fun getSwipeDirs(r: RecyclerView, v: RecyclerView.ViewHolder): Int {
+                val position = v.adapterPosition
+                val item = adapter.currentList[position]
+                val diff = item.nextServiceDate - System.currentTimeMillis()
+                val isUpcomingOrOverdue = item.isActive && diff <= (7L * 24L * 60L * 60L * 1000L)
+                return if (isUpcomingOrOverdue) {
+                    ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
+                } else {
+                    ItemTouchHelper.RIGHT
+                }
+            }
 
             override fun onMove(r: RecyclerView, v: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder): Boolean = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val item = adapter.currentList[position]
-                showDeleteConfirmationDialog(item, position)
+                if (direction == ItemTouchHelper.RIGHT) {
+                    showDeleteConfirmationDialog(item, position)
+                } else if (direction == ItemTouchHelper.LEFT) {
+                    showAddHistoryConfirmDialog(item, position)
+                }
             }
 
             override fun onChildDraw(c: Canvas, r: RecyclerView, v: RecyclerView.ViewHolder, dX: Float, dY: Float, s: Int, a: Boolean) {
                 val itemView = v.itemView
                 val itemHeight = itemView.bottom - itemView.top
-                background.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
-                background.draw(c)
-                if (dX > 0) {
-                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-                    val iconMargin = (itemHeight - intrinsicHeight) / 2
-                    val iconLeft = itemView.left + iconMargin
-                    val iconRight = itemView.left + iconMargin + intrinsicWidth
-                    val iconBottom = iconTop + intrinsicHeight
-                    deleteIcon?.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                    deleteIcon?.setTint(Color.parseColor("#E74C3C"))
-                    deleteIcon?.draw(c)
+
+                if (dX > 0) { // Swipe Right for Delete
+                    bgDelete.setBounds(itemView.left, itemView.top, itemView.left + dX.toInt(), itemView.bottom)
+                    bgDelete.draw(c)
+                    
+                    iconDelete?.let {
+                        val iconMargin = (itemHeight - it.intrinsicHeight) / 2
+                        val iconTop = itemView.top + iconMargin
+                        val iconBottom = iconTop + it.intrinsicHeight
+                        val iconLeft = itemView.left + iconMargin
+                        val iconRight = iconLeft + it.intrinsicWidth
+                        it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        it.setTint(Color.parseColor("#E74C3C"))
+                        it.draw(c)
+                    }
+                } else if (dX < 0) { // Swipe Left for Quick Done
+                    bgDone.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                    bgDone.draw(c)
+
+                    val text = "Quick Done ✅"
+                    val textMargin = (24 * resources.displayMetrics.density).toInt()
+                    val textX = itemView.right - textMargin.toFloat()
+                    val textY = itemView.top + (itemHeight / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f)
+                    
+                    if (Math.abs(dX) > textPaint.measureText(text) + textMargin) {
+                        c.drawText(text, textX, textY, textPaint)
+                    }
                 }
                 super.onChildDraw(c, r, v, dX, dY, s, a)
             }
@@ -218,15 +262,79 @@ class DevicesFragment : Fragment() {
         ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.rvAllDevices)
     }
 
+    private fun showAddHistoryConfirmDialog(item: Item, position: Int) {
+        val format = NumberFormat.getInstance(Locale("in", "ID"))
+        val costText = if (item.estimatedCost > 0) "Rp ${format.format(item.estimatedCost.toLong())}" else "Rp 0"
+
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_quick_done, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val tvName = dialogView.findViewById<TextView>(R.id.tvQuickDeviceName)
+        val tvDate = dialogView.findViewById<TextView>(R.id.tvQuickDate)
+        val tvCost = dialogView.findViewById<TextView>(R.id.tvQuickCost)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnQuickCancel)
+        val btnSave = dialogView.findViewById<View>(R.id.btnQuickSave)
+
+        tvName.text = item.name
+        tvDate.text = DateUtil.formatDate(System.currentTimeMillis())
+        tvCost.text = costText
+
+        btnSave.setOnClickListener {
+            val date = System.currentTimeMillis()
+            val history = ServiceHistory(
+                itemId = item.id,
+                serviceDate = date,
+                description = "Auto done by swipe",
+                cost = item.estimatedCost
+            )
+            viewModel.addHistory(history)
+            val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
+            viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
+            Toast.makeText(requireContext(), "Catatan servis berhasil ditambahkan otomatis", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener {
+            adapter.notifyItemChanged(position)
+            dialog.dismiss()
+        }
+
+        dialog.setOnCancelListener {
+            adapter.notifyItemChanged(position)
+        }
+
+        dialog.show()
+    }
+
     private fun showDeleteConfirmationDialog(item: Item, position: Int) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Hapus Perangkat")
-            .setMessage("Apakah Anda yakin ingin menghapus '${item.name}'?")
-            .setPositiveButton("Hapus") { _, _ -> viewModel.deleteItem(item) }
-            .setNegativeButton("Batal") { dialog, _ ->
-                adapter.notifyItemChanged(position)
-                dialog.dismiss()
-            }.show()
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_confirm, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val tvName = dialogView.findViewById<TextView>(R.id.tvDeleteDeviceName)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnDeleteCancel)
+        val btnDelete = dialogView.findViewById<View>(R.id.btnDeleteConfirm)
+
+        tvName.text = item.name
+
+        btnDelete.setOnClickListener {
+            viewModel.deleteItem(item)
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener {
+            adapter.notifyItemChanged(position)
+            dialog.dismiss()
+        }
+
+        dialog.setOnCancelListener {
+            adapter.notifyItemChanged(position)
+        }
+
+        dialog.show()
     }
 
     private fun showAddHistoryDialog(item: Item) {

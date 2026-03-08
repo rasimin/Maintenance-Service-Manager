@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import android.view.MotionEvent
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -24,6 +25,8 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDetailBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.TextView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -57,6 +60,7 @@ class DetailFragment : Fragment() {
         setupSwipeToDelete()
         loadInterstitialAd()
         observeItem()
+        setupPullToEdit()
 
         // Setup header back button & title
         binding.header.ivBackButton.setOnClickListener {
@@ -95,6 +99,62 @@ class DetailFragment : Fragment() {
                 val action = DetailFragmentDirections.actionDetailFragmentToAddItemFragment(item.id)
                 findNavController().navigate(action)
             }
+        }
+    }
+
+    private fun setupPullToEdit() {
+        var startY = 0f
+        var isSwiping = false
+        val threshold = 250f // px
+
+        binding.nestedScrollViewDetail.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (binding.nestedScrollViewDetail.scrollY == 0) {
+                        startY = event.y
+                        isSwiping = true
+                    }
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (isSwiping && event.y > startY && binding.nestedScrollViewDetail.scrollY == 0) {
+                        val deltaY = event.y - startY
+                        val dragY = deltaY / 2.5f
+
+                        if (dragY > 0) {
+                            binding.nestedScrollViewDetail.translationY = dragY
+                            val alpha = (dragY / threshold).coerceIn(0f, 1f)
+                            binding.llSwipeEditBg.alpha = alpha
+
+                            if (dragY > threshold) {
+                                binding.tvSwipeEditText.text = "Release to Edit Device"
+                            } else {
+                                binding.tvSwipeEditText.text = "Pull down to Edit Device"
+                            }
+                            return@setOnTouchListener true
+                        }
+                    } else if (isSwiping && event.y < startY) {
+                         isSwiping = false
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (isSwiping) {
+                        val deltaY = event.y - startY
+                        val dragY = deltaY / 2.5f
+
+                        if (dragY > threshold) {
+                            currentItem?.let { item ->
+                                val action = DetailFragmentDirections.actionDetailFragmentToAddItemFragment(item.id)
+                                findNavController().navigate(action)
+                            }
+                        }
+
+                        binding.nestedScrollViewDetail.animate().translationY(0f).setDuration(250).start()
+                        binding.llSwipeEditBg.animate().alpha(0f).setDuration(250).start()
+                        isSwiping = false
+                    }
+                }
+            }
+            false
         }
     }
 
@@ -242,44 +302,58 @@ class DetailFragment : Fragment() {
     }
 
     private fun showDeleteConfirmDialog(history: ServiceHistory, position: Int) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("🗑 Hapus Riwayat")
-            .setMessage("Yakin ingin menghapus catatan servis ini?\n\n\"${history.description}\"")
-            .setPositiveButton("Ya, Hapus") { _, _ ->
-                viewModel.deleteHistory(history)
-                
-                // Recalculate schedule if this was the latest history
-                currentItem?.let { item ->
-                    // Find remaining histories excluding the one being deleted
-                    val remainingHistory = historyAdapter.currentList.filter { it.id != history.id }
-                    if (remainingHistory.isNotEmpty()) {
-                        // Find the most recent date from the remaining history
-                        val latestHistoryDate = remainingHistory.maxOf { it.serviceDate }
-                        
-                        // If the current item's service date logic was driven by this maxDate, update it
-                        val nextDate = DateUtil.getNextServiceDate(latestHistoryDate, item.serviceIntervalValue, item.serviceIntervalUnit)
-                        viewModel.updateItem(item.copy(
-                            lastServiceDate = latestHistoryDate, 
-                            nextServiceDate = nextDate
-                        ))
-                    } else {
-                        // Revert to originalLastServiceDate since history is empty
-                        val originalNextDate = DateUtil.getNextServiceDate(item.originalLastServiceDate, item.serviceIntervalValue, item.serviceIntervalUnit)
-                        viewModel.updateItem(item.copy(
-                            lastServiceDate = item.originalLastServiceDate,
-                            nextServiceDate = originalNextDate
-                        ))
-                    }
-                }
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_history_confirm, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-                Toast.makeText(requireContext(), "Riwayat dihapus", Toast.LENGTH_SHORT).show()
+        val tvDesc = dialogView.findViewById<TextView>(R.id.tvDeleteHistoryDesc)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnDeleteHistoryCancel)
+        val btnDelete = dialogView.findViewById<View>(R.id.btnDeleteHistoryConfirm)
+
+        tvDesc.text = history.description
+
+        btnDelete.setOnClickListener {
+            viewModel.deleteHistory(history)
+            
+            // Recalculate schedule if this was the latest history
+            currentItem?.let { item ->
+                // Find remaining histories excluding the one being deleted
+                val remainingHistory = historyAdapter.currentList.filter { it.id != history.id }
+                if (remainingHistory.isNotEmpty()) {
+                    // Find the most recent date from the remaining history
+                    val latestHistoryDate = remainingHistory.maxOf { it.serviceDate }
+                    
+                    // If the current item's service date logic was driven by this maxDate, update it
+                    val nextDate = DateUtil.getNextServiceDate(latestHistoryDate, item.serviceIntervalValue, item.serviceIntervalUnit)
+                    viewModel.updateItem(item.copy(
+                        lastServiceDate = latestHistoryDate, 
+                        nextServiceDate = nextDate
+                    ))
+                } else {
+                    // Revert to originalLastServiceDate since history is empty
+                    val originalNextDate = DateUtil.getNextServiceDate(item.originalLastServiceDate, item.serviceIntervalValue, item.serviceIntervalUnit)
+                    viewModel.updateItem(item.copy(
+                        lastServiceDate = item.originalLastServiceDate,
+                        nextServiceDate = originalNextDate
+                    ))
+                }
             }
-            .setNegativeButton("Batal") { dialog, _ ->
-                historyAdapter.notifyItemChanged(position)
-                dialog.dismiss()
-            }
-            .setCancelable(false)
-            .show()
+
+            Toast.makeText(requireContext(), "Riwayat dihapus", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener {
+            historyAdapter.notifyItemChanged(position)
+            dialog.dismiss()
+        }
+
+        dialog.setOnCancelListener {
+            historyAdapter.notifyItemChanged(position)
+        }
+
+        dialog.show()
     }
 
     // ── Add History Dialog ───────────────────────────────────────────────────

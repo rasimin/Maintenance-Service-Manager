@@ -171,6 +171,18 @@
                     app:strokeWidth="1dp" />
             </LinearLayout>
 
+            <!-- Swipe Hint -->
+            <TextView
+                android:id="@+id/tvSwipeHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="💡 Swipe left on upcoming/overdue items for Quick Done"
+                android:textColor="#A0A0B0"
+                android:textSize="11sp"
+                app:layout_constraintTop_toBottomOf="@id/llFiltersAndSort" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAllDevices"
                 android:layout_width="match_parent"
@@ -179,7 +191,7 @@
                 android:clipToPadding="false"
                 android:paddingBottom="20dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toBottomOf="@id/llFiltersAndSort"
+                app:layout_constraintTop_toBottomOf="@id/tvSwipeHint"
                 tools:listitem="@layout/item_service_list" />
 
             <!-- Empty State -->
