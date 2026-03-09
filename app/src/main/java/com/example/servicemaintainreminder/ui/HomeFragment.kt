@@ -342,6 +342,11 @@ class HomeFragment : Fragment() {
             val action = HomeFragmentDirections.actionHomeFragmentToAddItemFragment()
             findNavController().navigate(action)
         }
+
+        binding.layoutCostDashboard.btnCalendarView.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToCalendarCostFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun updateDashboard(items: List<com.example.servicemaintainreminder.data.Item>) {

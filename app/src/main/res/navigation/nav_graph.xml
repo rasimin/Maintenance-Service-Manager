@@ -31,6 +31,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_homeFragment_to_calendarCostFragment"
+            app:destination="@id/calendarCostFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -91,6 +98,12 @@
         android:name="com.example.servicemaintainreminder.ui.HistoryFragment"
         android:label="Service History"
         tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/calendarCostFragment"
+        android:name="com.example.servicemaintainreminder.ui.CalendarCostFragment"
+        android:label="Cost Calendar"
+        tools:layout="@layout/fragment_calendar_cost" />
 
     <fragment
         android:id="@+id/FirstFragment"
