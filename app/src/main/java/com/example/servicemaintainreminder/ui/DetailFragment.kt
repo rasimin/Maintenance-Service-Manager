@@ -103,7 +103,7 @@ class DetailFragment : Fragment() {
                 val menuItems = listOf(
                     ModernMenuItem(1, "Edit", R.drawable.ic_input_edit),
                     ModernMenuItem(2, "Quick Done", android.R.drawable.ic_menu_myplaces),
-                    ModernMenuItem(3, "Hapus", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
+                    ModernMenuItem(3, "Delete", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
                 )
 
                 ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
@@ -116,7 +116,7 @@ class DetailFragment : Fragment() {
                             if (binding.sclMainInfo.canSwipeLeft()) {
                                 showQuickDoneDialog(item)
                             } else {
-                                Toast.makeText(requireContext(), "Quick Done hanya untuk device Upcoming / Overdue", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "Quick Done is only for Upcoming/Overdue devices", Toast.LENGTH_SHORT).show()
                             }
                         }
                         3 -> {
@@ -198,7 +198,7 @@ class DetailFragment : Fragment() {
             viewModel.addHistory(history)
             val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
             viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
-            Toast.makeText(requireContext(), "Catatan servis berhasil ditambahkan otomatis", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Service record added automatically", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
@@ -463,7 +463,7 @@ class DetailFragment : Fragment() {
                 }
             }
 
-            Toast.makeText(requireContext(), "Riwayat dihapus", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Record deleted", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
@@ -513,7 +513,7 @@ class DetailFragment : Fragment() {
                 saveHistory(desc, costStr.toDouble(), selectedHistoryDate)
                 dialog.dismiss()
             } else {
-                Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -540,7 +540,7 @@ class DetailFragment : Fragment() {
             }
         }
 
-        Toast.makeText(requireContext(), "Catatan servis disimpan ✓", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Service record saved ✓", Toast.LENGTH_SHORT).show()
 
         mInterstitialAd?.show(requireActivity())
         loadInterstitialAd()

@@ -551,7 +551,7 @@ class HomeFragment : Fragment() {
 
         if (details.isEmpty()) {
             val emptyTv = TextView(requireContext()).apply {
-                text = "Tidak ada jadwal servis yang butuh biaya estimasi di bulan ini."
+                text = "No service schedules require an estimated cost this month."
                 textSize = 13f
                 setPadding(0, 16, 0, 16)
             }

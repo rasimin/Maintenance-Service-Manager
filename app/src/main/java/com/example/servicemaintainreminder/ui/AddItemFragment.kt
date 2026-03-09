@@ -92,7 +92,7 @@ class AddItemFragment : Fragment() {
     }
 
     private fun setupSpinners() {
-        val categories = arrayOf("AC", "Kendaraan", "Elektronik", "Mesin", "Rumah Tangga", "Lainnya")
+        val categories = arrayOf("AC", "Vehicle", "Electronics", "Machine", "Home Appliance", "Other")
         val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categories)
         binding.spinnerCategory.setAdapter(categoryAdapter)
 

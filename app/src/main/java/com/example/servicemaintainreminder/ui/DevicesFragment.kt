@@ -185,7 +185,7 @@ class DevicesFragment : Fragment() {
                     ModernMenuItem(1, "Edit", R.drawable.ic_input_edit),
                     ModernMenuItem(2, "Quick Done", android.R.drawable.ic_menu_myplaces),
                     ModernMenuItem(3, "Add Service", android.R.drawable.ic_menu_add),
-                    ModernMenuItem(4, "Hapus", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
+                    ModernMenuItem(4, "Delete", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
                 )
 
                 ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
@@ -200,7 +200,7 @@ class DevicesFragment : Fragment() {
                                 val position = adapter.currentList.indexOf(item)
                                 showAddHistoryConfirmDialog(item, position)
                             } else {
-                                Toast.makeText(requireContext(), "Quick Done hanya untuk device Upcoming / Overdue", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "Quick Done is only for Upcoming/Overdue devices", Toast.LENGTH_SHORT).show()
                             }
                         }
                         3 -> {
@@ -322,7 +322,7 @@ class DevicesFragment : Fragment() {
             viewModel.addHistory(history)
             val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
             viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
-            Toast.makeText(requireContext(), "Catatan servis berhasil ditambahkan otomatis", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Service record added automatically", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
@@ -400,7 +400,7 @@ class DevicesFragment : Fragment() {
                 saveHistory(item, desc, costStr.toDouble(), selectedHistoryDate)
                 dialog.dismiss()
             } else {
-                Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
             }
         }
 
