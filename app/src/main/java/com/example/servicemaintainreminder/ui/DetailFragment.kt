@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import android.view.MotionEvent
+import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -196,7 +197,10 @@ class DetailFragment : Fragment() {
         // Update switch without triggering listener
         binding.swActiveDetail.setOnCheckedChangeListener(null)
         binding.swActiveDetail.isChecked = item.isActive
+        updateSwitchColor(item.isActive)
+        
         binding.swActiveDetail.setOnCheckedChangeListener { _, isChecked ->
+            updateSwitchColor(isChecked)
             if (item.isActive != isChecked) {
                 viewModel.updateItem(item.copy(isActive = isChecked))
                 Toast.makeText(requireContext(), "Device status updated", Toast.LENGTH_SHORT).show()
@@ -204,6 +208,11 @@ class DetailFragment : Fragment() {
         }
 
         updateStatusIndicator(item.nextServiceDate)
+    }
+
+    private fun updateSwitchColor(isActive: Boolean) {
+        val color = if (isActive) ContextCompat.getColor(requireContext(), R.color.brand_primary) else Color.parseColor("#D0D0D0")
+        binding.swActiveDetail.trackTintList = ColorStateList.valueOf(color)
     }
 
     private fun updateStatusIndicator(nextDate: Long) {

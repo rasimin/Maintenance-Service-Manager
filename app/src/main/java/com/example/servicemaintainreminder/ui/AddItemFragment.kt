@@ -14,7 +14,11 @@ import androidx.navigation.fragment.navArgs
 import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.databinding.FragmentAddItemBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.R
 import java.util.*
+import android.graphics.Color
+import android.content.res.ColorStateList
+import androidx.core.content.ContextCompat
 
 class AddItemFragment : Fragment() {
 
@@ -55,6 +59,16 @@ class AddItemFragment : Fragment() {
         binding.btnSave.setOnClickListener {
             saveItem()
         }
+
+        binding.switchActive.setOnCheckedChangeListener { _, isChecked ->
+            updateSwitchColor(isChecked)
+        }
+        updateSwitchColor(binding.switchActive.isChecked)
+    }
+
+    private fun updateSwitchColor(isActive: Boolean) {
+        val color = if (isActive) ContextCompat.getColor(requireContext(), R.color.brand_primary) else Color.parseColor("#D0D0D0")
+        binding.switchActive.trackTintList = ColorStateList.valueOf(color)
     }
 
     private fun setupEditMode() {

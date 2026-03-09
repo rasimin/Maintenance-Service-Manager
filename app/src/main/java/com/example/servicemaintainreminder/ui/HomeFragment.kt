@@ -58,7 +58,76 @@ class HomeFragment : Fragment() {
         setupSearchView()
         setupObservers()
         setupClickListeners()
+        setupHeader()
         loadAds()
+    }
+
+    private fun updateGreeting() {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val name = prefs.getString("user_name", "User") ?: "User"
+        binding.header.tvHeaderWelcome.text = "Welcome back, $name 👋"
+    }
+
+    private fun setupHeader() {
+        updateGreeting()
+        binding.header.cardSettings.setOnClickListener { view ->
+            val popupMenu = android.widget.PopupMenu(requireContext(), view)
+            popupMenu.menu.add(0, 1, 0, "Account")
+            popupMenu.menu.add(0, 2, 1, "Settings")
+            
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    1 -> {
+                        showAccountDialog()
+                        true
+                    }
+                    2 -> {
+                        android.widget.Toast.makeText(requireContext(), "Settings feature coming soon", android.widget.Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
+        }
+    }
+
+    private fun showAccountDialog() {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val currentName = prefs.getString("user_name", "") ?: ""
+        
+        val editText = android.widget.EditText(requireContext()).apply {
+            hint = "Enter your name"
+            setText(currentName)
+            setLines(1)
+            maxLines = 1
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+        
+        val container = android.widget.FrameLayout(requireContext())
+        val params = android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        // Add margins 24dp
+        val margin = (24 * resources.displayMetrics.density).toInt()
+        params.setMargins(margin, 0, margin, 0)
+        editText.layoutParams = params
+        container.addView(editText)
+        
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Account Settings")
+            .setMessage("Change your display name:")
+            .setView(container)
+            .setPositiveButton("Save") { _, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    prefs.edit().putString("user_name", newName).apply()
+                    updateGreeting()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupRecyclerView() {

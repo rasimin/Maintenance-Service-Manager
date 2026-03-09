@@ -151,6 +151,8 @@ class DevicesFragment : Fragment() {
             }
         }
         binding.llEmptyState.isVisible = finalSortedList.isEmpty()
+        
+        binding.tvSwipeHint.isVisible = (checkedChipId == R.id.chipUpcoming || checkedChipId == R.id.chipOverdue) && finalSortedList.isNotEmpty()
     }
 
     private fun setupObservers() {

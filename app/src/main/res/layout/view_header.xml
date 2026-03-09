@@ -22,18 +22,18 @@
         android:id="@+id/tvHeaderWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome back, Alex 👋"
+        android:text="Welcome back 👋"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/cardNotification"
+        app:layout_constraintEnd_toStartOf="@id/cardSettings"
         app:layout_constraintStart_toEndOf="@id/ivHeaderIcon"
         app:layout_constraintTop_toTopOf="@id/ivHeaderIcon"
         app:layout_constraintBottom_toBottomOf="@id/ivHeaderIcon" />
 
-    <!-- Right: Notification Bell -->
+    <!-- Right: Settings Gear -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardNotification"
+        android:id="@+id/cardSettings"
         android:layout_width="32dp"
         android:layout_height="32dp"
         app:cardBackgroundColor="@color/glass_white"
@@ -52,17 +52,8 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_popup_reminder"
+                android:src="@android:drawable/ic_menu_preferences"
                 app:tint="@color/white" />
-
-            <View
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="6dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_circle_indicator"
-                android:backgroundTint="@color/danger" />
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
 
