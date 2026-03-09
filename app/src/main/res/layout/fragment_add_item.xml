@@ -43,22 +43,67 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Card Title -->
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Card Header Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Item Details"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Fill in the maintenance information below"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        <!-- Titles -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Item Details"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Fill in the maintenance information below"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Active Toggle moved to header -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="end">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Status"
+                                android:textColor="@color/brand_primary"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:background="@drawable/bg_status_badge"
+                                android:backgroundTint="#EEF2FF"
+                                android:paddingHorizontal="6dp"
+                                android:paddingVertical="2dp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switchActive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="2dp"
+                                android:checked="true"
+                                app:thumbTint="@color/white"
+                                app:trackTint="@color/brand_primary"
+                                app:useMaterialThemeColors="false" />
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <!-- Divider -->
                     <View
@@ -123,42 +168,147 @@
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- ── Active Status Switch ── -->
+
+                    <!-- ── Schedule Type Compact Selector ── -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="@drawable/bg_status_badge"
-                        android:backgroundTint="#F5F7FF"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="12dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@android:drawable/ic_lock_idle_charging"
-                            app:tint="@color/brand_primary" />
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:text="Device Active Status"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchActive"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
-                            app:thumbTint="@color/white"
-                            app:trackTint="@color/brand_primary"
-                            app:useMaterialThemeColors="false" />
+                            android:layout_marginBottom="8dp"
+                            android:text="Schedule Type"
+                            android:textColor="@color/text_primary"
+                            android:textSize="12sp"
+                            android:letterSpacing="0.05"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- Option: Flexible -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardFlexible"
+                                android:layout_width="0dp"
+                                android:layout_height="56dp"
+                                android:layout_weight="1"
+                                android:clickable="true"
+                                android:focusable="true"
+                                app:cardBackgroundColor="#EDF1FF"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="@color/brand_primary"
+                                app:strokeWidth="1.5dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingHorizontal="12dp">
+
+                                    <ImageView
+                                        android:id="@+id/ivFlexibleIcon"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_schedule_flexible"
+                                        app:tint="@color/brand_primary" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Flexible"
+                                            android:textColor="@color/brand_primary"
+                                            android:textSize="12sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Ikut tanggal service"
+                                            android:textColor="@color/brand_primary"
+                                            android:alpha="0.6"
+                                            android:textSize="9sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <View
+                                android:layout_width="8dp"
+                                android:layout_height="0dp" />
+
+                            <!-- Option: Fixed -->
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardFixed"
+                                android:layout_width="0dp"
+                                android:layout_height="56dp"
+                                android:layout_weight="1"
+                                android:clickable="true"
+                                android:focusable="true"
+                                app:cardBackgroundColor="#F5F5F7"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="#DEDEDE"
+                                app:strokeWidth="1.5dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:paddingHorizontal="12dp">
+
+                                    <ImageView
+                                        android:id="@+id/ivFixedIcon"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_schedule_fixed"
+                                        app:tint="#AAAAAA" />
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/tvFixedLabel"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Fixed"
+                                            android:textColor="#AAAAAA"
+                                            android:textSize="12sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/tvFixedSubLabel"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Tanggal tetap"
+                                            android:textColor="#BBBBBB"
+                                            android:textSize="9sp" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- ── Last Service Date ── -->
@@ -190,6 +340,37 @@
                             android:textColorHint="@color/text_placeholder"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Info hint: muncul hanya saat Fixed dipilih -->
+                    <LinearLayout
+                        android:id="@+id/llFixedDateHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_status_badge"
+                        android:backgroundTint="#FFF3E0"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="7dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📌"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="Tanggal ini akan menjadi acuan perhitungan jadwal berikutnya secara tetap"
+                            android:textColor="#C0622D"
+                            android:textSize="11sp"
+                            android:lineSpacingExtra="2dp" />
+
+                    </LinearLayout>
 
                     <!-- ── Interval + Unit Row ── -->
                     <LinearLayout

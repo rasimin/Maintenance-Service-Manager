@@ -173,7 +173,7 @@
                         android:orientation="vertical"
                         android:padding="14dp">
 
-                        <!-- Name + Edit button row -->
+                        <!-- Name + Active Toggle row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -205,6 +205,37 @@
                                     tools:text="Elektronik" />
                             </LinearLayout>
 
+                            <!-- Active Toggle moved to header -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="end">
+
+                                <TextView
+                                    android:id="@+id/tvActiveLabel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Status"
+                                    android:textColor="@color/brand_primary"
+                                    android:textSize="9sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/bg_status_badge"
+                                    android:backgroundTint="#EEF2FF"
+                                    android:paddingHorizontal="6dp"
+                                    android:paddingVertical="2dp" />
+
+                                <com.google.android.material.switchmaterial.SwitchMaterial
+                                    android:id="@+id/swActiveDetail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="24dp"
+                                    android:layout_marginTop="2dp"
+                                    android:checked="true"
+                                    app:thumbTint="@color/white"
+                                    app:trackTint="@color/brand_primary"
+                                    app:useMaterialThemeColors="false" />
+                            </LinearLayout>
+
                         </LinearLayout>
 
                         <!-- Next Maintenance Highlight Box -->
@@ -234,6 +265,22 @@
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 tools:text="06 Apr 2026" />
+
+                            <!-- Schedule Type Badge -->
+                            <TextView
+                                android:id="@+id/tvScheduleTypeBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_status_badge"
+                                android:backgroundTint="#EEF2FF"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="3dp"
+                                android:textColor="@color/brand_primary"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                tools:text="🔄 Flexible Schedule" />
+
                         </LinearLayout>
 
                         <!-- Divider -->
@@ -244,7 +291,7 @@
                             android:background="@color/divider" />
 
                         <!-- Stats Grid: 2x2 -->
-                        <!-- Row 1: Last Service | Active Toggle -->
+                        <!-- Row 1: Last Service | Service Interval -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -287,7 +334,7 @@
                                 android:layout_width="10dp"
                                 android:layout_height="0dp" />
 
-                            <!-- Active Toggle -->
+                            <!-- Service Interval -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -297,31 +344,30 @@
                                 android:gravity="end">
 
                                 <TextView
-                                    android:id="@+id/tvActiveLabel"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Status"
-                                    android:textColor="@color/brand_primary"
+                                    android:text="Interval"
+                                    android:textColor="#27AE60"
                                     android:textSize="10sp"
                                     android:textStyle="bold"
                                     android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#EEF2FF"
+                                    android:backgroundTint="#E8F8F0"
                                     android:paddingHorizontal="8dp"
                                     android:paddingVertical="3dp" />
 
-                                <com.google.android.material.switchmaterial.SwitchMaterial
-                                    android:id="@+id/swActiveDetail"
+                                <TextView
+                                    android:id="@+id/tvDetailInterval"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="32dp"
+                                    android:layout_height="wrap_content"
                                     android:layout_marginTop="6dp"
-                                    android:checked="true"
-                                    app:thumbTint="@color/white"
-                                    app:trackTint="@color/brand_primary"
-                                    app:useMaterialThemeColors="false" />
+                                    android:textColor="#1A1A2E"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    tools:text="30 Days" />
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Row 2: Total Cost | Interval -->
+                        <!-- Row 2: Total Cost | Estimated Cost -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -363,7 +409,7 @@
                                 android:layout_width="10dp"
                                 android:layout_height="0dp" />
 
-                            <!-- Service Interval -->
+                            <!-- Estimated Cost / Svc -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -371,46 +417,6 @@
                                 android:orientation="vertical"
                                 android:padding="4dp"
                                 android:gravity="end">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Interval"
-                                    android:textColor="#27AE60"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#E8F8F0"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailInterval"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    tools:text="30 Days" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- Row 3: Estimated Cost -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="8dp"
-                            android:baselineAligned="false">
-
-                            <!-- Estimated Cost -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -434,18 +440,6 @@
                                     android:textStyle="bold"
                                     tools:text="Rp 0" />
                             </LinearLayout>
-
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="0dp" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp"
-                                android:gravity="end" />
                         </LinearLayout>
 
                         <!-- Note Row -->

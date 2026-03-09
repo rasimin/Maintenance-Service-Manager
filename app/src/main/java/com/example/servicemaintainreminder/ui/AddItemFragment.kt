@@ -14,6 +14,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.databinding.FragmentAddItemBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.CurrencyTextWatcher
 import com.example.servicemaintainreminder.R
 import java.util.*
 import android.graphics.Color
@@ -29,6 +30,7 @@ class AddItemFragment : Fragment() {
     private var selectedDate: Long = System.currentTimeMillis()
     private var isEditMode = false
     private var itemToEdit: Item? = null
+    private var isFixedScheduleSelected = false  // false = Flexible (default)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,11 +66,70 @@ class AddItemFragment : Fragment() {
             updateSwitchColor(isChecked)
         }
         updateSwitchColor(binding.switchActive.isChecked)
+
+        setupScheduleTypeCards()
+
+        // Format otomatis titik ribuan pada field estimated cost
+        CurrencyTextWatcher.attach(binding.etEstimatedCost)
     }
 
     private fun updateSwitchColor(isActive: Boolean) {
         val color = if (isActive) ContextCompat.getColor(requireContext(), R.color.brand_primary) else Color.parseColor("#D0D0D0")
         binding.switchActive.trackTintList = ColorStateList.valueOf(color)
+    }
+
+    private fun setupScheduleTypeCards() {
+        updateScheduleCardUI(isFixedScheduleSelected)
+
+        binding.cardFlexible.setOnClickListener {
+            isFixedScheduleSelected = false
+            updateScheduleCardUI(false)
+        }
+        binding.cardFixed.setOnClickListener {
+            isFixedScheduleSelected = true
+            updateScheduleCardUI(true)
+        }
+    }
+
+    private fun updateScheduleCardUI(isFixed: Boolean) {
+        val brandColor = ContextCompat.getColor(requireContext(), R.color.brand_primary)
+        val grayColor = Color.parseColor("#AAAAAA")
+        val activeBg = Color.parseColor("#EDF1FF")
+        val inactiveBg = Color.parseColor("#F5F5F7")
+        val activeStroke = brandColor
+        val inactiveStroke = Color.parseColor("#DEDEDE")
+
+        // Buat animasi kemunculan/menghilang menjadi smooth
+        android.transition.TransitionManager.beginDelayedTransition(binding.root as android.view.ViewGroup)
+        
+        // Tampilkan/sembunyikan pesan peringatan di bawah field Last Service Date
+        binding.llFixedDateHint.visibility = if (isFixed) View.VISIBLE else View.GONE
+
+        if (isFixed) {
+            // Fixed → aktif
+            binding.cardFixed.setCardBackgroundColor(activeBg)
+            binding.cardFixed.strokeColor = activeStroke
+            binding.tvFixedLabel.setTextColor(brandColor)
+            binding.tvFixedSubLabel.setTextColor(brandColor)
+            binding.tvFixedSubLabel.alpha = 0.6f
+            binding.ivFixedIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
+            // Flexible → tidak aktif
+            binding.cardFlexible.setCardBackgroundColor(inactiveBg)
+            binding.cardFlexible.strokeColor = inactiveStroke
+            binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(grayColor)
+        } else {
+            // Flexible → aktif
+            binding.cardFlexible.setCardBackgroundColor(activeBg)
+            binding.cardFlexible.strokeColor = activeStroke
+            binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
+            // Fixed → tidak aktif
+            binding.cardFixed.setCardBackgroundColor(inactiveBg)
+            binding.cardFixed.strokeColor = inactiveStroke
+            binding.tvFixedLabel.setTextColor(grayColor)
+            binding.tvFixedSubLabel.setTextColor(Color.parseColor("#BBBBBB"))
+            binding.tvFixedSubLabel.alpha = 1f
+            binding.ivFixedIcon.imageTintList = android.content.res.ColorStateList.valueOf(grayColor)
+        }
     }
 
     private fun setupEditMode() {
@@ -82,8 +143,15 @@ class AddItemFragment : Fragment() {
                 binding.spinnerIntervalUnit.setText(item.serviceIntervalUnit, false)
                 binding.etNote.setText(item.note)
                 binding.switchActive.isChecked = item.isActive
-                val costStr = if (item.estimatedCost > 0) item.estimatedCost.toLong().toString() else ""
-                binding.etEstimatedCost.setText(costStr)
+                isFixedScheduleSelected = item.isFixedSchedule
+                // panggil setelah view siap
+                binding.root.post { updateScheduleCardUI(item.isFixedSchedule) }
+                // Prefill cost dengan format titik ribuan
+                val costFormatted = if (item.estimatedCost > 0) {
+                    java.text.NumberFormat.getInstance(java.util.Locale("in", "ID"))
+                        .format(item.estimatedCost.toLong())
+                } else ""
+                binding.etEstimatedCost.setText(costFormatted)
 
                 selectedDate = item.lastServiceDate
                 binding.etLastServiceDate.setText(DateUtil.formatDate(selectedDate))
@@ -99,6 +167,9 @@ class AddItemFragment : Fragment() {
         val units = arrayOf("Days", "Months")
         val unitAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, units)
         binding.spinnerIntervalUnit.setAdapter(unitAdapter)
+        
+        // Default ke "Days". Jika sedang edit mode, ini akan ditimpa di setupEditMode()
+        binding.spinnerIntervalUnit.setText(units[0], false)
     }
 
     private fun setupDatePicker() {
@@ -135,7 +206,7 @@ class AddItemFragment : Fragment() {
 
         val intervalValue = intervalValueStr.toInt()
         val nextServiceDate = DateUtil.getNextServiceDate(selectedDate, intervalValue, intervalUnit)
-        val estimatedCost = if (costStr.isNotEmpty()) costStr.toDouble() else 0.0
+        val estimatedCost = CurrencyTextWatcher.getRawValue(binding.etEstimatedCost)
 
         if (isEditMode && itemToEdit != null) {
             val updatedItem = itemToEdit!!.copy(
@@ -147,7 +218,8 @@ class AddItemFragment : Fragment() {
                 nextServiceDate = nextServiceDate,
                 note = note,
                 estimatedCost = estimatedCost,
-                isActive = binding.switchActive.isChecked
+                isActive = binding.switchActive.isChecked,
+                isFixedSchedule = isFixedScheduleSelected
             )
             viewModel.updateItem(updatedItem)
             Toast.makeText(requireContext(), "Item updated successfully", Toast.LENGTH_SHORT).show()
@@ -162,7 +234,8 @@ class AddItemFragment : Fragment() {
                 nextServiceDate = nextServiceDate,
                 note = note,
                 estimatedCost = estimatedCost,
-                isActive = binding.switchActive.isChecked
+                isActive = binding.switchActive.isChecked,
+                isFixedSchedule = isFixedScheduleSelected
             )
             viewModel.insertItem(newItem)
             Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()

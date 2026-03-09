@@ -16,5 +16,8 @@ data class Item(
     val nextServiceDate: Long,
     val note: String = "",
     val estimatedCost: Double = 0.0,
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    // true = jadwal SELALU dihitung dari jadwal awal (fixed)
+    // false = jadwal mengikuti tanggal service terakhir diinput (flexible)
+    val isFixedSchedule: Boolean = false
 )

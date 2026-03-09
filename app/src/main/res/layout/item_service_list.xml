@@ -131,6 +131,21 @@
             app:layout_constraintStart_toStartOf="@id/tvItemName"
             app:layout_constraintTop_toBottomOf="@id/divider" />
 
+        <!-- EST. COST label -->
+        <TextView
+            android:id="@+id/tvEstCostLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="EST. COST"
+            android:textColor="#AAAABC"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@id/btnMoreOptions"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
         <!-- Next Service Date with icon -->
         <LinearLayout
             android:id="@+id/llNextService"
@@ -159,6 +174,21 @@
                 tools:text="07 Mar 2026" />
 
         </LinearLayout>
+
+        <!-- Estimated Cost value -->
+        <TextView
+            android:id="@+id/tvEstCost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#8E44AD"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/tvEstCostLabel"
+            app:layout_constraintTop_toBottomOf="@id/tvEstCostLabel"
+            tools:text="Rp 250.000" />
+
+
 
         <!-- More Options Button -->
         <ImageButton

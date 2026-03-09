@@ -12,6 +12,8 @@ import com.example.servicemaintainreminder.R
 import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.databinding.ItemServiceListBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import java.text.NumberFormat
+import java.util.Locale
 
 class ItemAdapterVertical(
     private val onItemClick: (Item) -> Unit,
@@ -39,6 +41,13 @@ class ItemAdapterVertical(
             binding.tvItemName.text = item.name
             binding.tvCategory.text = item.category
             binding.tvNextServiceDate.text = DateUtil.formatDate(item.nextServiceDate)
+
+            // Estimated cost
+            val fmt = NumberFormat.getInstance(Locale("in", "ID"))
+            binding.tvEstCost.text = if (item.estimatedCost > 0)
+                "Rp ${fmt.format(item.estimatedCost.toLong())}"
+            else
+                "-"
 
             // Set Category Icon
             val iconRes = when (item.category.lowercase()) {
@@ -114,6 +123,7 @@ class ItemAdapterVertical(
                     ContextCompat.getColorStateList(binding.root.context, R.color.divider)
                 binding.btnMoreOptions.isEnabled = false
                 binding.btnMoreOptions.alpha = 0.4f
+                binding.tvEstCost.setTextColor(Color.parseColor("#AAAABC"))
             }
 
             binding.btnMoreOptions.setOnClickListener { view ->

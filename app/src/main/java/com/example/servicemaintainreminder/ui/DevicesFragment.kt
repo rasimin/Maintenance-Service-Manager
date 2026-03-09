@@ -25,6 +25,7 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDevicesBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.CurrencyTextWatcher
 import com.example.servicemaintainreminder.util.ModernMenuItem
 import com.example.servicemaintainreminder.util.ModernMenuUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -378,6 +379,9 @@ class DevicesFragment : Fragment() {
         val etDate = dialogView.findViewById<EditText>(R.id.etHistoryDate)
         val btnSave = dialogView.findViewById<View>(R.id.btnSaveHistory)
         val btnCancel = dialogView.findViewById<View>(R.id.btnCancelHistory)
+
+        // Format otomatis titik ribuan
+        CurrencyTextWatcher.attach(etCost)
         
         selectedHistoryDate = System.currentTimeMillis()
         etDate.setText(DateUtil.formatDate(selectedHistoryDate))
@@ -395,9 +399,9 @@ class DevicesFragment : Fragment() {
 
         btnSave.setOnClickListener {
             val desc = etDesc.text.toString()
-            val costStr = etCost.text.toString()
-            if (desc.isNotEmpty() && costStr.isNotEmpty()) {
-                saveHistory(item, desc, costStr.toDouble(), selectedHistoryDate)
+            if (desc.isNotEmpty()) {
+                val cost = CurrencyTextWatcher.getRawValue(etCost)
+                saveHistory(item, desc, cost, selectedHistoryDate)
                 dialog.dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()

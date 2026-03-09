@@ -26,6 +26,7 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDetailBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.CurrencyTextWatcher
 import com.example.servicemaintainreminder.util.ModernMenuItem
 import com.example.servicemaintainreminder.util.ModernMenuUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -308,6 +309,21 @@ class DetailFragment : Fragment() {
         
         binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
 
+        // Schedule type badge
+        if (item.isFixedSchedule) {
+            binding.tvScheduleTypeBadge.text = "📌 Fixed Schedule"
+            binding.tvScheduleTypeBadge.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFF3E0"))
+            binding.tvScheduleTypeBadge.setTextColor(android.graphics.Color.parseColor("#E67E22"))
+        } else {
+            binding.tvScheduleTypeBadge.text = "🔄 Flexible Schedule"
+            binding.tvScheduleTypeBadge.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#EEF2FF"))
+            binding.tvScheduleTypeBadge.setTextColor(
+                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary)
+            )
+        }
+
         // Update switch without triggering listener
         binding.swActiveDetail.setOnCheckedChangeListener(null)
         binding.swActiveDetail.isChecked = item.isActive
@@ -492,6 +508,9 @@ class DetailFragment : Fragment() {
         val btnSave = dialogView.findViewById<View>(R.id.btnSaveHistory)
         val btnCancel = dialogView.findViewById<View>(R.id.btnCancelHistory)
 
+        // Format otomatis titik ribuan
+        CurrencyTextWatcher.attach(etCost)
+
         selectedHistoryDate = System.currentTimeMillis()
         etDate.setText(DateUtil.formatDate(selectedHistoryDate))
 
@@ -508,9 +527,9 @@ class DetailFragment : Fragment() {
 
         btnSave.setOnClickListener {
             val desc = etDesc.text.toString()
-            val costStr = etCost.text.toString()
-            if (desc.isNotEmpty() && costStr.isNotEmpty()) {
-                saveHistory(desc, costStr.toDouble(), selectedHistoryDate)
+            if (desc.isNotEmpty()) {
+                val cost = CurrencyTextWatcher.getRawValue(etCost)
+                saveHistory(desc, cost, selectedHistoryDate)
                 dialog.dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
@@ -535,8 +554,36 @@ class DetailFragment : Fragment() {
 
         currentItem?.let { item ->
             if (date >= item.lastServiceDate) {
-                val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
-                viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
+                if (item.isFixedSchedule) {
+                    // ── FIXED MODE ───────────────────────────────────────────
+                    // next dihitung dari jadwal (nextServiceDate), bukan tanggal input
+                    val nextDate = DateUtil.getNextServiceDate(
+                        item.nextServiceDate,
+                        item.serviceIntervalValue,
+                        item.serviceIntervalUnit
+                    )
+                    // ⚠ lastServiceDate di-set ke nextServiceDate (batas jadwal),
+                    // BUKAN ke tanggal input 'date'. Tujuannya:
+                    // → Input ke-2 dalam periode yang sama akan memiliki
+                    //   date < lastServiceDate baru → kondisi di atas FALSE
+                    //   → tidak ada double-advance!
+                    viewModel.updateItem(item.copy(
+                        lastServiceDate = item.nextServiceDate,
+                        nextServiceDate = nextDate
+                    ))
+                } else {
+                    // ── FLEXIBLE MODE ─────────────────────────────────────────
+                    // next dihitung dari tanggal service yang diinput
+                    val nextDate = DateUtil.getNextServiceDate(
+                        date,
+                        item.serviceIntervalValue,
+                        item.serviceIntervalUnit
+                    )
+                    viewModel.updateItem(item.copy(
+                        lastServiceDate = date,
+                        nextServiceDate = nextDate
+                    ))
+                }
             }
         }
 
