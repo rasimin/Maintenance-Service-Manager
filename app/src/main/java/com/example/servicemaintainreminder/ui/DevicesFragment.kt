@@ -25,6 +25,8 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDevicesBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.ModernMenuItem
+import com.example.servicemaintainreminder.util.ModernMenuUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
 import android.graphics.Paint
@@ -178,12 +180,38 @@ class DevicesFragment : Fragment() {
                 val action = DevicesFragmentDirections.actionDevicesFragmentToDetailFragment(item.id)
                 findNavController().navigate(action)
             },
-            onEditClick = { item ->
-                val action = DevicesFragmentDirections.actionDevicesFragmentToAddItemFragment(item.id)
-                findNavController().navigate(action)
-            },
-            onAddRecordClick = { item ->
-                showAddHistoryDialog(item)
+            onMoreOptionsClick = { item, view ->
+                val menuItems = listOf(
+                    ModernMenuItem(1, "Edit", R.drawable.ic_input_edit),
+                    ModernMenuItem(2, "Quick Done", android.R.drawable.ic_menu_myplaces),
+                    ModernMenuItem(3, "Add Service", android.R.drawable.ic_menu_add),
+                    ModernMenuItem(4, "Hapus", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
+                )
+
+                ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
+                    when (selectedId) {
+                        1 -> {
+                            val action = DevicesFragmentDirections.actionDevicesFragmentToAddItemFragment(item.id)
+                            findNavController().navigate(action)
+                        }
+                        2 -> {
+                            // Check if Upcoming or Overdue
+                            if (item.nextServiceDate <= System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000L)) {
+                                val position = adapter.currentList.indexOf(item)
+                                showAddHistoryConfirmDialog(item, position)
+                            } else {
+                                Toast.makeText(requireContext(), "Quick Done hanya untuk device Upcoming / Overdue", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        3 -> {
+                            showAddHistoryDialog(item)
+                        }
+                        4 -> {
+                            val position = adapter.currentList.indexOf(item)
+                            showDeleteConfirmationDialog(item, position)
+                        }
+                    }
+                }
             }
         )
         binding.rvAllDevices.adapter = adapter
@@ -340,15 +368,23 @@ class DevicesFragment : Fragment() {
     }
 
     private fun showAddHistoryDialog(item: Item) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_history, null)
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_history, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         val etDesc = dialogView.findViewById<EditText>(R.id.etHistoryDesc)
         val etCost = dialogView.findViewById<EditText>(R.id.etHistoryCost)
         val etDate = dialogView.findViewById<EditText>(R.id.etHistoryDate)
+        val btnSave = dialogView.findViewById<View>(R.id.btnSaveHistory)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnCancelHistory)
         
         selectedHistoryDate = System.currentTimeMillis()
         etDate.setText(DateUtil.formatDate(selectedHistoryDate))
+        
         etDate.setOnClickListener {
             val calendar = Calendar.getInstance()
+            calendar.timeInMillis = selectedHistoryDate
             DatePickerDialog(requireContext(), { _, year, month, day ->
                 val selCal = Calendar.getInstance()
                 selCal.set(year, month, day)
@@ -357,15 +393,22 @@ class DevicesFragment : Fragment() {
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Tambah Catatan Servis")
-            .setView(dialogView)
-            .setPositiveButton("Simpan") { _, _ ->
-                val desc = etDesc.text.toString()
-                val costStr = etCost.text.toString()
-                if (desc.isNotEmpty() && costStr.isNotEmpty()) saveHistory(item, desc, costStr.toDouble(), selectedHistoryDate)
+        btnSave.setOnClickListener {
+            val desc = etDesc.text.toString()
+            val costStr = etCost.text.toString()
+            if (desc.isNotEmpty() && costStr.isNotEmpty()) {
+                saveHistory(item, desc, costStr.toDouble(), selectedHistoryDate)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Batal", null).show()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun saveHistory(item: Item, description: String, cost: Double, date: Long) {

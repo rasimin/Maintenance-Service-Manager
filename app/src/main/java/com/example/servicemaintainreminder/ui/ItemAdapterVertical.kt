@@ -15,8 +15,7 @@ import com.example.servicemaintainreminder.util.DateUtil
 
 class ItemAdapterVertical(
     private val onItemClick: (Item) -> Unit,
-    private val onEditClick: (Item) -> Unit,
-    private val onAddRecordClick: (Item) -> Unit
+    private val onMoreOptionsClick: (Item, android.view.View) -> Unit
 ) : ListAdapter<Item, ItemAdapterVertical.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -96,9 +95,8 @@ class ItemAdapterVertical(
                             ContextCompat.getColorStateList(binding.root.context, R.color.status_safe_bg)
                     }
                 }
-
-                binding.btnAddRecord.isEnabled = true
-                binding.btnAddRecord.alpha = 1.0f
+                binding.btnMoreOptions.isEnabled = true
+                binding.btnMoreOptions.alpha = 1.0f
             } else {
                 // INACTIVE STATE STYLING (Grayed out)
                 binding.root.alpha = 0.75f
@@ -114,17 +112,12 @@ class ItemAdapterVertical(
                 binding.tvStatus.setTextColor(grayText)
                 binding.tvStatus.backgroundTintList =
                     ContextCompat.getColorStateList(binding.root.context, R.color.divider)
-
-                binding.btnAddRecord.isEnabled = false
-                binding.btnAddRecord.alpha = 0.4f
+                binding.btnMoreOptions.isEnabled = false
+                binding.btnMoreOptions.alpha = 0.4f
             }
 
-            binding.btnEdit.setOnClickListener {
-                onEditClick(item)
-            }
-
-            binding.btnAddRecord.setOnClickListener {
-                onAddRecordClick(item)
+            binding.btnMoreOptions.setOnClickListener { view ->
+                onMoreOptionsClick(item, view)
             }
 
             binding.root.setOnClickListener {

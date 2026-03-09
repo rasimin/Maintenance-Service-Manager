@@ -12,35 +12,35 @@
     app:strokeColor="@color/divider"
     app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
         <!-- Colored Left Accent Bar (status indicator) -->
         <View
             android:id="@+id/viewAccentBar"
-            android:layout_width="4dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_rounded_accent"
-            android:backgroundTint="#2ECC71"
-            android:layout_marginEnd="12dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:backgroundTint="#2ECC71" />
 
-        <!-- Icon Circle -->
-        <View
-            android:id="@+id/viewIconBg"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_circle_indicator"
-            android:backgroundTint="#EEF2FF"
-            android:layout_marginStart="4dp"
-            app:layout_constraintStart_toEndOf="@id/viewAccentBar"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="16dp">
+
+            <!-- Icon Circle -->
+            <View
+                android:id="@+id/viewIconBg"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_indicator"
+                android:backgroundTint="#EEF2FF"
+                android:layout_marginStart="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivItemIcon"
@@ -111,9 +111,10 @@
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
+            android:layout_marginStart="0dp"
             android:background="@color/divider"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/viewAccentBar"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/viewIconBg" />
 
         <!-- NEXT SERVICE label -->
@@ -159,43 +160,19 @@
 
         </LinearLayout>
 
-        <!-- Buttons Row -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEdit"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="0dp"
-            android:text="Edit"
-            android:textColor="#8A8A9A"
-            android:textSize="11sp"
-            android:textAllCaps="false"
-            app:cornerRadius="8dp"
-            app:strokeColor="@color/divider"
-            app:strokeWidth="1dp"
-            app:layout_constraintBottom_toBottomOf="@id/llNextService"
-            app:layout_constraintEnd_toStartOf="@+id/btnAddRecord"
-            android:layout_marginEnd="8dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddRecord"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="0dp"
-            android:text="✓ Record"
-            android:textColor="@color/white"
-            android:textSize="11sp"
-            android:textAllCaps="false"
-            app:backgroundTint="@color/brand_primary"
-            app:cornerRadius="8dp"
-            app:layout_constraintBottom_toBottomOf="@id/llNextService"
+        <!-- More Options Button -->
+        <ImageButton
+            android:id="@+id/btnMoreOptions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_vert"
+            app:tint="#8A8A9A"
+            android:contentDescription="More Options"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

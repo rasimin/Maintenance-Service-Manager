@@ -15,6 +15,8 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentHomeBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.ModernMenuItem
+import com.example.servicemaintainreminder.util.ModernMenuUtil
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.LinearLayout
@@ -71,63 +73,51 @@ class HomeFragment : Fragment() {
     private fun setupHeader() {
         updateGreeting()
         binding.header.cardSettings.setOnClickListener { view ->
-            val popupMenu = android.widget.PopupMenu(requireContext(), view)
-            popupMenu.menu.add(0, 1, 0, "Account")
-            popupMenu.menu.add(0, 2, 1, "Settings")
+            val menuItems = listOf(
+                ModernMenuItem(1, "Account", R.drawable.ic_input_edit),
+                ModernMenuItem(2, "Settings", android.R.drawable.ic_menu_preferences)
+            )
             
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    1 -> {
-                        showAccountDialog()
-                        true
-                    }
-                    2 -> {
-                        android.widget.Toast.makeText(requireContext(), "Settings feature coming soon", android.widget.Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
+            ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
+                when (selectedId) {
+                    1 -> showAccountDialog()
+                    2 -> android.widget.Toast.makeText(requireContext(), "Settings feature coming soon", android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
-            popupMenu.show()
         }
     }
 
     private fun showAccountDialog() {
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val currentName = prefs.getString("user_name", "") ?: ""
-        
-        val editText = android.widget.EditText(requireContext()).apply {
-            hint = "Enter your name"
-            setText(currentName)
-            setLines(1)
-            maxLines = 1
-            inputType = android.text.InputType.TYPE_CLASS_TEXT
-        }
-        
-        val container = android.widget.FrameLayout(requireContext())
-        val params = android.widget.FrameLayout.LayoutParams(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        // Add margins 24dp
-        val margin = (24 * resources.displayMetrics.density).toInt()
-        params.setMargins(margin, 0, margin, 0)
-        editText.layoutParams = params
-        container.addView(editText)
-        
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Account Settings")
-            .setMessage("Change your display name:")
-            .setView(container)
-            .setPositiveButton("Save") { _, _ ->
-                val newName = editText.text.toString().trim()
-                if (newName.isNotEmpty()) {
-                    prefs.edit().putString("user_name", newName).apply()
-                    updateGreeting()
-                }
+
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_account, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        val etName = dialogView.findViewById<android.widget.EditText>(R.id.etAccountName)
+        val btnSave = dialogView.findViewById<View>(R.id.btnSaveAccount)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnCancelAccount)
+
+        etName.setText(currentName)
+
+        btnSave.setOnClickListener {
+            val newName = etName.text.toString().trim()
+            if (newName.isNotEmpty()) {
+                prefs.edit().putString("user_name", newName).apply()
+                updateGreeting()
+                dialog.dismiss()
+            } else {
+                android.widget.Toast.makeText(requireContext(), "Name cannot be empty", android.widget.Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun setupRecyclerView() {

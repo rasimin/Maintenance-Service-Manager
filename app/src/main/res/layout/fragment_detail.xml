@@ -77,15 +77,70 @@
                 android:layout_marginBottom="6dp"
                 android:letterSpacing="0.05" />
 
-            <!-- ── Main Info Card ── -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- ── Main Info Card Wrapper ── -->
+            <com.example.servicemaintainreminder.ui.SwipeCardLayout
+                android:id="@+id/sclMainInfo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/divider"
-                app:strokeWidth="1dp">
+                android:layout_height="wrap_content">
+
+                <!-- Background Card for Swipe -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        
+                        <!-- Left side (Delete) -->
+                        <LinearLayout
+                            android:id="@+id/llSwipeDeleteAreaDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#E74C3C"
+                            android:gravity="center_vertical|start"
+                            android:paddingStart="24dp"
+                            android:alpha="0">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@android:drawable/ic_menu_delete"
+                                app:tint="@color/white" />
+                        </LinearLayout>
+
+                        <!-- Right side (Quick Done) -->
+                        <LinearLayout
+                            android:id="@+id/llSwipeDoneAreaDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#E8F8F0"
+                            android:gravity="center_vertical|end"
+                            android:paddingEnd="24dp"
+                            android:alpha="0">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Quick Done ✅"
+                                android:textColor="#27AE60"
+                                android:textStyle="bold"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── Main Info Card ── -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvMainInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -150,24 +205,6 @@
                                     tools:text="Elektronik" />
                             </LinearLayout>
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnEditDetail"
-                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="36dp"
-                                android:minHeight="0dp"
-                                android:paddingHorizontal="14dp"
-                                android:paddingVertical="0dp"
-                                android:text="Edit"
-                                android:textColor="@color/brand_primary"
-                                android:textSize="13sp"
-                                android:textAllCaps="false"
-                                app:cornerRadius="10dp"
-                                app:strokeColor="@color/brand_primary"
-                                app:strokeWidth="1dp"
-                                app:icon="@android:drawable/ic_menu_edit"
-                                app:iconSize="14dp"
-                                app:iconTint="@color/brand_primary" />
                         </LinearLayout>
 
                         <!-- Next Maintenance Highlight Box -->
@@ -450,11 +487,22 @@
                                     android:textSize="14sp"
                                     tools:text="Optional notes..." />
                             </LinearLayout>
+
+                            <!-- More Options (Edit, Delete, Quick Done) -->
+                            <ImageButton
+                                android:id="@+id/btnMoreOptions"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_more_vert"
+                                app:tint="#8A8A9A"
+                                android:contentDescription="More Options" />
                         </LinearLayout>
 
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            </com.example.servicemaintainreminder.ui.SwipeCardLayout>
 
             <!-- ── Maintenance History Section ── -->
             <LinearLayout

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@drawable/bg_search_overlay"
+    android:orientation="vertical"
     android:padding="24dp">
 
     <!-- Header Icon -->
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Add Maintenance Service"
+        android:text="Account Settings"
         android:textColor="#1A1A2E"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -39,7 +39,7 @@
         android:layout_marginTop="6dp"
         android:gravity="center"
         android:lineSpacingExtra="4dp"
-        android:text="Record a new maintenance activity manually."
+        android:text="Change your display name."
         android:textColor="#8A8A9A"
         android:textSize="13sp" />
 
@@ -49,69 +49,12 @@
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-        <!-- Service Date -->
+        <!-- Display Name -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Service Date"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxStrokeColor="@color/input_stroke_color"
-            app:boxStrokeWidth="1dp"
-            app:boxStrokeWidthFocused="1.5dp"
-            app:hintTextColor="@color/brand_primary"
-            app:startIconDrawable="@drawable/ic_input_calendar"
-            app:startIconTint="@color/brand_primary">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etHistoryDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="false"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_placeholder"
-                android:textSize="14sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Maintenance Cost -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="Maintenance Cost (Rp)"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxStrokeColor="@color/input_stroke_color"
-            app:boxStrokeWidth="1dp"
-            app:boxStrokeWidthFocused="1.5dp"
-            app:hintTextColor="@color/brand_primary"
-            app:startIconDrawable="@drawable/ic_input_info"
-            app:startIconTint="@color/brand_primary">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etHistoryCost"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_placeholder"
-                android:textSize="14sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Service Description -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="Service Description"
+            android:hint="Display Name"
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
@@ -124,9 +67,10 @@
             app:startIconTint="@color/brand_primary">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etHistoryDesc"
+                android:id="@+id/etAccountName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textPersonName"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/text_placeholder"
                 android:textSize="14sp" />
@@ -141,7 +85,7 @@
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancelHistory"
+            android:id="@+id/btnCancelAccount"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -154,7 +98,7 @@
             app:strokeColor="#E5E7EB" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSaveHistory"
+            android:id="@+id/btnSaveAccount"
             style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:layout_width="0dp"
             android:layout_height="50dp"

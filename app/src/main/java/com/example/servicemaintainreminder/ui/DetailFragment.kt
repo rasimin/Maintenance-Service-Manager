@@ -26,6 +26,8 @@ import com.example.servicemaintainreminder.data.Item
 import com.example.servicemaintainreminder.data.ServiceHistory
 import com.example.servicemaintainreminder.databinding.FragmentDetailBinding
 import com.example.servicemaintainreminder.util.DateUtil
+import com.example.servicemaintainreminder.util.ModernMenuItem
+import com.example.servicemaintainreminder.util.ModernMenuUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
 import com.google.android.gms.ads.AdRequest
@@ -62,6 +64,7 @@ class DetailFragment : Fragment() {
         loadInterstitialAd()
         observeItem()
         setupPullToEdit()
+        setupCardSwipe()
 
         // Setup header back button & title
         binding.header.ivBackButton.setOnClickListener {
@@ -95,33 +98,139 @@ class DetailFragment : Fragment() {
             }
         }
 
-        binding.btnEditDetail.setOnClickListener {
+        binding.btnMoreOptions.setOnClickListener { view ->
             currentItem?.let { item ->
-                val action = DetailFragmentDirections.actionDetailFragmentToAddItemFragment(item.id)
-                findNavController().navigate(action)
+                val menuItems = listOf(
+                    ModernMenuItem(1, "Edit", R.drawable.ic_input_edit),
+                    ModernMenuItem(2, "Quick Done", android.R.drawable.ic_menu_myplaces),
+                    ModernMenuItem(3, "Hapus", android.R.drawable.ic_menu_delete, Color.parseColor("#E74C3C"))
+                )
+
+                ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
+                    when (selectedId) {
+                        1 -> {
+                            val action = DetailFragmentDirections.actionDetailFragmentToAddItemFragment(item.id)
+                            findNavController().navigate(action)
+                        }
+                        2 -> {
+                            if (binding.sclMainInfo.canSwipeLeft()) {
+                                showQuickDoneDialog(item)
+                            } else {
+                                Toast.makeText(requireContext(), "Quick Done hanya untuk device Upcoming / Overdue", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        3 -> {
+                            showDeleteDeviceDialog(item)
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private fun setupCardSwipe() {
+        binding.sclMainInfo.onSwipeRight = {
+            currentItem?.let { item -> showDeleteDeviceDialog(item) }
+        }
+        binding.sclMainInfo.onSwipeLeft = {
+            currentItem?.let { item -> showQuickDoneDialog(item) }
+        }
+        binding.sclMainInfo.canSwipeLeft = {
+            val item = currentItem
+            if (item != null) {
+                val diff = item.nextServiceDate - System.currentTimeMillis()
+                item.isActive && diff <= (7L * 24L * 60L * 60L * 1000L)
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun showDeleteDeviceDialog(item: Item) {
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_confirm, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val tvName = dialogView.findViewById<TextView>(R.id.tvDeleteDeviceName)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnDeleteCancel)
+        val btnDelete = dialogView.findViewById<View>(R.id.btnDeleteConfirm)
+
+        tvName.text = item.name
+
+        btnDelete.setOnClickListener {
+            viewModel.deleteItem(item)
+            dialog.dismiss()
+            findNavController().navigateUp()
+        }
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showQuickDoneDialog(item: Item) {
+        val format = NumberFormat.getInstance(Locale("in", "ID"))
+        val costText = if (item.estimatedCost > 0) "Rp ${format.format(item.estimatedCost.toLong())}" else "Rp 0"
+
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_quick_done, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val tvName = dialogView.findViewById<TextView>(R.id.tvQuickDeviceName)
+        val tvDate = dialogView.findViewById<TextView>(R.id.tvQuickDate)
+        val tvCost = dialogView.findViewById<TextView>(R.id.tvQuickCost)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnQuickCancel)
+        val btnSave = dialogView.findViewById<View>(R.id.btnQuickSave)
+
+        tvName.text = item.name
+        tvDate.text = DateUtil.formatDate(System.currentTimeMillis())
+        tvCost.text = costText
+
+        btnSave.setOnClickListener {
+            val date = System.currentTimeMillis()
+            val history = ServiceHistory(
+                itemId = item.id,
+                serviceDate = date,
+                description = "Auto done by swipe",
+                cost = item.estimatedCost
+            )
+            viewModel.addHistory(history)
+            val nextDate = DateUtil.getNextServiceDate(date, item.serviceIntervalValue, item.serviceIntervalUnit)
+            viewModel.updateItem(item.copy(lastServiceDate = date, nextServiceDate = nextDate))
+            Toast.makeText(requireContext(), "Catatan servis berhasil ditambahkan otomatis", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     private fun setupPullToEdit() {
         var startY = 0f
         var isSwiping = false
-        val threshold = 250f // px
+        val threshold = 150f // px
 
         binding.nestedScrollViewDetail.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     if (binding.nestedScrollViewDetail.scrollY == 0) {
-                        startY = event.y
+                        startY = event.rawY
                         isSwiping = true
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    if (isSwiping && event.y > startY && binding.nestedScrollViewDetail.scrollY == 0) {
-                        val deltaY = event.y - startY
-                        val dragY = deltaY / 2.5f
+                    if (!isSwiping && binding.nestedScrollViewDetail.scrollY == 0 && event.rawY - startY > 10f) {
+                        isSwiping = true
+                        startY = event.rawY
+                    }
+
+                    if (isSwiping && binding.nestedScrollViewDetail.scrollY == 0) {
+                        val deltaY = event.rawY - startY
+                        val dragY = deltaY / 1.5f
 
                         if (dragY > 0) {
+                            binding.nestedScrollViewDetail.parent?.requestDisallowInterceptTouchEvent(true)
                             binding.nestedScrollViewDetail.translationY = dragY
                             val alpha = (dragY / threshold).coerceIn(0f, 1f)
                             binding.llSwipeEditBg.alpha = alpha
@@ -133,14 +242,15 @@ class DetailFragment : Fragment() {
                             }
                             return@setOnTouchListener true
                         }
-                    } else if (isSwiping && event.y < startY) {
+                    } else if (isSwiping && event.rawY < startY) {
                          isSwiping = false
+                         binding.nestedScrollViewDetail.parent?.requestDisallowInterceptTouchEvent(false)
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     if (isSwiping) {
-                        val deltaY = event.y - startY
-                        val dragY = deltaY / 2.5f
+                        val deltaY = event.rawY - startY
+                        val dragY = deltaY / 1.5f
 
                         if (dragY > threshold) {
                             currentItem?.let { item ->
@@ -152,6 +262,10 @@ class DetailFragment : Fragment() {
                         binding.nestedScrollViewDetail.animate().translationY(0f).setDuration(250).start()
                         binding.llSwipeEditBg.animate().alpha(0f).setDuration(250).start()
                         isSwiping = false
+                        binding.nestedScrollViewDetail.parent?.requestDisallowInterceptTouchEvent(false)
+                    } else if (event.action == MotionEvent.ACTION_CANCEL) {
+                        binding.nestedScrollViewDetail.animate().translationY(0f).setDuration(250).start()
+                        binding.llSwipeEditBg.animate().alpha(0f).setDuration(250).start()
                     }
                 }
             }
@@ -367,10 +481,16 @@ class DetailFragment : Fragment() {
 
     // ── Add History Dialog ───────────────────────────────────────────────────
     private fun showAddHistoryDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_history, null)
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_history, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         val etDesc = dialogView.findViewById<EditText>(R.id.etHistoryDesc)
         val etCost = dialogView.findViewById<EditText>(R.id.etHistoryCost)
         val etDate = dialogView.findViewById<EditText>(R.id.etHistoryDate)
+        val btnSave = dialogView.findViewById<View>(R.id.btnSaveHistory)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnCancelHistory)
 
         selectedHistoryDate = System.currentTimeMillis()
         etDate.setText(DateUtil.formatDate(selectedHistoryDate))
@@ -386,20 +506,22 @@ class DetailFragment : Fragment() {
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Tambah Catatan Servis")
-            .setView(dialogView)
-            .setPositiveButton("Simpan") { _, _ ->
-                val desc = etDesc.text.toString()
-                val costStr = etCost.text.toString()
-                if (desc.isNotEmpty() && costStr.isNotEmpty()) {
-                    saveHistory(desc, costStr.toDouble(), selectedHistoryDate)
-                } else {
-                    Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
-                }
+        btnSave.setOnClickListener {
+            val desc = etDesc.text.toString()
+            val costStr = etCost.text.toString()
+            if (desc.isNotEmpty() && costStr.isNotEmpty()) {
+                saveHistory(desc, costStr.toDouble(), selectedHistoryDate)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(requireContext(), "Isi semua field terlebih dahulu", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Batal", null)
-            .show()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun saveHistory(description: String, cost: Double, date: Long) {
