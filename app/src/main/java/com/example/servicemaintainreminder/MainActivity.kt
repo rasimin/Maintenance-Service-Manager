@@ -8,10 +8,16 @@ import com.google.android.gms.ads.MobileAds
 import androidx.work.*
 import com.example.servicemaintainreminder.worker.ReminderWorker
 import java.util.concurrent.TimeUnit
+import android.content.Context
+import android.widget.Toast
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var isAuthenticatedSession = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +30,61 @@ class MainActivity : AppCompatActivity() {
 
         // Schedule Notification Worker
         setupReminderWorker()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkAppLock()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Reset authentication when app goes to background
+        isAuthenticatedSession = false
+    }
+
+    private fun checkAppLock() {
+        if (isAuthenticatedSession) return
+
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
+
+        val overlay = binding.root.findViewById<android.view.View>(R.id.viewLockOverlay)
+        if (!isLocked) {
+            overlay?.visibility = android.view.View.GONE
+            return
+        }
+
+        // Show lock overlay
+        overlay?.visibility = android.view.View.VISIBLE
+
+        val executor = ContextCompat.getMainExecutor(this)
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    isAuthenticatedSession = true
+                    overlay?.visibility = android.view.View.GONE
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                        finishAffinity()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+                        finishAffinity()
+                    }
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Authentication Required")
+            .setSubtitle("Please authenticate to unlock the app")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun setupReminderWorker() {

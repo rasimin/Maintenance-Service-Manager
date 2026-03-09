@@ -24,6 +24,9 @@ import android.widget.TextView
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricManager
+import androidx.core.content.ContextCompat
 
 data class CostDetail(
     val itemName: String,
@@ -75,13 +78,13 @@ class HomeFragment : Fragment() {
         binding.header.cardSettings.setOnClickListener { view ->
             val menuItems = listOf(
                 ModernMenuItem(1, "Account", R.drawable.ic_input_edit),
-                ModernMenuItem(2, "Settings", android.R.drawable.ic_menu_preferences)
+                ModernMenuItem(2, "Security", android.R.drawable.ic_secure)
             )
             
             ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
                 when (selectedId) {
                     1 -> showAccountDialog()
-                    2 -> android.widget.Toast.makeText(requireContext(), "Settings feature coming soon", android.widget.Toast.LENGTH_SHORT).show()
+                    2 -> showSettingsDialog()
                 }
             }
         }
@@ -114,6 +117,74 @@ class HomeFragment : Fragment() {
         }
 
         btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showSettingsDialog() {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
+
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_settings, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        val switchAppLock = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchAppLock)
+        val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
+
+        // Only update UI initially without triggering listener
+        switchAppLock.setOnCheckedChangeListener(null)
+        switchAppLock.isChecked = isLocked
+
+        switchAppLock.setOnCheckedChangeListener { buttonView, isChecked ->
+            // Revert visually immediately so it only switches upon authentication success
+            buttonView.setOnCheckedChangeListener(null)
+            buttonView.isChecked = !isChecked
+
+            val executor = ContextCompat.getMainExecutor(requireContext())
+            val biometricPrompt = BiometricPrompt(this, executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        super.onAuthenticationSucceeded(result)
+                        // Actually apply the chosen state
+                        prefs.edit().putBoolean("is_app_lock_enabled", isChecked).apply()
+                        buttonView.isChecked = isChecked
+                        android.widget.Toast.makeText(requireContext(), if(isChecked) "App Lock Enabled" else "App Lock Disabled", android.widget.Toast.LENGTH_SHORT).show()
+                        
+                        // Re-attach listener
+                        reattachListener()
+                    }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        android.widget.Toast.makeText(requireContext(), "Authentication error: $errString", android.widget.Toast.LENGTH_SHORT).show()
+                        reattachListener()
+                    }
+                    
+                    private fun reattachListener() {
+                        buttonView.setOnCheckedChangeListener { _, newChecked ->
+                            // This would trigger the whole block again if user clicks again, but requires recreating the logic or calling a function.
+                            // To keep it simple, we just toggle it manually for subsequent clicks.
+                            // Instead of duplicating, we will just dismiss the dialog on success so user reopen it next time to change state again.
+                        }
+                        // For simplicity, dismiss dialog after changes to refresh state reliably.
+                        dialog.dismiss()
+                    }
+                })
+
+            val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Security Check")
+                .setSubtitle(if (isChecked) "Turn ON App Lock" else "Turn OFF App Lock")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                .build()
+
+            biometricPrompt.authenticate(promptInfo)
+        }
+
+        btnClose.setOnClickListener {
             dialog.dismiss()
         }
 

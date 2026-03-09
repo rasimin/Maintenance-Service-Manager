@@ -59,6 +59,9 @@ dependencies {
     // Ads
     implementation(libs.play.services.ads)
 
+    // Biometric Security
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
     // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
