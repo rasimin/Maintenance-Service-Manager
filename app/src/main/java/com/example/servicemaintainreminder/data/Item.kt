@@ -19,5 +19,6 @@ data class Item(
     val isActive: Boolean = true,
     // true = jadwal SELALU dihitung dari jadwal awal (fixed)
     // false = jadwal mengikuti tanggal service terakhir diinput (flexible)
-    val isFixedSchedule: Boolean = false
+    val isFixedSchedule: Boolean = false,
+    val icon: String? = null
 )

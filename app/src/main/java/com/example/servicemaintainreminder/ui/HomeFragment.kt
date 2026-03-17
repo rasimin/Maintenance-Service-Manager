@@ -78,19 +78,22 @@ class HomeFragment : Fragment() {
         binding.header.cardSettings.setOnClickListener { view ->
             val menuItems = listOf(
                 ModernMenuItem(1, "Account", R.drawable.ic_input_edit),
-                ModernMenuItem(2, "Security", android.R.drawable.ic_secure)
+                ModernMenuItem(2, "Security", R.drawable.ic_input_note),
+                ModernMenuItem(3, "Settings", R.drawable.ic_upcoming)
             )
             
             ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
                 when (selectedId) {
                     1 -> showAccountDialog()
                     2 -> showSettingsDialog()
+                    3 -> showThresholdSettingsDialog()
                 }
             }
         }
     }
 
     private fun showAccountDialog() {
+        // ... (keep as is)
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val currentName = prefs.getString("user_name", "") ?: ""
 
@@ -125,7 +128,6 @@ class HomeFragment : Fragment() {
 
     private fun showSettingsDialog() {
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
 
         val dialog = BottomSheetDialog(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.dialog_settings, null)
@@ -133,55 +135,326 @@ class HomeFragment : Fragment() {
         dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
 
         val switchAppLock = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchAppLock)
+        val llSecurityStatus = dialogView.findViewById<android.view.View>(R.id.llSecurityStatus)
+        val tvPinStatus = dialogView.findViewById<android.widget.TextView>(R.id.tvPinStatus)
+        val tvBiometricStatus = dialogView.findViewById<android.widget.TextView>(R.id.tvBiometricStatus)
+        val switchBiometric = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchBiometric)
+        val btnChangePinInline = dialogView.findViewById<android.view.View>(R.id.btnChangePinInline)
         val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
 
-        // Only update UI initially without triggering listener
-        switchAppLock.setOnCheckedChangeListener(null)
-        switchAppLock.isChecked = isLocked
+        fun refreshStatus() {
+            val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
+            val pinSet = !prefs.getString("app_custom_pin", "").isNullOrEmpty()
+            val biometricEnabled = prefs.getBoolean("is_biometric_enabled", false)
 
-        switchAppLock.setOnCheckedChangeListener { buttonView, isChecked ->
-            // Revert visually immediately so it only switches upon authentication success
-            buttonView.setOnCheckedChangeListener(null)
-            buttonView.isChecked = !isChecked
+            switchAppLock.isChecked = isLocked
+            llSecurityStatus.isVisible = isLocked
 
-            val executor = ContextCompat.getMainExecutor(requireContext())
-            val biometricPrompt = BiometricPrompt(this, executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                        super.onAuthenticationSucceeded(result)
-                        // Actually apply the chosen state
-                        prefs.edit().putBoolean("is_app_lock_enabled", isChecked).apply()
-                        buttonView.isChecked = isChecked
-                        android.widget.Toast.makeText(requireContext(), if(isChecked) "App Lock Enabled" else "App Lock Disabled", android.widget.Toast.LENGTH_SHORT).show()
-                        
-                        // Re-attach listener
-                        reattachListener()
-                    }
+            if (pinSet) {
+                tvPinStatus.text = "📌 PIN: ✅ Set"
+                tvPinStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
+            } else {
+                tvPinStatus.text = "📌 PIN: ⚠ Not set"
+                tvPinStatus.setTextColor(android.graphics.Color.parseColor("#E74C3C"))
+            }
 
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        android.widget.Toast.makeText(requireContext(), "Authentication error: $errString", android.widget.Toast.LENGTH_SHORT).show()
-                        reattachListener()
-                    }
-                    
-                    private fun reattachListener() {
-                        buttonView.setOnCheckedChangeListener { _, newChecked ->
-                            // This would trigger the whole block again if user clicks again, but requires recreating the logic or calling a function.
-                            // To keep it simple, we just toggle it manually for subsequent clicks.
-                            // Instead of duplicating, we will just dismiss the dialog on success so user reopen it next time to change state again.
+            switchBiometric.isEnabled = pinSet
+            switchBiometric.isChecked = biometricEnabled
+
+            if (biometricEnabled) {
+                tvBiometricStatus.text = "👆 Biometric: ✅ Enabled"
+                tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
+            } else {
+                tvBiometricStatus.text = "👆 Biometric: Disabled"
+                tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#8A8A9A"))
+            }
+        }
+
+        var isProgrammaticChange = false
+
+        fun setSwitchChecked(checked: Boolean) {
+            isProgrammaticChange = true
+            switchAppLock.isChecked = checked
+            isProgrammaticChange = false
+        }
+
+        refreshStatus()
+
+        switchAppLock.setOnCheckedChangeListener { _, isChecked ->
+            if (isProgrammaticChange) return@setOnCheckedChangeListener
+
+            if (isChecked) {
+                // Selalu wajib setup PIN dari awal (karena PIN dihapus saat disable)
+                setSwitchChecked(false)
+                showSetPinDialog(isEnableLockFlow = true) {
+                    // PIN berhasil disimpan, aktifkan lock tanpa trigger listener
+                    prefs.edit().putBoolean("is_app_lock_enabled", true).apply()
+                    setSwitchChecked(true)
+                    refreshStatus()
+                    // Tawarkan biometrik
+                    showBiometricOfferDialog(prefs) { refreshStatus() }
+                }
+            } else {
+                // Reset semua setting security saat dimatikan
+                prefs.edit()
+                    .putBoolean("is_app_lock_enabled", false)
+                    .putBoolean("is_biometric_enabled", false)
+                    .remove("app_custom_pin")
+                    .apply()
+                refreshStatus()
+            }
+        }
+
+        var isProgrammaticBiometricChange = false
+
+        switchBiometric.setOnCheckedChangeListener { _, isChecked ->
+            if (isProgrammaticBiometricChange) return@setOnCheckedChangeListener
+
+            if (isChecked) {
+                // Wajib konfirmasi biometrik sebelum enable
+                isProgrammaticBiometricChange = true
+                switchBiometric.isChecked = false // revert dulu, tunggu konfirmasi
+                isProgrammaticBiometricChange = false
+
+                val executor = ContextCompat.getMainExecutor(requireContext())
+                val biometricPrompt = BiometricPrompt(this, executor,
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                            super.onAuthenticationSucceeded(result)
+                            prefs.edit().putBoolean("is_biometric_enabled", true).apply()
+                            isProgrammaticBiometricChange = true
+                            switchBiometric.isChecked = true
+                            isProgrammaticBiometricChange = false
+                            refreshStatus()
+                            android.widget.Toast.makeText(requireContext(), "✅ Biometric enabled", android.widget.Toast.LENGTH_SHORT).show()
                         }
-                        // For simplicity, dismiss dialog after changes to refresh state reliably.
-                        dialog.dismiss()
-                    }
-                })
+                        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                            super.onAuthenticationError(errorCode, errString)
+                            // Tetap false, switch sudah di-revert
+                            android.widget.Toast.makeText(requireContext(), "Biometric not confirmed", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        override fun onAuthenticationFailed() {
+                            super.onAuthenticationFailed()
+                        }
+                    })
+                val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Confirm Biometric")
+                    .setSubtitle("Authenticate to enable biometric login")
+                    .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                    .setNegativeButtonText("Cancel")
+                    .build()
+                biometricPrompt.authenticate(promptInfo)
+            } else {
+                // Disable langsung tanpa konfirmasi
+                prefs.edit().putBoolean("is_biometric_enabled", false).apply()
+                refreshStatus()
+            }
+        }
 
-            val promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Security Check")
-                .setSubtitle(if (isChecked) "Turn ON App Lock" else "Turn OFF App Lock")
-                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                .build()
+        btnChangePinInline.setOnClickListener {
+            showSetPinDialog(isEnableLockFlow = false) {
+                refreshStatus()
+            }
+        }
 
-            biometricPrompt.authenticate(promptInfo)
+        btnClose.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun showBiometricOfferDialog(prefs: android.content.SharedPreferences, onDone: () -> Unit) {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            gravity = android.view.Gravity.CENTER
+            setPadding(80, 60, 80, 60)
+            setBackgroundResource(R.drawable.bg_search_overlay)
+        }
+        val icon = android.widget.ImageView(requireContext()).apply {
+            setImageResource(android.R.drawable.ic_secure)
+            imageTintList = android.content.res.ColorStateList.valueOf(
+                androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary))
+            layoutParams = android.widget.LinearLayout.LayoutParams(120, 120).apply { gravity = android.view.Gravity.CENTER }
+        }
+        val title = android.widget.TextView(requireContext()).apply {
+            text = "Enable Biometric Login?"
+            textSize = 18f
+            setTextColor(android.graphics.Color.parseColor("#1A1A2E"))
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, 24, 0, 8)
+        }
+        val subtitle = android.widget.TextView(requireContext()).apply {
+            text = "Use fingerprint or face recognition for faster access.\nYou can still use PIN as backup."
+            textSize = 13f
+            setTextColor(android.graphics.Color.parseColor("#8A8A9A"))
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, 0, 0, 32)
+        }
+        val btnEnable = com.google.android.material.button.MaterialButton(requireContext()).apply {
+            text = "Enable Biometric"
+            setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary))
+            setTextColor(android.graphics.Color.WHITE)
+            cornerRadius = 24
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 140)
+        }
+        val btnSkip = com.google.android.material.button.MaterialButton(requireContext(), null,
+            com.google.android.material.R.attr.borderlessButtonStyle).apply {
+            text = "Skip for now"
+            setTextColor(android.graphics.Color.parseColor("#8A8A9A"))
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT).apply { gravity = android.view.Gravity.CENTER }
+        }
+        view.addView(icon)
+        view.addView(title)
+        view.addView(subtitle)
+        view.addView(btnEnable)
+        view.addView(btnSkip)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        btnEnable.setOnClickListener {
+            prefs.edit().putBoolean("is_biometric_enabled", true).apply()
+            android.widget.Toast.makeText(requireContext(), "✅ Security setup complete! PIN + Biometric enabled.", android.widget.Toast.LENGTH_LONG).show()
+            dialog.dismiss()
+            onDone()
+        }
+        btnSkip.setOnClickListener {
+            android.widget.Toast.makeText(requireContext(), "✅ PIN lock enabled. You can add biometric later in Security settings.", android.widget.Toast.LENGTH_LONG).show()
+            dialog.dismiss()
+            onDone()
+        }
+        dialog.show()
+    }
+
+    private fun authenticateForSecurity(onSuccess: () -> Unit): Unit? {
+        val executor = ContextCompat.getMainExecutor(requireContext())
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    onSuccess()
+                }
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    android.widget.Toast.makeText(requireContext(), "Auth Error: $errString", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Security Confirmation")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+        return Unit
+    }
+
+    private fun showSetPinDialog(isEnableLockFlow: Boolean = false, onPinSaved: (() -> Unit)? = null) {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_set_pin, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        if (isEnableLockFlow) dialog.setCancelable(false)
+
+        val tvTitle = dialogView.findViewById<android.widget.TextView>(R.id.tvSetPinTitle)
+        val tvSubtitle = dialogView.findViewById<android.widget.TextView>(R.id.tvSetPinSubtitle)
+        val tvError = dialogView.findViewById<android.widget.TextView>(R.id.tvSetPinError)
+        val btnCancel = dialogView.findViewById<android.view.View>(R.id.btnCancelSetPin)
+
+        val dots = listOf(
+            dialogView.findViewById<android.view.View>(R.id.setupPinDot1),
+            dialogView.findViewById<android.view.View>(R.id.setupPinDot2),
+            dialogView.findViewById<android.view.View>(R.id.setupPinDot3),
+            dialogView.findViewById<android.view.View>(R.id.setupPinDot4),
+        )
+
+        if (isEnableLockFlow) {
+            tvTitle.text = "Create Your PIN"
+            tvSubtitle.text = "Set a 4-digit PIN to lock your app"
+        } else {
+            tvTitle.text = "Change Your PIN"
+            tvSubtitle.text = "Enter a new 4-digit PIN"
+        }
+
+        var enteredPin = ""
+        val brandColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary)
+
+        fun updateDots() {
+            dots.forEachIndexed { i, dot ->
+                dot.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    if (i < enteredPin.length) brandColor else android.graphics.Color.parseColor("#DDDDDD")
+                )
+            }
+        }
+
+        fun onDigit(d: String) {
+            if (enteredPin.length < 4) {
+                enteredPin += d
+                updateDots()
+                if (enteredPin.length == 4) {
+                    prefs.edit().putString("app_custom_pin", enteredPin).apply()
+                    prefs.edit().putBoolean("is_app_lock_enabled", true).apply()
+                    android.widget.Toast.makeText(requireContext(), "PIN saved!", android.widget.Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    onPinSaved?.invoke()
+                }
+            }
+            tvError.visibility = android.view.View.INVISIBLE
+        }
+
+        fun onBack() {
+            if (enteredPin.isNotEmpty()) {
+                enteredPin = enteredPin.dropLast(1)
+                updateDots()
+            }
+        }
+
+        val btnIds = mapOf(
+            R.id.setupBtn1 to "1", R.id.setupBtn2 to "2", R.id.setupBtn3 to "3",
+            R.id.setupBtn4 to "4", R.id.setupBtn5 to "5", R.id.setupBtn6 to "6",
+            R.id.setupBtn7 to "7", R.id.setupBtn8 to "8", R.id.setupBtn9 to "9",
+            R.id.setupBtn0 to "0"
+        )
+        btnIds.forEach { (id, digit) ->
+            dialogView.findViewById<android.view.View>(id).setOnClickListener { onDigit(digit) }
+        }
+        dialogView.findViewById<android.view.View>(R.id.setupBtnBackspace).setOnClickListener { onBack() }
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnCancel.isVisible = !isEnableLockFlow
+
+        dialog.show()
+    }
+
+
+    private fun showThresholdSettingsDialog() {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_threshold_settings, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        val etUpcomingDays = dialogView.findViewById<android.widget.EditText>(R.id.etUpcomingDays)
+        val btnSaveUpcoming = dialogView.findViewById<android.view.View>(R.id.btnSaveUpcoming)
+        val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseUpcomingDialog)
+        
+        val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+        etUpcomingDays.setText(daysLimit.toString())
+
+        btnSaveUpcoming.setOnClickListener {
+            val daysStr = etUpcomingDays.text.toString()
+            val newDaysLimit = if (daysStr.isNotEmpty()) daysStr.toIntOrNull() ?: 30 else 30
+            prefs.edit().putInt("upcoming_days_limit", newDaysLimit).apply()
+
+            if (binding.tvUpcomingHeader.text == "Upcoming Maintenance") {
+                loadUpcomingItems()
+            }
+            updateDashboard(viewModel.allItems.value ?: emptyList())
+            
+            android.widget.Toast.makeText(requireContext(), "Parameter saved", android.widget.Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
         }
 
         btnClose.setOnClickListener {
@@ -271,10 +544,21 @@ class HomeFragment : Fragment() {
     private fun loadUpcomingItems() {
         viewModel.allItems.value?.let { items ->
             val currentTime = System.currentTimeMillis()
-            val oneMonthInMs = 30L * 24 * 60 * 60 * 1000L
-            val upcoming = items.filter { it.isActive && it.nextServiceDate in currentTime..(currentTime + oneMonthInMs) }
+            val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+            val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+            
+            val upcoming = items.filter { 
+                if (!it.isActive) return@filter false
+                val ms = it.nextServiceDate - currentTime
+                val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+                ms >= 0 && ds <= daysLimit 
+            }
                 .sortedBy { it.nextServiceDate }
-                .take(10) // Maksimal muncul 10 card
+                .take(10)
+            
+            binding.rvItems.isVisible = upcoming.isNotEmpty()
+            binding.llEmptyState.isVisible = upcoming.isEmpty()
+            
             adapter.submitList(upcoming) {
                 recyclerViewState?.let {
                     binding.rvItems.layoutManager?.onRestoreInstanceState(it)
@@ -293,12 +577,20 @@ class HomeFragment : Fragment() {
         binding.cardUpcoming.setOnClickListener {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
-                val oneWeekInMs = 7 * 24 * 60 * 60 * 1000L
+                val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+                
                 val urgent = items.filter { 
-                    it.isActive && it.nextServiceDate - currentTime in 0..oneWeekInMs 
+                    if (!it.isActive) return@filter false
+                    val ms = it.nextServiceDate - currentTime
+                    val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+                    ms >= 0 && ds <= daysLimit
                 }
-                binding.tvUpcomingHeader.text = "Urgent Maintenance"
-                adapter.submitList(urgent.sortedBy { it.nextServiceDate })
+                binding.tvUpcomingHeader.text = "Upcoming Maintenance"
+                val sorted = urgent.sortedBy { it.nextServiceDate }
+                binding.rvItems.isVisible = sorted.isNotEmpty()
+                binding.llEmptyState.isVisible = sorted.isEmpty()
+                adapter.submitList(sorted)
             }
         }
 
@@ -307,7 +599,10 @@ class HomeFragment : Fragment() {
                 val currentTime = System.currentTimeMillis()
                 val overdue = items.filter { it.isActive && it.nextServiceDate < currentTime }
                 binding.tvUpcomingHeader.text = "Overdue Items"
-                adapter.submitList(overdue.sortedBy { it.nextServiceDate })
+                val sorted = overdue.sortedBy { it.nextServiceDate }
+                binding.rvItems.isVisible = sorted.isNotEmpty()
+                binding.llEmptyState.isVisible = sorted.isEmpty()
+                adapter.submitList(sorted)
             }
         }
 
@@ -353,9 +648,14 @@ class HomeFragment : Fragment() {
         val activeItems = items.filter { it.isActive }
         val total = activeItems.size
         val currentTime = System.currentTimeMillis()
-        val oneWeekInMs = 7 * 24 * 60 * 60 * 1000L
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val daysLimit = prefs.getInt("upcoming_days_limit", 30)
 
-        val upcoming = activeItems.count { it.nextServiceDate - currentTime in 0..oneWeekInMs }
+        val upcoming = activeItems.count { 
+            val ms = it.nextServiceDate - currentTime
+            val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+            ms >= 0 && ds <= daysLimit 
+        }
         val overdue = activeItems.count { it.nextServiceDate < currentTime }
 
         binding.tvTotalItems.text = total.toString()

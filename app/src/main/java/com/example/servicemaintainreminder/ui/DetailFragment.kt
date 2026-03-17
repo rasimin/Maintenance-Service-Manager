@@ -140,7 +140,10 @@ class DetailFragment : Fragment() {
             val item = currentItem
             if (item != null) {
                 val diff = item.nextServiceDate - System.currentTimeMillis()
-                item.isActive && diff <= (7L * 24L * 60L * 60L * 1000L)
+                val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val upcomingLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+                val limitInMs = upcomingLimit * 24 * 60 * 60 * 1000L
+                item.isActive && diff <= limitInMs
             } else {
                 false
             }
@@ -309,6 +312,19 @@ class DetailFragment : Fragment() {
         
         binding.tvDetailNote.text = item.note.ifEmpty { "No notes added" }
 
+        // Set Icon
+        val customIconResId = item.icon?.let { iconName ->
+            requireContext().resources.getIdentifier(iconName, "drawable", requireContext().packageName)
+        } ?: 0
+
+        if (customIconResId != 0) {
+            binding.ivDetailIcon.setImageResource(customIconResId)
+        } else {
+            val isVehicle = item.category.equals("vehicle", ignoreCase = true) || item.category.equals("kendaraan", ignoreCase = true)
+            val iconRes = if (isVehicle) android.R.drawable.ic_menu_directions else android.R.drawable.ic_menu_preferences
+            binding.ivDetailIcon.setImageResource(iconRes)
+        }
+
         // Schedule type badge
         if (item.isFixedSchedule) {
             binding.tvScheduleTypeBadge.text = "📌 Fixed Schedule"
@@ -349,13 +365,16 @@ class DetailFragment : Fragment() {
         val currentTime = System.currentTimeMillis()
         val daysDiff = (nextDate - currentTime) / (24 * 60 * 60 * 1000)
 
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val upcomingLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+
         when {
             daysDiff < 0 -> {
                 binding.tvStatusIndicator.text = "❗ Overdue"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_error))
                 binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AE74C3C"))
             }
-            daysDiff <= 7 -> {
+            daysDiff <= upcomingLimit -> {
                 binding.tvStatusIndicator.text = "⚠ Maintenance Soon"
                 binding.tvStatusIndicator.setTextColor(ContextCompat.getColor(requireContext(), R.color.status_warning))
                 binding.flDetailStatusHeader.setBackgroundColor(Color.parseColor("#1AF5A623"))

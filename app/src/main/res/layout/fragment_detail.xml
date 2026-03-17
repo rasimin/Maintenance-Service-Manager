@@ -184,25 +184,49 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
 
-                                <TextView
-                                    android:id="@+id/tvDetailName"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold"
-                                    tools:text="AC Ruang Tamu" />
+                                <View
+                                    android:id="@+id/viewDetailIconBg"
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:background="@drawable/bg_circle_indicator"
+                                    android:backgroundTint="#EEF2FF" />
 
-                                <TextView
-                                    android:id="@+id/tvDetailCategory"
-                                    android:layout_width="wrap_content"
+                                <ImageView
+                                    android:id="@+id/ivDetailIcon"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginStart="-32dp"
+                                    android:src="@drawable/ic_devices"
+                                    app:tint="@color/brand_primary" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:textColor="@color/brand_primary"
-                                    android:textSize="13sp"
-                                    tools:text="Elektronik" />
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvDetailName"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="#1A1A2E"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold"
+                                        tools:text="AC Ruang Tamu" />
+
+                                    <TextView
+                                        android:id="@+id/tvDetailCategory"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/brand_primary"
+                                        android:textSize="13sp"
+                                        tools:text="Elektronik" />
+                                </LinearLayout>
                             </LinearLayout>
 
                             <!-- Active Toggle moved to header -->

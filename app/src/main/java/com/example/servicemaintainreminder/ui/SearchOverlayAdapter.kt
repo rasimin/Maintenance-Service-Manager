@@ -49,8 +49,16 @@ class SearchOverlayAdapter(
             tvNextDate.text = "Servis: ${DateUtil.formatDate(item.nextServiceDate)}"
 
             val isVehicle = item.category.equals("vehicle", ignoreCase = true) || item.category.equals("kendaraan", ignoreCase = true)
-            val iconRes = if (isVehicle) android.R.drawable.ic_menu_directions else android.R.drawable.ic_menu_preferences
-            ivIcon.setImageResource(iconRes)
+            val customIconResId = item.icon?.let { iconName ->
+                context.resources.getIdentifier(iconName, "drawable", context.packageName)
+            } ?: 0
+
+            if (customIconResId != 0) {
+                ivIcon.setImageResource(customIconResId)
+            } else {
+                val iconRes = if (isVehicle) android.R.drawable.ic_menu_directions else android.R.drawable.ic_menu_preferences
+                ivIcon.setImageResource(iconRes)
+            }
 
             if (isVehicle) {
                 flIconBackground.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#2BA57A"))
@@ -60,6 +68,9 @@ class SearchOverlayAdapter(
 
             val msLeft = item.nextServiceDate - System.currentTimeMillis()
             val daysLeft = (msLeft / (24 * 60 * 60 * 1000L)).toInt()
+
+            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+            val upcomingLimit = prefs.getInt("upcoming_days_limit", 30)
 
             when {
                 daysLeft < 0 -> {
@@ -72,7 +83,7 @@ class SearchOverlayAdapter(
                     tvStatus.setTextColor(ContextCompat.getColor(context, R.color.danger))
                     tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.status_error_bg))
                 }
-                daysLeft <= 7 -> {
+                daysLeft <= upcomingLimit -> {
                     tvStatus.text = "$daysLeft days left"
                     tvStatus.setTextColor(ContextCompat.getColor(context, R.color.warning))
                     tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.status_warning_bg))

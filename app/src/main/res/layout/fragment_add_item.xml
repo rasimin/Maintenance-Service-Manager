@@ -167,7 +167,31 @@
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
+                    <!-- ── Icon Selection ── -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Choose Icon"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/llIconContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingVertical="4dp">
+                            <!-- Icons will be added dynamically or statically -->
+                        </LinearLayout>
+                    </HorizontalScrollView>
 
                     <!-- ── Schedule Type Compact Selector ── -->
                     <LinearLayout
@@ -346,29 +370,30 @@
                         android:id="@+id/llFixedDateHint"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="-8dp"
                         android:background="@drawable/bg_status_badge"
                         android:backgroundTint="#FFF3E0"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="7dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="10dp"
                         android:visibility="gone">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📌"
-                            android:textSize="12sp" />
+                            android:text="💡"
+                            android:textSize="14sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="Tanggal ini akan menjadi acuan perhitungan jadwal berikutnya secara tetap"
+                            android:layout_marginStart="8dp"
+                            android:text="Tanggal ini akan menjadi acuan tetap untuk jadwal berikutnya (Fixed), pastikan tanggal servis terakhir sudah benar."
                             android:textColor="#C0622D"
-                            android:textSize="11sp"
-                            android:lineSpacingExtra="2dp" />
+                            android:textSize="11.5sp"
+                            android:lineSpacingExtra="2dp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 

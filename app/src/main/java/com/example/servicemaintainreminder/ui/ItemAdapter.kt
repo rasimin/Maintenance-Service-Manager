@@ -39,13 +39,22 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
             binding.tvServiceType.text = item.category
             binding.tvNextDate.text = "Servis: ${DateUtil.formatDate(item.nextServiceDate)}"
 
-            // Set Category Icon
-            val iconRes = when (item.category.lowercase()) {
-                "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
-                "electronics", "elektronik" -> android.R.drawable.ic_menu_preferences
-                else -> android.R.drawable.ic_menu_slideshow
+            // Set Category or Custom Icon
+            val customIconResId = item.icon?.let { iconName ->
+                context.resources.getIdentifier(iconName, "drawable", context.packageName)
+            } ?: 0
+
+            if (customIconResId != 0) {
+                binding.ivItemIcon.setImageResource(customIconResId)
+            } else {
+                val iconRes = when (item.category.lowercase()) {
+                    "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
+                    "electronics", "elektronik" -> android.R.drawable.ic_menu_preferences
+                    "home appliance" -> android.R.drawable.ic_menu_gallery
+                    else -> android.R.drawable.ic_menu_slideshow
+                }
+                binding.ivItemIcon.setImageResource(iconRes)
             }
-            binding.ivItemIcon.setImageResource(iconRes)
 
 
             // Hitung sisa hari
@@ -54,6 +63,9 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
             val daysLeft = (msLeft / (24 * 60 * 60 * 1000L)).toInt()
 
             // Tentukan teks, warna, dan accent berdasarkan urgensi
+            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+            val upcomingLimit = prefs.getInt("upcoming_days_limit", 30)
+
             when {
                 daysLeft < 0 -> {
                     // Sudah lewat jadwal
@@ -73,8 +85,8 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
                     binding.tvStatusLabel.backgroundTintList = ColorStateList.valueOf(bgColor)
                     binding.tvStatusLabel.setTextColor(color)
                 }
-                daysLeft <= 7 -> {
-                    // Segera (dalam 7 hari)
+                daysLeft <= upcomingLimit -> {
+                    // Segera (sesuai config)
                     val color = ContextCompat.getColor(context, R.color.warning)
                     val bgColor = ContextCompat.getColor(context, R.color.status_warning_bg)
                     binding.viewTopAccent.setBackgroundColor(color)

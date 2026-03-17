@@ -31,6 +31,12 @@ class AddItemFragment : Fragment() {
     private var isEditMode = false
     private var itemToEdit: Item? = null
     private var isFixedScheduleSelected = false  // false = Flexible (default)
+    private var selectedIcon: String? = null
+    private val availableIcons = listOf(
+        "ic_devices", "ic_upcoming", "ic_history", "ic_input_calendar", 
+        "ic_input_cost", "ic_schedule_fixed", "ic_schedule_flexible", "ic_input_note",
+        "ic_input_category", "ic_input_edit", "ic_input_info"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +51,7 @@ class AddItemFragment : Fragment() {
 
         setupSpinners()
         setupDatePicker()
+        setupIconSelection()
 
         isEditMode = args.itemId != -1L
 
@@ -73,6 +80,40 @@ class AddItemFragment : Fragment() {
         CurrencyTextWatcher.attach(binding.etEstimatedCost)
     }
 
+    private fun setupIconSelection() {
+        binding.llIconContainer.removeAllViews()
+        availableIcons.forEach { iconName ->
+            val iconView = layoutInflater.inflate(R.layout.item_icon_choice, binding.llIconContainer, false)
+            val ivIcon = iconView.findViewById<android.widget.ImageView>(R.id.ivIconChoice)
+            val cardIcon = iconView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardIconChoice)
+            
+            val resId = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
+            ivIcon.setImageResource(if (resId != 0) resId else R.drawable.ic_devices)
+            
+            updateIconSelectionUI(cardIcon, iconName == selectedIcon)
+            
+            cardIcon.setOnClickListener {
+                selectedIcon = iconName
+                setupIconSelection() // Refresh selection state
+            }
+            
+            binding.llIconContainer.addView(iconView)
+        }
+    }
+
+    private fun updateIconSelectionUI(card: com.google.android.material.card.MaterialCardView, isSelected: Boolean) {
+        val brandColor = ContextCompat.getColor(requireContext(), R.color.brand_primary)
+        if (isSelected) {
+            card.strokeColor = brandColor
+            card.strokeWidth = (2 * resources.displayMetrics.density).toInt()
+            card.setCardBackgroundColor(Color.parseColor("#EDF1FF"))
+        } else {
+            card.strokeColor = Color.parseColor("#EEEEEE")
+            card.strokeWidth = (1 * resources.displayMetrics.density).toInt()
+            card.setCardBackgroundColor(Color.WHITE)
+        }
+    }
+
     private fun updateSwitchColor(isActive: Boolean) {
         val color = if (isActive) ContextCompat.getColor(requireContext(), R.color.brand_primary) else Color.parseColor("#D0D0D0")
         binding.switchActive.trackTintList = ColorStateList.valueOf(color)
@@ -99,30 +140,23 @@ class AddItemFragment : Fragment() {
         val activeStroke = brandColor
         val inactiveStroke = Color.parseColor("#DEDEDE")
 
-        // Buat animasi kemunculan/menghilang menjadi smooth
         android.transition.TransitionManager.beginDelayedTransition(binding.root as android.view.ViewGroup)
-        
-        // Tampilkan/sembunyikan pesan peringatan di bawah field Last Service Date
         binding.llFixedDateHint.visibility = if (isFixed) View.VISIBLE else View.GONE
 
         if (isFixed) {
-            // Fixed → aktif
             binding.cardFixed.setCardBackgroundColor(activeBg)
             binding.cardFixed.strokeColor = activeStroke
             binding.tvFixedLabel.setTextColor(brandColor)
             binding.tvFixedSubLabel.setTextColor(brandColor)
             binding.tvFixedSubLabel.alpha = 0.6f
             binding.ivFixedIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
-            // Flexible → tidak aktif
             binding.cardFlexible.setCardBackgroundColor(inactiveBg)
             binding.cardFlexible.strokeColor = inactiveStroke
             binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(grayColor)
         } else {
-            // Flexible → aktif
             binding.cardFlexible.setCardBackgroundColor(activeBg)
             binding.cardFlexible.strokeColor = activeStroke
             binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
-            // Fixed → tidak aktif
             binding.cardFixed.setCardBackgroundColor(inactiveBg)
             binding.cardFixed.strokeColor = inactiveStroke
             binding.tvFixedLabel.setTextColor(grayColor)
@@ -144,9 +178,9 @@ class AddItemFragment : Fragment() {
                 binding.etNote.setText(item.note)
                 binding.switchActive.isChecked = item.isActive
                 isFixedScheduleSelected = item.isFixedSchedule
-                // panggil setelah view siap
+                selectedIcon = item.icon
+                setupIconSelection()
                 binding.root.post { updateScheduleCardUI(item.isFixedSchedule) }
-                // Prefill cost dengan format titik ribuan
                 val costFormatted = if (item.estimatedCost > 0) {
                     java.text.NumberFormat.getInstance(java.util.Locale("in", "ID"))
                         .format(item.estimatedCost.toLong())
@@ -167,8 +201,6 @@ class AddItemFragment : Fragment() {
         val units = arrayOf("Days", "Months")
         val unitAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, units)
         binding.spinnerIntervalUnit.setAdapter(unitAdapter)
-        
-        // Default ke "Days". Jika sedang edit mode, ini akan ditimpa di setupEditMode()
         binding.spinnerIntervalUnit.setText(units[0], false)
     }
 
@@ -197,7 +229,6 @@ class AddItemFragment : Fragment() {
         val intervalValueStr = binding.etIntervalValue.text.toString()
         val intervalUnit = binding.spinnerIntervalUnit.text.toString()
         val note = binding.etNote.text.toString()
-        val costStr = binding.etEstimatedCost.text.toString().trim()
 
         if (name.isEmpty() || category.isEmpty() || intervalValueStr.isEmpty() || intervalUnit.isEmpty()) {
             Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
@@ -219,7 +250,8 @@ class AddItemFragment : Fragment() {
                 note = note,
                 estimatedCost = estimatedCost,
                 isActive = binding.switchActive.isChecked,
-                isFixedSchedule = isFixedScheduleSelected
+                isFixedSchedule = isFixedScheduleSelected,
+                icon = selectedIcon
             )
             viewModel.updateItem(updatedItem)
             Toast.makeText(requireContext(), "Item updated successfully", Toast.LENGTH_SHORT).show()
@@ -235,7 +267,8 @@ class AddItemFragment : Fragment() {
                 note = note,
                 estimatedCost = estimatedCost,
                 isActive = binding.switchActive.isChecked,
-                isFixedSchedule = isFixedScheduleSelected
+                isFixedSchedule = isFixedScheduleSelected,
+                icon = selectedIcon
             )
             viewModel.insertItem(newItem)
             Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()

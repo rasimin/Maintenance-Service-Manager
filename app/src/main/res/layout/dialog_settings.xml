@@ -19,7 +19,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center"
-            android:src="@android:drawable/ic_secure"
+            android:src="@android:drawable/ic_menu_preferences"
             app:tint="#F50057" />
     </FrameLayout>
 
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Security Settings"
+        android:text="App Settings"
         android:textColor="#1A1A2E"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -39,49 +39,138 @@
         android:layout_marginTop="6dp"
         android:gravity="center"
         android:lineSpacingExtra="4dp"
-        android:text="Protect your data from unauthorized access."
+        android:text="Configure your preferences."
         android:textColor="#8A8A9A"
         android:textSize="13sp" />
 
+    <!-- ── SECURITY SECTION ── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_status_badge"
-        android:backgroundTint="#F4F4F9"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
 
+        <!-- Master Switch -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:background="@drawable/bg_status_badge"
+            android:backgroundTint="#F4F4F9"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="App Lock (PIN / Biometric)"
-                android:textColor="#1A1A2E"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <TextView
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enable App Lock"
+                    android:textColor="#1A1A2E"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Secure your data on startup"
+                    android:textColor="#8A8A9A"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchAppLock"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Ask for device authentication when app starts"
-                android:textColor="#8A8A9A"
-                android:textSize="12sp" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchAppLock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!-- Security Status Card (shown when lock is enabled) -->
+        <LinearLayout
+            android:id="@+id/llSecurityStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_status_badge"
+            android:backgroundTint="#F0FFF4"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="🔒 Security Status"
+                android:textColor="#1A1A2E"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- PIN Status Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvPinStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="📌 PIN: Not set"
+                    android:textColor="#E74C3C"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChangePinInline"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="Change PIN"
+                    android:textAllCaps="false"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Biometric Status Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvBiometricStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="👆 Biometric: Disabled"
+                    android:textColor="#8A8A9A"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchBiometric"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:enabled="false" />
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
 
     <!-- Close Button -->
     <com.google.android.material.button.MaterialButton
@@ -89,7 +178,6 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="12dp"
         android:text="Close"
         android:textColor="#8A8A9A"
         android:textAllCaps="false"

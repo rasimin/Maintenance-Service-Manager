@@ -49,13 +49,18 @@ class ItemAdapterVertical(
             else
                 "-"
 
-            // Set Category Icon
-            val iconRes = when (item.category.lowercase()) {
-                "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
-                "electronics", "elektronik" -> android.R.drawable.ic_menu_preferences
-                else -> android.R.drawable.ic_menu_slideshow
+            // Set custom or category icon
+            val customIconResId = item.icon?.let { iconName ->
+                binding.root.context.resources.getIdentifier(iconName, "drawable", binding.root.context.packageName)
+            } ?: 0
+
+            if (customIconResId != 0) {
+                binding.ivItemIcon.setImageResource(customIconResId)
+            } else {
+                val isVehicle = item.category.equals("vehicle", ignoreCase = true) || item.category.equals("kendaraan", ignoreCase = true)
+                val iconRes = if (isVehicle) android.R.drawable.ic_menu_directions else android.R.drawable.ic_menu_preferences
+                binding.ivItemIcon.setImageResource(iconRes)
             }
-            binding.ivItemIcon.setImageResource(iconRes)
 
             val currentTime = System.currentTimeMillis()
             val timeDiff = item.nextServiceDate - currentTime
@@ -72,6 +77,9 @@ class ItemAdapterVertical(
                 )
 
                 // Update accent bar color and status badge based on urgency
+                val prefs = binding.root.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val upcomingLimit = prefs.getInt("upcoming_days_limit", 30)
+
                 when {
                     daysDiff < 0 -> {
                         // Overdue - red accent
@@ -83,8 +91,8 @@ class ItemAdapterVertical(
                         binding.tvStatus.backgroundTintList =
                             ContextCompat.getColorStateList(binding.root.context, R.color.stats_red_bg)
                     }
-                    daysDiff <= 7 -> {
-                        // Urgent - orange accent
+                    daysDiff <= upcomingLimit -> {
+                        // Urgent - orange accent (based on dynamic config)
                         binding.viewAccentBar.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F5A623"))
                         binding.tvStatus.text = if (daysDiff == 0) "Today!" else "$daysDiff days left"
                         binding.tvStatus.setTextColor(

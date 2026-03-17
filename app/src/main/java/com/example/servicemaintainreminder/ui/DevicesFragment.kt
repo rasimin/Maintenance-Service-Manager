@@ -119,10 +119,16 @@ class DevicesFragment : Fragment() {
         var filteredList = allItemsList
 
         // 1. Filter by Status Chip
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val daysLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+        val limitInMs = daysLimit * 24 * 60 * 60 * 1000L
+
         filteredList = when (checkedChipId) {
             R.id.chipUpcoming -> filteredList.filter {
-                val diff = it.nextServiceDate - System.currentTimeMillis()
-                it.isActive && diff in 0..(7 * 24 * 60 * 60 * 1000L) // Next 7 days
+                val currentTime = System.currentTimeMillis()
+                val ms = it.nextServiceDate - currentTime
+                val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+                it.isActive && ms >= 0 && ds <= daysLimit
             }
             R.id.chipOverdue -> filteredList.filter {
                 it.isActive && it.nextServiceDate < System.currentTimeMillis()
@@ -196,8 +202,13 @@ class DevicesFragment : Fragment() {
                             findNavController().navigate(action)
                         }
                         2 -> {
-                            // Check if Upcoming or Overdue
-                            if (item.nextServiceDate <= System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000L)) {
+                            val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            val ms = item.nextServiceDate - System.currentTimeMillis()
+                            val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+                            val limit = prefs.getInt("upcoming_days_limit", 30)
+
+                            // Check if Upcoming (based on rounded days) or Overdue
+                            if (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && ds <= limit)) {
                                 val position = adapter.currentList.indexOf(item)
                                 showAddHistoryConfirmDialog(item, position)
                             } else {
@@ -235,8 +246,11 @@ class DevicesFragment : Fragment() {
             override fun getSwipeDirs(r: RecyclerView, v: RecyclerView.ViewHolder): Int {
                 val position = v.adapterPosition
                 val item = adapter.currentList[position]
-                val diff = item.nextServiceDate - System.currentTimeMillis()
-                val isUpcomingOrOverdue = item.isActive && diff <= (7L * 24L * 60L * 60L * 1000L)
+                val ms = item.nextServiceDate - System.currentTimeMillis()
+                val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val limit = prefs.getInt("upcoming_days_limit", 30)
+                
+                val isUpcomingOrOverdue = item.isActive && (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && (ms / (24 * 60 * 60 * 1000L)).toInt() <= limit))
                 return if (isUpcomingOrOverdue) {
                     ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
                 } else {
