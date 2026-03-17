@@ -48,10 +48,12 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
                 binding.ivItemIcon.setImageResource(customIconResId)
             } else {
                 val iconRes = when (item.category.lowercase()) {
-                    "vehicle", "kendaraan" -> android.R.drawable.ic_menu_directions
-                    "electronics", "elektronik" -> android.R.drawable.ic_menu_preferences
-                    "home appliance" -> android.R.drawable.ic_menu_gallery
-                    else -> android.R.drawable.ic_menu_slideshow
+                    "ac", "air conditioner" -> R.drawable.ic_ac
+                    "vehicle", "kendaraan", "mobil", "motor" -> R.drawable.ic_car
+                    "electronics", "elektronik" -> R.drawable.ic_electronic
+                    "machine", "mesin" -> R.drawable.ic_machine
+                    "home appliance" -> R.drawable.ic_electronic
+                    else -> R.drawable.ic_devices
                 }
                 binding.ivItemIcon.setImageResource(iconRes)
             }

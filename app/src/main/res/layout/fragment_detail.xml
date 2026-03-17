@@ -145,379 +145,396 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp">
 
-                    <!-- Status strip top -->
-                    <FrameLayout
+                    <!-- Status strip transformed into a clean top right badge -->
+                    <RelativeLayout
                         android:id="@+id/flDetailStatusHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="8dp"
-                        android:paddingHorizontal="20dp"
-                        android:background="#F0F9F4">
+                        android:paddingTop="16dp"
+                        android:paddingBottom="4dp"
+                        android:paddingHorizontal="24dp">
 
                         <TextView
                             android:id="@+id/tvStatusIndicator"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:textSize="12sp"
+                            android:layout_alignParentEnd="true"
+                            android:textSize="10sp"
                             android:textStyle="bold"
-                            tools:text="✅ Scheduled"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:letterSpacing="0.05"
+                            android:background="@drawable/bg_status_badge"
+                            android:backgroundTint="#F0F9F4"
+                            tools:text="✅ SCHEDULED"
                             tools:textColor="#2ECC71" />
-                    </FrameLayout>
+                    </RelativeLayout>
 
+                    <!-- Device Identity Row -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="24dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="20dp">
+
+                        <View
+                            android:id="@+id/viewDetailIconBg"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_circle_indicator"
+                            android:backgroundTint="#EEF2FF"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/ivDetailIcon"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@drawable/ic_devices"
+                            app:tint="@color/brand_primary"
+                            app:layout_constraintStart_toStartOf="@id/viewDetailIconBg"
+                            app:layout_constraintEnd_toEndOf="@id/viewDetailIconBg"
+                            app:layout_constraintTop_toTopOf="@id/viewDetailIconBg"
+                            app:layout_constraintBottom_toBottomOf="@id/viewDetailIconBg" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="18dp"
+                            android:layout_marginEnd="12dp"
+                            app:layout_constraintStart_toEndOf="@id/viewDetailIconBg"
+                            app:layout_constraintEnd_toStartOf="@id/swActiveDetail"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <TextView
+                                android:id="@+id/tvDetailName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="AC Ruang Tamu" />
+
+                            <TextView
+                                android:id="@+id/tvDetailCategory"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                tools:text="Elektronik" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swActiveDetail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:thumbTint="@color/white"
+                            app:trackTint="@color/brand_primary"
+                            app:useMaterialThemeColors="false"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvActiveLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- Next Maintenance Premium Card -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
+                        android:layout_marginHorizontal="24dp"
+                        android:background="@drawable/bg_next_service_rounded"
+                        android:backgroundTint="#F8FAFF"
+                        android:padding="18dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                        <!-- Name + Active Toggle row -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <View
-                                    android:id="@+id/viewDetailIconBg"
-                                    android:layout_width="44dp"
-                                    android:layout_height="44dp"
-                                    android:background="@drawable/bg_circle_indicator"
-                                    android:backgroundTint="#EEF2FF" />
-
-                                <ImageView
-                                    android:id="@+id/ivDetailIcon"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_marginStart="-32dp"
-                                    android:src="@drawable/ic_devices"
-                                    app:tint="@color/brand_primary" />
-
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:layout_marginStart="12dp"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:id="@+id/tvDetailName"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textColor="#1A1A2E"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold"
-                                        tools:text="AC Ruang Tamu" />
-
-                                    <TextView
-                                        android:id="@+id/tvDetailCategory"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="2dp"
-                                        android:textColor="@color/brand_primary"
-                                        android:textSize="13sp"
-                                        tools:text="Elektronik" />
-                                </LinearLayout>
-                            </LinearLayout>
-
-                            <!-- Active Toggle moved to header -->
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="end">
-
-                                <TextView
-                                    android:id="@+id/tvActiveLabel"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Status"
-                                    android:textColor="@color/brand_primary"
-                                    android:textSize="9sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#EEF2FF"
-                                    android:paddingHorizontal="6dp"
-                                    android:paddingVertical="2dp" />
-
-                                <com.google.android.material.switchmaterial.SwitchMaterial
-                                    android:id="@+id/swActiveDetail"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="24dp"
-                                    android:layout_marginTop="2dp"
-                                    android:checked="true"
-                                    app:thumbTint="@color/white"
-                                    app:trackTint="@color/brand_primary"
-                                    app:useMaterialThemeColors="false" />
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <!-- Next Maintenance Highlight Box -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_next_service_rounded"
-                            android:orientation="vertical"
-                            android:padding="12dp">
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:letterSpacing="0.08"
                                 android:text="NEXT MAINTENANCE"
-                                android:textColor="#8A8A9A"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.12" />
 
                             <TextView
                                 android:id="@+id/tvDetailNextService"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
+                                android:layout_marginTop="6dp"
                                 android:textColor="@color/brand_primary"
-                                android:textSize="18sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 tools:text="06 Apr 2026" />
-
-                            <!-- Schedule Type Badge -->
-                            <TextView
-                                android:id="@+id/tvScheduleTypeBadge"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_status_badge"
-                                android:backgroundTint="#EEF2FF"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="3dp"
-                                android:textColor="@color/brand_primary"
-                                android:textSize="10sp"
-                                android:textStyle="bold"
-                                tools:text="🔄 Flexible Schedule" />
-
                         </LinearLayout>
 
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="12dp"
-                            android:background="@color/divider" />
+                        <TextView
+                            android:id="@+id/tvScheduleTypeBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_status_badge"
+                            android:backgroundTint="#EEF2FF"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:textColor="@color/brand_primary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            tools:text="🔄 Flexible" />
+                    </LinearLayout>
 
-                        <!-- Stats Grid: 2x2 -->
-                        <!-- Row 1: Last Service | Service Interval -->
+                    <!-- Stats Grid -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp"
+                        android:paddingHorizontal="24dp">
+
+                        <!-- Row 1 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp"
-                            android:baselineAligned="false">
+                            android:orientation="horizontal">
 
                             <!-- Last Service -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_input_calendar"
+                                    app:tint="@color/text_placeholder" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Last Service"
-                                    android:textColor="@color/brand_primary"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#EEF2FF"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailLastService"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    tools:text="07 Mar 2026" />
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Last Service"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="9sp"
+                                        android:letterSpacing="0.02" />
+                                    <TextView
+                                        android:id="@+id/tvDetailLastService"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        tools:text="07 Mar 2026" />
+                                </LinearLayout>
                             </LinearLayout>
 
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="0dp" />
-
-                            <!-- Service Interval -->
+                            <!-- Interval -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp"
-                                android:gravity="end">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginStart="12dp">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_history"
+                                    app:tint="@color/text_placeholder" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Interval"
-                                    android:textColor="#27AE60"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#E8F8F0"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailInterval"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    tools:text="30 Days" />
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Interval"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="9sp"
+                                        android:letterSpacing="0.02" />
+                                    <TextView
+                                        android:id="@+id/tvDetailInterval"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        tools:text="30 Days" />
+                                </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Row 2: Total Cost | Estimated Cost -->
+                        <!-- Row 2 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:baselineAligned="false">
+                            android:layout_marginTop="16dp">
 
                             <!-- Total Cost -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_input_cost"
+                                    app:tint="@color/text_placeholder" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Total Cost"
-                                    android:textColor="#E67E22"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#FFF3E0"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailTotalCost"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    tools:text="Rp 0" />
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Total Cost"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="9sp"
+                                        android:letterSpacing="0.02" />
+                                    <TextView
+                                        android:id="@+id/tvDetailTotalCost"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        tools:text="Rp 0" />
+                                </LinearLayout>
                             </LinearLayout>
 
-                            <View
-                                android:layout_width="10dp"
-                                android:layout_height="0dp" />
-
-                            <!-- Estimated Cost / Svc -->
+                            <!-- Estimated Cost -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="4dp"
-                                android:gravity="end">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginStart="12dp">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_dashboard"
+                                    app:tint="@color/text_placeholder" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Estimated Cost / Svc"
-                                    android:textColor="#8E44AD"
-                                    android:textSize="10sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bg_status_badge"
-                                    android:backgroundTint="#F5EEF8"
-                                    android:paddingHorizontal="8dp"
-                                    android:paddingVertical="3dp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailEstimatedCost"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold"
-                                    tools:text="Rp 0" />
+                                    android:layout_marginStart="12dp"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Est. Cost"
+                                        android:textColor="@color/text_tertiary"
+                                        android:textSize="9sp"
+                                        android:letterSpacing="0.02" />
+                                    <TextView
+                                        android:id="@+id/tvDetailEstimatedCost"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        tools:text="Rp 0" />
+                                </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
-
-                        <!-- Note Row -->
-                        <LinearLayout
-                            android:id="@+id/llNoteContainer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="4dp">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/ic_input_note"
-                                app:tint="@color/brand_primary" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Note"
-                                    android:textColor="#8A8A9A"
-                                    android:textSize="11sp" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailNote"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:textColor="#1A1A2E"
-                                    android:textSize="14sp"
-                                    tools:text="Optional notes..." />
-                            </LinearLayout>
-
-                            <!-- More Options (Edit, Delete, Quick Done) -->
-                            <ImageButton
-                                android:id="@+id/btnMoreOptions"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:src="@drawable/ic_more_vert"
-                                app:tint="#8A8A9A"
-                                android:contentDescription="More Options" />
-                        </LinearLayout>
-
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginHorizontal="24dp"
+                        android:layout_marginTop="24dp" />
+
+                    <!-- Bottom row: Note + More -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/llNoteContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="24dp"
+                        android:paddingVertical="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivNoteIcon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_input_note"
+                            app:tint="@color/text_placeholder"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/tvNoteLabel"
+                            app:layout_constraintBottom_toBottomOf="@id/tvNoteLabel" />
+
+                        <TextView
+                            android:id="@+id/tvNoteLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Notes"
+                            android:textColor="@color/text_tertiary"
+                            android:textSize="10sp"
+                            android:layout_marginStart="10dp"
+                            app:layout_constraintStart_toEndOf="@id/ivNoteIcon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvDetailNote"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            tools:text="Optional notes..."
+                            app:layout_constraintStart_toStartOf="@id/tvNoteLabel"
+                            app:layout_constraintEnd_toStartOf="@id/btnMoreOptions"
+                            app:layout_constraintTop_toBottomOf="@id/tvNoteLabel" />
+
+                        <ImageButton
+                            android:id="@+id/btnMoreOptions"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_more_vert"
+                            app:tint="@color/text_placeholder"
+                            android:contentDescription="More Options"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
             </com.example.servicemaintainreminder.ui.SwipeCardLayout>

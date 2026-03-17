@@ -307,70 +307,51 @@ class HomeFragment : Fragment() {
         val currentHour = prefs.getInt("notif_hour", 8)
         val currentMinute = prefs.getInt("notif_minute", 0)
 
-        val hours   = Array(24) { "%02d".format(it) }
-        val minutes = Array(60) { "%02d".format(it) }
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.dialog_time_picker, null)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
 
-        // Buat custom view dengan 2 Spinner
-        val layout = android.widget.LinearLayout(requireContext()).apply {
-            orientation = android.widget.LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER
-            setPadding(48, 32, 48, 16)
-        }
+        val npHour = view.findViewById<android.widget.NumberPicker>(R.id.npHour)
+        val npMinute = view.findViewById<android.widget.NumberPicker>(R.id.npMinute)
+        val btnSave = view.findViewById<android.view.View>(R.id.btnSaveTime)
+        val btnCancel = view.findViewById<android.view.View>(R.id.btnCancelTime)
 
-        val spinnerHour = android.widget.Spinner(requireContext()).apply {
-            adapter = android.widget.ArrayAdapter(
+        // Setup Hours
+        npHour.minValue = 0
+        npHour.maxValue = 23
+        npHour.setFormatter { "%02d".format(it) }
+        npHour.value = currentHour
+
+        // Setup Minutes
+        npMinute.minValue = 0
+        npMinute.maxValue = 59
+        npMinute.setFormatter { "%02d".format(it) }
+        npMinute.value = currentMinute
+
+        btnSave.setOnClickListener {
+            val selectedHour = npHour.value
+            val selectedMinute = npMinute.value
+
+            prefs.edit()
+                .putInt("notif_hour", selectedHour)
+                .putInt("notif_minute", selectedMinute)
+                .apply()
+
+            rescheduleNotifWorker(selectedHour, selectedMinute)
+
+            android.widget.Toast.makeText(
                 requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                hours
-            )
-            setSelection(currentHour)
+                "Notifikasi setiap hari pukul %02d:%02d".format(selectedHour, selectedMinute),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+
+            onTimeSet()
+            dialog.dismiss()
         }
 
-        val tvColon = android.widget.TextView(requireContext()).apply {
-            text = " : "
-            textSize = 20f
-            setTextColor(android.graphics.Color.parseColor("#1A1A2E"))
-            gravity = android.view.Gravity.CENTER
-            setPadding(16, 0, 16, 0)
-        }
-
-        val spinnerMinute = android.widget.Spinner(requireContext()).apply {
-            adapter = android.widget.ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                minutes
-            )
-            setSelection(currentMinute)
-        }
-
-        layout.addView(spinnerHour)
-        layout.addView(tvColon)
-        layout.addView(spinnerMinute)
-
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Pilih Jam Notifikasi")
-            .setView(layout)
-            .setPositiveButton("Simpan") { _, _ ->
-                val selectedHour   = spinnerHour.selectedItemPosition
-                val selectedMinute = spinnerMinute.selectedItemPosition
-
-                prefs.edit()
-                    .putInt("notif_hour", selectedHour)
-                    .putInt("notif_minute", selectedMinute)
-                    .apply()
-
-                rescheduleNotifWorker(selectedHour, selectedMinute)
-
-                android.widget.Toast.makeText(
-                    requireContext(),
-                    "Notifikasi setiap hari pukul %02d:%02d".format(selectedHour, selectedMinute),
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
-
-                onTimeSet()
-            }
-            .setNegativeButton("Batal", null)
-            .show()
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     private fun rescheduleNotifWorker(hour: Int, minute: Int) {

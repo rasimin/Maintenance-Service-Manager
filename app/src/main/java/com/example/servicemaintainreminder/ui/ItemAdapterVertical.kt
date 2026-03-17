@@ -57,8 +57,14 @@ class ItemAdapterVertical(
             if (customIconResId != 0) {
                 binding.ivItemIcon.setImageResource(customIconResId)
             } else {
-                val isVehicle = item.category.equals("vehicle", ignoreCase = true) || item.category.equals("kendaraan", ignoreCase = true)
-                val iconRes = if (isVehicle) android.R.drawable.ic_menu_directions else android.R.drawable.ic_menu_preferences
+                val iconRes = when (item.category.lowercase()) {
+                    "ac", "air conditioner" -> R.drawable.ic_ac
+                    "vehicle", "kendaraan", "mobil", "motor" -> R.drawable.ic_car
+                    "electronics", "elektronik" -> R.drawable.ic_electronic
+                    "machine", "mesin" -> R.drawable.ic_machine
+                    "home appliance" -> R.drawable.ic_electronic
+                    else -> R.drawable.ic_devices
+                }
                 binding.ivItemIcon.setImageResource(iconRes)
             }
 

@@ -33,9 +33,9 @@ class AddItemFragment : Fragment() {
     private var isFixedScheduleSelected = false  // false = Flexible (default)
     private var selectedIcon: String? = null
     private val availableIcons = listOf(
-        "ic_devices", "ic_upcoming", "ic_history", "ic_input_calendar", 
-        "ic_input_cost", "ic_schedule_fixed", "ic_schedule_flexible", "ic_input_note",
-        "ic_input_category", "ic_input_edit", "ic_input_info"
+        "ic_ac", "ic_car", "ic_electronic", "ic_machine", 
+        "ic_service", "ic_devices", "ic_clock", "ic_upcoming",
+        "ic_history", "ic_input_calendar", "ic_input_cost", "ic_input_note"
     )
 
     override fun onCreateView(
