@@ -1,86 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_search_overlay"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@drawable/bg_search_overlay">
 
-    <!-- Header Icon -->
-    <FrameLayout
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/bg_next_service_rounded"
-        android:backgroundTint="#FFF0F5">
-
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="center"
-            android:src="@android:drawable/ic_menu_preferences"
-            app:tint="#F50057" />
-    </FrameLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="App Settings"
-        android:textColor="#1A1A2E"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:gravity="center"
-        android:lineSpacingExtra="4dp"
-        android:text="Configure your preferences."
-        android:textColor="#8A8A9A"
-        android:textSize="13sp" />
-
-    <!-- ── SECURITY SECTION ── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-        <!-- Master Switch -->
+        <!-- ── Header ── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_status_badge"
-            android:backgroundTint="#F4F4F9"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pengaturan"
+                android:textColor="#111827"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Kelola akun, keamanan &amp; preferensi"
+                android:textColor="#9CA3AF"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!--  SECTION: AKUN                              -->
+        <!-- ════════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F3F4F6"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="8dp"
+            android:text="AKUN"
+            android:textColor="#6B7280"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
+
+        <!-- Account Name Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="#FFFFFF"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_person"
+                app:tint="#6366F1" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="14dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enable App Lock"
-                    android:textColor="#1A1A2E"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:text="Nama Akun"
+                    android:textColor="#111827"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvCurrentAccountName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="—"
+                android:textColor="#9CA3AF"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/btnChangeAccount"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="#D1D5DB" />
+        </LinearLayout>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!--  SECTION: KEAMANAN                          -->
+        <!-- ════════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F3F4F6"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="8dp"
+            android:text="KEAMANAN"
+            android:textColor="#6B7280"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
+
+        <!-- App Lock -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_lock"
+                app:tint="#6366F1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Secure your data on startup"
-                    android:textColor="#8A8A9A"
-                    android:textSize="12sp" />
+                    android:text="Kunci Aplikasi"
+                    android:textColor="#111827"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lindungi app dengan PIN &amp; biometrik"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
             </LinearLayout>
 
             <com.google.android.material.materialswitch.MaterialSwitch
@@ -89,73 +157,117 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <!-- Security Status Card (shown when lock is enabled) -->
+        <!-- Security Status (visible only when lock is on) -->
         <LinearLayout
             android:id="@+id/llSecurityStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_status_badge"
-            android:backgroundTint="#F0FFF4"
             android:orientation="vertical"
-            android:padding="16dp"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="🔒 Security Status"
-                android:textColor="#1A1A2E"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+            <!-- Thin inset divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginStart="52dp"
+                android:background="#E5E7EB" />
 
-            <!-- PIN Status Row -->
+            <!-- PIN Row -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="58dp"
+                android:background="#FFFFFF"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp">
 
-                <TextView
-                    android:id="@+id/tvPinStatus"
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_pin"
+                    app:tint="#6366F1" />
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="📌 PIN: Not set"
-                    android:textColor="#E74C3C"
-                    android:textSize="13sp" />
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PIN"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvPinStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Belum diset"
+                        android:textColor="#EF4444"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnChangePinInline"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="0dp"
                     android:minHeight="0dp"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="Change PIN"
+                    android:paddingHorizontal="0dp"
+                    android:text="Ganti"
                     android:textAllCaps="false"
                     android:textColor="@color/brand_primary"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- Biometric Status Row -->
+            <!-- Thin inset divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginStart="52dp"
+                android:background="#E5E7EB" />
+
+            <!-- Biometric Row -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="58dp"
+                android:background="#FFFFFF"
                 android:gravity="center_vertical"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp">
 
-                <TextView
-                    android:id="@+id/tvBiometricStatus"
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_fingerprint"
+                    app:tint="#6366F1" />
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="👆 Biometric: Disabled"
-                    android:textColor="#8A8A9A"
-                    android:textSize="13sp" />
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Biometrik"
+                        android:textColor="#111827"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvBiometricStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nonaktif"
+                        android:textColor="#9CA3AF"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchBiometric"
@@ -163,88 +275,177 @@
                     android:layout_height="wrap_content"
                     android:enabled="false" />
             </LinearLayout>
-
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- ════════════════════════════════════════════ -->
+        <!--  SECTION: NOTIFIKASI                        -->
+        <!-- ════════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F3F4F6"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="8dp"
+            android:text="NOTIFIKASI"
+            android:textColor="#6B7280"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
 
-    <!-- ── NOTIFICATION TIME SECTION ── -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bg_status_badge"
-        android:backgroundTint="#F4F4F9"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
+        <!-- Notification Time Row -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔔 Jam Notifikasi"
-                android:textColor="#1A1A2E"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_notif_bell"
+                app:tint="#6366F1" />
 
-            <TextView
-                android:id="@+id/tvNotifTimeDesc"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Pengingat dikirim setiap hari pukul 08:00"
-                android:textColor="#8A8A9A"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jam Pengingat"
+                    android:textColor="#111827"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvNotifTimeDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Setiap hari pukul 08:00"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTestNotif"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="8dp"
+                android:text="Test"
+                android:textAllCaps="false"
+                android:textColor="#EF4444"
                 android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChangeNotifTime"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="4dp"
+                android:text="Ubah"
+                android:textAllCaps="false"
+                android:textColor="@color/brand_primary"
+                android:textSize="13sp" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTestNotif"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+        <!-- ════════════════════════════════════════════ -->
+        <!--  SECTION: DASHBOARD                         -->
+        <!-- ════════════════════════════════════════════ -->
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="4dp"
-            android:text="Test"
-            android:textAllCaps="false"
-            android:textColor="#E74C3C"
-            android:textSize="12sp" />
+            android:background="#F3F4F6"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="8dp"
+            android:text="DASHBOARD"
+            android:textColor="#6B7280"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnChangeNotifTime"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+        <!-- Threshold Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_dashboard"
+                app:tint="#6366F1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Batas Upcoming"
+                    android:textColor="#111827"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvThresholdDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tampilkan item 30 hari ke depan"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChangeThreshold"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="4dp"
+                android:text="Ubah"
+                android:textAllCaps="false"
+                android:textColor="@color/brand_primary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Bottom section filler + close button -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="Ubah"
-            android:textAllCaps="false"
-            android:textColor="@color/brand_primary"
-            android:textSize="12sp" />
+            android:background="#F3F4F6"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="28dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCloseSettings"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Tutup"
+                android:textColor="#6B7280"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                app:cornerRadius="10dp"
+                app:strokeColor="#D1D5DB"
+                app:strokeWidth="1dp" />
+        </LinearLayout>
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="16dp" />
-
-    <!-- Close Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCloseSettings"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Close"
-        android:textColor="#8A8A9A"
-        android:textAllCaps="false"
-        app:cornerRadius="12dp"
-        app:strokeColor="#E5E7EB" />
-
-</LinearLayout>
+</ScrollView>

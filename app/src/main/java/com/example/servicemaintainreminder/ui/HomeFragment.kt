@@ -75,20 +75,8 @@ class HomeFragment : Fragment() {
 
     private fun setupHeader() {
         updateGreeting()
-        binding.header.cardSettings.setOnClickListener { view ->
-            val menuItems = listOf(
-                ModernMenuItem(1, "Account", R.drawable.ic_input_edit),
-                ModernMenuItem(2, "Security", R.drawable.ic_input_note),
-                ModernMenuItem(3, "Settings", R.drawable.ic_upcoming)
-            )
-            
-            ModernMenuUtil.showMenu(requireContext(), view, menuItems) { selectedId ->
-                when (selectedId) {
-                    1 -> showAccountDialog()
-                    2 -> showSettingsDialog()
-                    3 -> showThresholdSettingsDialog()
-                }
-            }
+        binding.header.cardSettings.setOnClickListener {
+            showSettingsDialog()
         }
     }
 
@@ -134,16 +122,28 @@ class HomeFragment : Fragment() {
         dialog.setContentView(dialogView)
         dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
 
+        // — Akun —
+        val tvCurrentAccountName = dialogView.findViewById<android.widget.TextView>(R.id.tvCurrentAccountName)
+        val btnChangeAccount = dialogView.findViewById<android.view.View>(R.id.btnChangeAccount)
+
+        // — Keamanan —
         val switchAppLock = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchAppLock)
         val llSecurityStatus = dialogView.findViewById<android.view.View>(R.id.llSecurityStatus)
         val tvPinStatus = dialogView.findViewById<android.widget.TextView>(R.id.tvPinStatus)
         val tvBiometricStatus = dialogView.findViewById<android.widget.TextView>(R.id.tvBiometricStatus)
         val switchBiometric = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchBiometric)
         val btnChangePinInline = dialogView.findViewById<android.view.View>(R.id.btnChangePinInline)
-        val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
+
+        // — Notifikasi —
         val tvNotifTimeDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvNotifTimeDesc)
         val btnChangeNotifTime = dialogView.findViewById<android.view.View>(R.id.btnChangeNotifTime)
         val btnTestNotif = dialogView.findViewById<android.view.View>(R.id.btnTestNotif)
+
+        // — Dashboard —
+        val tvThresholdDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvThresholdDesc)
+        val btnChangeThreshold = dialogView.findViewById<android.view.View>(R.id.btnChangeThreshold)
+
+        val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
 
         fun refreshStatus() {
             val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
@@ -151,28 +151,45 @@ class HomeFragment : Fragment() {
             val biometricEnabled = prefs.getBoolean("is_biometric_enabled", false)
             val notifHour = prefs.getInt("notif_hour", 8)
             val notifMinute = prefs.getInt("notif_minute", 0)
-            tvNotifTimeDesc.text = "Pengingat dikirim setiap hari pukul %02d:%02d".format(notifHour, notifMinute)
+            val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+            val accountName = prefs.getString("user_name", "") ?: ""
 
-            switchAppLock.isChecked = isLocked
+            // Akun
+            tvCurrentAccountName.text = if (accountName.isNotEmpty()) accountName else "Belum diset"
+
+            // Dashboard
+            tvThresholdDesc.text = "Tampilkan item dalam $daysLimit hari ke depan"
+
+            // Notifikasi
+            tvNotifTimeDesc.text = "Dikirim setiap hari pukul %02d:%02d".format(notifHour, notifMinute)
+
+            // Keamanan
+            var isProgrammaticLockChange = switchAppLock.tag as? Boolean ?: false
+            if (!isProgrammaticLockChange) {
+                switchAppLock.isChecked = isLocked
+            }
             llSecurityStatus.isVisible = isLocked
 
             if (pinSet) {
-                tvPinStatus.text = "📌 PIN: ✅ Set"
+                tvPinStatus.text = "Sudah diset"
                 tvPinStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
             } else {
-                tvPinStatus.text = "📌 PIN: ⚠ Not set"
+                tvPinStatus.text = "Belum diset"
                 tvPinStatus.setTextColor(android.graphics.Color.parseColor("#E74C3C"))
             }
 
             switchBiometric.isEnabled = pinSet
-            switchBiometric.isChecked = biometricEnabled
+            var isProgrammaticBioChange = switchBiometric.tag as? Boolean ?: false
+            if (!isProgrammaticBioChange) {
+                switchBiometric.isChecked = biometricEnabled
+            }
 
             if (biometricEnabled) {
-                tvBiometricStatus.text = "👆 Biometric: ✅ Enabled"
+                tvBiometricStatus.text = "Aktif"
                 tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
             } else {
-                tvBiometricStatus.text = "👆 Biometric: Disabled"
-                tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#8A8A9A"))
+                tvBiometricStatus.text = "Nonaktif"
+                tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#9CA3AF"))
             }
         }
 
@@ -180,28 +197,33 @@ class HomeFragment : Fragment() {
 
         fun setSwitchChecked(checked: Boolean) {
             isProgrammaticChange = true
+            switchAppLock.tag = true
             switchAppLock.isChecked = checked
+            switchAppLock.tag = false
             isProgrammaticChange = false
         }
 
         refreshStatus()
 
+        // ── Akun ──
+        btnChangeAccount.setOnClickListener {
+            dialog.dismiss()
+            showAccountDialog()
+        }
+
+        // ── Keamanan ──
         switchAppLock.setOnCheckedChangeListener { _, isChecked ->
             if (isProgrammaticChange) return@setOnCheckedChangeListener
 
             if (isChecked) {
-                // Selalu wajib setup PIN dari awal (karena PIN dihapus saat disable)
                 setSwitchChecked(false)
                 showSetPinDialog(isEnableLockFlow = true) {
-                    // PIN berhasil disimpan, aktifkan lock tanpa trigger listener
                     prefs.edit().putBoolean("is_app_lock_enabled", true).apply()
                     setSwitchChecked(true)
                     refreshStatus()
-                    // Tawarkan biometrik
                     showBiometricOfferDialog(prefs) { refreshStatus() }
                 }
             } else {
-                // Reset semua setting security saat dimatikan
                 prefs.edit()
                     .putBoolean("is_app_lock_enabled", false)
                     .putBoolean("is_biometric_enabled", false)
@@ -217,9 +239,8 @@ class HomeFragment : Fragment() {
             if (isProgrammaticBiometricChange) return@setOnCheckedChangeListener
 
             if (isChecked) {
-                // Wajib konfirmasi biometrik sebelum enable
                 isProgrammaticBiometricChange = true
-                switchBiometric.isChecked = false // revert dulu, tunggu konfirmasi
+                switchBiometric.isChecked = false
                 isProgrammaticBiometricChange = false
 
                 val executor = ContextCompat.getMainExecutor(requireContext())
@@ -232,52 +253,47 @@ class HomeFragment : Fragment() {
                             switchBiometric.isChecked = true
                             isProgrammaticBiometricChange = false
                             refreshStatus()
-                            android.widget.Toast.makeText(requireContext(), "✅ Biometric enabled", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(requireContext(), "✅ Biometrik diaktifkan", android.widget.Toast.LENGTH_SHORT).show()
                         }
                         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                             super.onAuthenticationError(errorCode, errString)
-                            // Tetap false, switch sudah di-revert
-                            android.widget.Toast.makeText(requireContext(), "Biometric not confirmed", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(requireContext(), "Biometrik tidak dikonfirmasi", android.widget.Toast.LENGTH_SHORT).show()
                         }
-                        override fun onAuthenticationFailed() {
-                            super.onAuthenticationFailed()
-                        }
+                        override fun onAuthenticationFailed() { super.onAuthenticationFailed() }
                     })
                 val promptInfo = BiometricPrompt.PromptInfo.Builder()
-                    .setTitle("Confirm Biometric")
-                    .setSubtitle("Authenticate to enable biometric login")
+                    .setTitle("Konfirmasi Biometrik")
+                    .setSubtitle("Autentikasi untuk mengaktifkan login biometrik")
                     .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                    .setNegativeButtonText("Cancel")
+                    .setNegativeButtonText("Batal")
                     .build()
                 biometricPrompt.authenticate(promptInfo)
             } else {
-                // Disable langsung tanpa konfirmasi
                 prefs.edit().putBoolean("is_biometric_enabled", false).apply()
                 refreshStatus()
             }
         }
 
         btnChangePinInline.setOnClickListener {
-            showSetPinDialog(isEnableLockFlow = false) {
-                refreshStatus()
-            }
+            showSetPinDialog(isEnableLockFlow = false) { refreshStatus() }
         }
 
+        // ── Notifikasi ──
         btnChangeNotifTime.setOnClickListener {
             showNotifTimePicker(prefs) { refreshStatus() }
         }
 
         btnTestNotif.setOnClickListener {
-            // Trigger notifikasi langsung sekarang (OneTime untuk testing)
             val testRequest = androidx.work.OneTimeWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>()
                 .build()
-            androidx.work.WorkManager.getInstance(requireContext())
-                .enqueue(testRequest)
-            android.widget.Toast.makeText(
-                requireContext(),
-                "🔔 Mengirim notifikasi test...",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
+            androidx.work.WorkManager.getInstance(requireContext()).enqueue(testRequest)
+            android.widget.Toast.makeText(requireContext(), "🔔 Mengirim notifikasi test...", android.widget.Toast.LENGTH_SHORT).show()
+        }
+
+        // ── Dashboard ──
+        btnChangeThreshold.setOnClickListener {
+            dialog.dismiss()
+            showThresholdSettingsDialog()
         }
 
         btnClose.setOnClickListener { dialog.dismiss() }
@@ -291,33 +307,70 @@ class HomeFragment : Fragment() {
         val currentHour = prefs.getInt("notif_hour", 8)
         val currentMinute = prefs.getInt("notif_minute", 0)
 
-        val timePicker = android.app.TimePickerDialog(
-            requireContext(),
-            { _, hour, minute ->
-                // Simpan jam yang dipilih
+        val hours   = Array(24) { "%02d".format(it) }
+        val minutes = Array(60) { "%02d".format(it) }
+
+        // Buat custom view dengan 2 Spinner
+        val layout = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER
+            setPadding(48, 32, 48, 16)
+        }
+
+        val spinnerHour = android.widget.Spinner(requireContext()).apply {
+            adapter = android.widget.ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                hours
+            )
+            setSelection(currentHour)
+        }
+
+        val tvColon = android.widget.TextView(requireContext()).apply {
+            text = " : "
+            textSize = 20f
+            setTextColor(android.graphics.Color.parseColor("#1A1A2E"))
+            gravity = android.view.Gravity.CENTER
+            setPadding(16, 0, 16, 0)
+        }
+
+        val spinnerMinute = android.widget.Spinner(requireContext()).apply {
+            adapter = android.widget.ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                minutes
+            )
+            setSelection(currentMinute)
+        }
+
+        layout.addView(spinnerHour)
+        layout.addView(tvColon)
+        layout.addView(spinnerMinute)
+
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Pilih Jam Notifikasi")
+            .setView(layout)
+            .setPositiveButton("Simpan") { _, _ ->
+                val selectedHour   = spinnerHour.selectedItemPosition
+                val selectedMinute = spinnerMinute.selectedItemPosition
+
                 prefs.edit()
-                    .putInt("notif_hour", hour)
-                    .putInt("notif_minute", minute)
+                    .putInt("notif_hour", selectedHour)
+                    .putInt("notif_minute", selectedMinute)
                     .apply()
 
-                // Reschedule worker dengan delay ke jam target
-                rescheduleNotifWorker(hour, minute)
+                rescheduleNotifWorker(selectedHour, selectedMinute)
 
-                val timeStr = "%02d:%02d".format(hour, minute)
                 android.widget.Toast.makeText(
                     requireContext(),
-                    "✅ Notifikasi akan dikirim setiap hari pukul $timeStr",
-                    android.widget.Toast.LENGTH_LONG
+                    "Notifikasi setiap hari pukul %02d:%02d".format(selectedHour, selectedMinute),
+                    android.widget.Toast.LENGTH_SHORT
                 ).show()
 
                 onTimeSet()
-            },
-            currentHour,
-            currentMinute,
-            true // 24-hour format
-        )
-        timePicker.setTitle("Pilih Jam Notifikasi")
-        timePicker.show()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
     }
 
     private fun rescheduleNotifWorker(hour: Int, minute: Int) {
