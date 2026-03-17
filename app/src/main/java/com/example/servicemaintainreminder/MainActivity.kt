@@ -1,6 +1,8 @@
 package com.example.servicemaintainreminder
 
 import android.os.Bundle
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.example.servicemaintainreminder.databinding.ActivityMainBinding
@@ -19,6 +21,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var isAuthenticatedSession = false
 
+    // Launcher untuk request permission notifikasi (Android 13+)
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Toast.makeText(this, "Izin notifikasi diperlukan agar pengingat servis berfungsi.", Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -27,6 +38,14 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Ads
         MobileAds.initialize(this) {}
+
+        // Request notification permission for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
 
         // Schedule Notification Worker
         setupReminderWorker()
@@ -188,11 +207,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupReminderWorker() {
         val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED).build())
+            .setInitialDelay(1, TimeUnit.HOURS) // delay pertama agar tidak langsung jalan
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "ServiceReminderWork",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE, // UPDATE agar perubahan konfigurasi langsung aktif
             workRequest
         )
     }
