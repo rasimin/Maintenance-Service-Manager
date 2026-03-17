@@ -80,7 +80,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showAccountDialog() {
+    private fun showAccountDialog(onDismissed: (() -> Unit)? = null) {
         // ... (keep as is)
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val currentName = prefs.getString("user_name", "") ?: ""
@@ -102,6 +102,7 @@ class HomeFragment : Fragment() {
                 prefs.edit().putString("user_name", newName).apply()
                 updateGreeting()
                 dialog.dismiss()
+                onDismissed?.invoke()
             } else {
                 android.widget.Toast.makeText(requireContext(), "Name cannot be empty", android.widget.Toast.LENGTH_SHORT).show()
             }
@@ -109,7 +110,10 @@ class HomeFragment : Fragment() {
 
         btnCancel.setOnClickListener {
             dialog.dismiss()
+            onDismissed?.invoke()
         }
+
+        dialog.setOnCancelListener { onDismissed?.invoke() }
 
         dialog.show()
     }
@@ -135,9 +139,15 @@ class HomeFragment : Fragment() {
         val btnChangePinInline = dialogView.findViewById<android.view.View>(R.id.btnChangePinInline)
 
         // — Notifikasi —
+        val switchEnableNotif = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchEnableNotif)
+        val rowNotifTime = dialogView.findViewById<android.view.View>(R.id.rowNotifTime)
+        val rowExactAlarm = dialogView.findViewById<android.view.View>(R.id.rowExactAlarm)
+        val d1 = dialogView.findViewById<android.view.View>(R.id.dividerNotif1)
+        val d2 = dialogView.findViewById<android.view.View>(R.id.dividerNotif2)
         val tvNotifTimeDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvNotifTimeDesc)
         val btnChangeNotifTime = dialogView.findViewById<android.view.View>(R.id.btnChangeNotifTime)
         val btnTestNotif = dialogView.findViewById<android.view.View>(R.id.btnTestNotif)
+        val switchExactAlarm = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchExactAlarm)
 
         // — Dashboard —
         val tvThresholdDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvThresholdDesc)
@@ -161,6 +171,20 @@ class HomeFragment : Fragment() {
             tvThresholdDesc.text = "Tampilkan item dalam $daysLimit hari ke depan"
 
             // Notifikasi
+            val isNotifEnabled = prefs.getBoolean("is_notif_enabled", true)
+            switchEnableNotif.isChecked = isNotifEnabled
+            
+            val isExactAlarmEnabled = prefs.getBoolean("is_exact_alarm_enabled", false)
+            switchExactAlarm.tag = true
+            switchExactAlarm.isChecked = isExactAlarmEnabled
+            switchExactAlarm.tag = null
+
+            val visibility = if (isNotifEnabled) android.view.View.VISIBLE else android.view.View.GONE
+            rowNotifTime.visibility = visibility
+            rowExactAlarm.visibility = visibility
+            d1?.visibility = visibility
+            d2?.visibility = visibility
+
             tvNotifTimeDesc.text = "Dikirim setiap hari pukul %02d:%02d".format(notifHour, notifMinute)
 
             // Keamanan
@@ -208,7 +232,7 @@ class HomeFragment : Fragment() {
         // ── Akun ──
         btnChangeAccount.setOnClickListener {
             dialog.dismiss()
-            showAccountDialog()
+            showAccountDialog { showSettingsDialog() }
         }
 
         // ── Keamanan ──
@@ -279,8 +303,72 @@ class HomeFragment : Fragment() {
         }
 
         // ── Notifikasi ──
+        switchEnableNotif.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("is_notif_enabled", isChecked).apply()
+            
+            val visibility = if (isChecked) android.view.View.VISIBLE else android.view.View.GONE
+            rowNotifTime.visibility = visibility
+            rowExactAlarm.visibility = visibility
+            d1?.visibility = visibility
+            d2?.visibility = visibility
+            
+            if (isChecked) {
+                val h = prefs.getInt("notif_hour", 8)
+                val m = prefs.getInt("notif_minute", 0)
+                rescheduleNotifWorker(h, m)
+            } else {
+                // Cancel everything
+                androidx.work.WorkManager.getInstance(requireContext()).cancelUniqueWork("ServiceReminderWork")
+                val am = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+                val intent = android.content.Intent(requireContext(), com.example.servicemaintainreminder.worker.AlarmReceiver::class.java)
+                val pendingIntent = android.app.PendingIntent.getBroadcast(
+                    requireContext(), 1001, intent, 
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                )
+                am.cancel(pendingIntent)
+            }
+        }
+
         btnChangeNotifTime.setOnClickListener {
-            showNotifTimePicker(prefs) { refreshStatus() }
+            dialog.dismiss()
+            showNotifTimePicker(prefs) { showSettingsDialog() }
+        }
+
+        switchExactAlarm.setOnCheckedChangeListener { _, isChecked ->
+            if (switchExactAlarm.tag == true) return@setOnCheckedChangeListener
+            if (isChecked) {
+                // Check for exact alarm permission on Android 12+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    val alarmManager = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+                    if (!alarmManager.canScheduleExactAlarms()) {
+                        // Redirect to system settings
+                        android.app.AlertDialog.Builder(requireContext())
+                            .setTitle("Izin Diperlukan")
+                            .setMessage("Untuk pengingat real-time, Anda perlu mengaktifkan izin 'Alarm & Reminders' di pengaturan sistem. Tanpa izin ini, Android akan menunda notifikasi untuk menghemat baterai.")
+                            .setPositiveButton("Buka Pengaturan") { _, _ ->
+                                val intent = android.content.Intent().apply {
+                                    action = android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                                }
+                                startActivity(intent)
+                            }
+                            .setNegativeButton("Batal") { _, _ -> 
+                                switchExactAlarm.isChecked = false
+                            }
+                            .show()
+                        return@setOnCheckedChangeListener
+                    }
+                }
+                prefs.edit().putBoolean("is_exact_alarm_enabled", true).apply()
+                android.widget.Toast.makeText(requireContext(), "🚀 Pengingat Real-time diaktifkan!", android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                prefs.edit().putBoolean("is_exact_alarm_enabled", false).apply()
+                android.widget.Toast.makeText(requireContext(), "Pengingat kembali ke mode hemat baterai.", android.widget.Toast.LENGTH_SHORT).show()
+            }
+
+            // Reschedule regardless of exact or periodic
+            val h = prefs.getInt("notif_hour", 8)
+            val m = prefs.getInt("notif_minute", 0)
+            rescheduleNotifWorker(h, m)
         }
 
         btnTestNotif.setOnClickListener {
@@ -293,7 +381,7 @@ class HomeFragment : Fragment() {
         // ── Dashboard ──
         btnChangeThreshold.setOnClickListener {
             dialog.dismiss()
-            showThresholdSettingsDialog()
+            showThresholdSettingsDialog { showSettingsDialog() }
         }
 
         btnClose.setOnClickListener { dialog.dismiss() }
@@ -350,39 +438,76 @@ class HomeFragment : Fragment() {
             dialog.dismiss()
         }
 
-        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            onTimeSet()
+        }
+
+        dialog.setOnCancelListener { onTimeSet() }
         dialog.show()
     }
 
     private fun rescheduleNotifWorker(hour: Int, minute: Int) {
+        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val isExact = prefs.getBoolean("is_exact_alarm_enabled", false)
+        
         val now = java.util.Calendar.getInstance()
         val target = java.util.Calendar.getInstance().apply {
             set(java.util.Calendar.HOUR_OF_DAY, hour)
             set(java.util.Calendar.MINUTE, minute)
             set(java.util.Calendar.SECOND, 0)
             set(java.util.Calendar.MILLISECOND, 0)
-            // Jika jam target sudah lewat hari ini, jadwalkan besok
             if (before(now)) add(java.util.Calendar.DAY_OF_YEAR, 1)
         }
 
         val delayMs = target.timeInMillis - now.timeInMillis
 
-        val workRequest = androidx.work.PeriodicWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>(
-            1, java.util.concurrent.TimeUnit.DAYS
-        )
-            .setInitialDelay(delayMs, java.util.concurrent.TimeUnit.MILLISECONDS)
-            .setConstraints(
-                androidx.work.Constraints.Builder()
-                    .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED)
-                    .build()
-            )
-            .build()
+        // 1. Always cancel existing WorkManager periodic work
+        androidx.work.WorkManager.getInstance(requireContext()).cancelUniqueWork("ServiceReminderWork")
 
-        androidx.work.WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "ServiceReminderWork",
-            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
-            workRequest
+        // 2. Clear existing Exact Alarm regardless of current setting
+        val am = requireContext().getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+        val intent = android.content.Intent(requireContext(), com.example.servicemaintainreminder.worker.AlarmReceiver::class.java)
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            requireContext(), 1001, intent, 
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
+        am.cancel(pendingIntent)
+
+        if (isExact) {
+            // MODE REAL-TIME (Exact Alarm)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(
+                    android.app.AlarmManager.RTC_WAKEUP,
+                    target.timeInMillis,
+                    pendingIntent
+                )
+            } else {
+                am.setExact(
+                    android.app.AlarmManager.RTC_WAKEUP,
+                    target.timeInMillis,
+                    pendingIntent
+                )
+            }
+        } else {
+            // MODE HEMAT BATERAI (WorkManager)
+            val workRequest = androidx.work.PeriodicWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>(
+                1, java.util.concurrent.TimeUnit.DAYS
+            )
+                .setInitialDelay(delayMs, java.util.concurrent.TimeUnit.MILLISECONDS)
+                .setConstraints(
+                    androidx.work.Constraints.Builder()
+                        .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED)
+                        .build()
+                )
+                .build()
+
+            androidx.work.WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+                "ServiceReminderWork",
+                androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
+                workRequest
+            )
+        }
     }
 
     private fun showBiometricOfferDialog(prefs: android.content.SharedPreferences, onDone: () -> Unit) {
@@ -553,7 +678,7 @@ class HomeFragment : Fragment() {
     }
 
 
-    private fun showThresholdSettingsDialog() {
+    private fun showThresholdSettingsDialog(onDismissed: (() -> Unit)? = null) {
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val dialog = BottomSheetDialog(requireContext())
         val dialogView = layoutInflater.inflate(R.layout.dialog_threshold_settings, null)
@@ -579,12 +704,15 @@ class HomeFragment : Fragment() {
             
             android.widget.Toast.makeText(requireContext(), "Parameter saved", android.widget.Toast.LENGTH_SHORT).show()
             dialog.dismiss()
+            onDismissed?.invoke()
         }
 
         btnClose.setOnClickListener {
             dialog.dismiss()
+            onDismissed?.invoke()
         }
 
+        dialog.setOnCancelListener { onDismissed?.invoke() }
         dialog.show()
     }
 

@@ -45,12 +45,19 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
             val daysLeft = (timeDiff / (24 * 60 * 60 * 1000L)).toInt()
 
             when {
-                timeDiff < 0 -> {
-                    val daysOverdue = (-daysLeft)
-                    overdueItems.add("• ${item.name} (${daysOverdue} hari terlambat)")
+                daysLeft < 0 -> {
+                    // Terlambat
+                    val daysOverdue = -daysLeft
+                    overdueItems.add("• ${item.name} ($daysOverdue hari terlambat)")
                     overdueIds.add(item.id)
                 }
+                daysLeft == 0 -> {
+                    // Hari ini (Hari H!)
+                    upcomingItems.add("• ${item.name} (HARI INI!)")
+                    upcomingIds.add(item.id)
+                }
                 daysLeft <= upcomingDaysLimit -> {
+                    // Masih ada sisa hari
                     upcomingItems.add("• ${item.name} ($daysLeft hari lagi)")
                     upcomingIds.add(item.id)
                 }

@@ -228,33 +228,61 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupReminderWorker() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isNotifEnabled = prefs.getBoolean("is_notif_enabled", true)
+        val isExact = prefs.getBoolean("is_exact_alarm_enabled", false)
         val targetHour = prefs.getInt("notif_hour", 8)
         val targetMinute = prefs.getInt("notif_minute", 0)
 
-        // Hitung delay ke jam target berikutnya
+        // Prep cancel/schedule objects
+        val am = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val intent = Intent(this, com.example.servicemaintainreminder.worker.AlarmReceiver::class.java)
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            this, 1001, intent, 
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // 1. Cancel everything first to be sure
+        WorkManager.getInstance(this).cancelUniqueWork("ServiceReminderWork")
+        am.cancel(pendingIntent)
+
+        // 2. If global setting is OFF, stop here
+        if (!isNotifEnabled) return
+
         val now = java.util.Calendar.getInstance()
         val target = java.util.Calendar.getInstance().apply {
             set(java.util.Calendar.HOUR_OF_DAY, targetHour)
             set(java.util.Calendar.MINUTE, targetMinute)
             set(java.util.Calendar.SECOND, 0)
             set(java.util.Calendar.MILLISECOND, 0)
-            // Jika jam target sudah lewat hari ini, jadwalkan besok
             if (before(now)) add(java.util.Calendar.DAY_OF_YEAR, 1)
         }
         val delayMs = target.timeInMillis - now.timeInMillis
 
-        val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
-            .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
-            .setConstraints(
-                Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED).build()
-            )
-            .build()
+        if (isExact) {
+            // Mode Real-time (Exact Alarm)
+            // Selalu set ulang alarm saat boot/app open untuk memastikan AlarmManager tetap aktif setelah proses mati
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(android.app.AlarmManager.RTC_WAKEUP, target.timeInMillis, pendingIntent)
+            } else {
+                am.setExact(android.app.AlarmManager.RTC_WAKEUP, target.timeInMillis, pendingIntent)
+            }
+        } else {
+            // Mode Periodic (WorkManager)
+            // Batalkan exact alarm jika ada (transisi mode)
+            am.cancel(pendingIntent)
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "ServiceReminderWork",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            workRequest
-        )
+            val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
+                .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED).build())
+                .build()
+
+            // Gunakan KEEP agar jika sudah ada jadwal, tidak di-reset ulang (mengurangi notif dadakan saat build)
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "ServiceReminderWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                workRequest
+            )
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
