@@ -141,11 +141,17 @@ class HomeFragment : Fragment() {
         val switchBiometric = dialogView.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.switchBiometric)
         val btnChangePinInline = dialogView.findViewById<android.view.View>(R.id.btnChangePinInline)
         val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
+        val tvNotifTimeDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvNotifTimeDesc)
+        val btnChangeNotifTime = dialogView.findViewById<android.view.View>(R.id.btnChangeNotifTime)
+        val btnTestNotif = dialogView.findViewById<android.view.View>(R.id.btnTestNotif)
 
         fun refreshStatus() {
             val isLocked = prefs.getBoolean("is_app_lock_enabled", false)
             val pinSet = !prefs.getString("app_custom_pin", "").isNullOrEmpty()
             val biometricEnabled = prefs.getBoolean("is_biometric_enabled", false)
+            val notifHour = prefs.getInt("notif_hour", 8)
+            val notifMinute = prefs.getInt("notif_minute", 0)
+            tvNotifTimeDesc.text = "Pengingat dikirim setiap hari pukul %02d:%02d".format(notifHour, notifMinute)
 
             switchAppLock.isChecked = isLocked
             llSecurityStatus.isVisible = isLocked
@@ -257,8 +263,92 @@ class HomeFragment : Fragment() {
             }
         }
 
+        btnChangeNotifTime.setOnClickListener {
+            showNotifTimePicker(prefs) { refreshStatus() }
+        }
+
+        btnTestNotif.setOnClickListener {
+            // Trigger notifikasi langsung sekarang (OneTime untuk testing)
+            val testRequest = androidx.work.OneTimeWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>()
+                .build()
+            androidx.work.WorkManager.getInstance(requireContext())
+                .enqueue(testRequest)
+            android.widget.Toast.makeText(
+                requireContext(),
+                "🔔 Mengirim notifikasi test...",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+
         btnClose.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun showNotifTimePicker(
+        prefs: android.content.SharedPreferences,
+        onTimeSet: () -> Unit
+    ) {
+        val currentHour = prefs.getInt("notif_hour", 8)
+        val currentMinute = prefs.getInt("notif_minute", 0)
+
+        val timePicker = android.app.TimePickerDialog(
+            requireContext(),
+            { _, hour, minute ->
+                // Simpan jam yang dipilih
+                prefs.edit()
+                    .putInt("notif_hour", hour)
+                    .putInt("notif_minute", minute)
+                    .apply()
+
+                // Reschedule worker dengan delay ke jam target
+                rescheduleNotifWorker(hour, minute)
+
+                val timeStr = "%02d:%02d".format(hour, minute)
+                android.widget.Toast.makeText(
+                    requireContext(),
+                    "✅ Notifikasi akan dikirim setiap hari pukul $timeStr",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+
+                onTimeSet()
+            },
+            currentHour,
+            currentMinute,
+            true // 24-hour format
+        )
+        timePicker.setTitle("Pilih Jam Notifikasi")
+        timePicker.show()
+    }
+
+    private fun rescheduleNotifWorker(hour: Int, minute: Int) {
+        val now = java.util.Calendar.getInstance()
+        val target = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, hour)
+            set(java.util.Calendar.MINUTE, minute)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+            // Jika jam target sudah lewat hari ini, jadwalkan besok
+            if (before(now)) add(java.util.Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val delayMs = target.timeInMillis - now.timeInMillis
+
+        val workRequest = androidx.work.PeriodicWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>(
+            1, java.util.concurrent.TimeUnit.DAYS
+        )
+            .setInitialDelay(delayMs, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .setConstraints(
+                androidx.work.Constraints.Builder()
+                    .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED)
+                    .build()
+            )
+            .build()
+
+        androidx.work.WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+            "ServiceReminderWork",
+            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
     }
 
     private fun showBiometricOfferDialog(prefs: android.content.SharedPreferences, onDone: () -> Unit) {

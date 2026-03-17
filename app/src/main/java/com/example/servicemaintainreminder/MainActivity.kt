@@ -2,6 +2,7 @@ package com.example.servicemaintainreminder
 
 import android.os.Bundle
 import android.os.Build
+import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -49,6 +50,27 @@ class MainActivity : AppCompatActivity() {
 
         // Schedule Notification Worker
         setupReminderWorker()
+
+        // Handle tap dari notifikasi (deep-link ke detail)
+        handleNotificationIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        val itemId = intent?.getLongExtra("EXTRA_ITEM_ID", -1L) ?: -1L
+        if (itemId == -1L) return
+
+        // Tunggu NavController siap baru navigate
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val bundle = android.os.Bundle().apply { putLong("itemId", itemId) }
+        navController.navigate(R.id.detailFragment, bundle)
+        // Clear extra agar tidak di-handle ulang saat onResume
+        intent?.removeExtra("EXTRA_ITEM_ID")
     }
 
     override fun onResume() {
@@ -205,14 +227,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupReminderWorker() {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val targetHour = prefs.getInt("notif_hour", 8)
+        val targetMinute = prefs.getInt("notif_minute", 0)
+
+        // Hitung delay ke jam target berikutnya
+        val now = java.util.Calendar.getInstance()
+        val target = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, targetHour)
+            set(java.util.Calendar.MINUTE, targetMinute)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+            // Jika jam target sudah lewat hari ini, jadwalkan besok
+            if (before(now)) add(java.util.Calendar.DAY_OF_YEAR, 1)
+        }
+        val delayMs = target.timeInMillis - now.timeInMillis
+
         val workRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED).build())
-            .setInitialDelay(1, TimeUnit.HOURS) // delay pertama agar tidak langsung jalan
+            .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+            .setConstraints(
+                Constraints.Builder().setRequiredNetworkType(NetworkType.NOT_REQUIRED).build()
+            )
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "ServiceReminderWork",
-            ExistingPeriodicWorkPolicy.UPDATE, // UPDATE agar perubahan konfigurasi langsung aktif
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
         )
     }

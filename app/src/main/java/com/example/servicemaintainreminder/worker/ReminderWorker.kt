@@ -37,6 +37,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 
         val upcomingItems = mutableListOf<String>()
         val overdueItems = mutableListOf<String>()
+        val upcomingIds = mutableListOf<Long>()
+        val overdueIds = mutableListOf<Long>()
 
         items.filter { it.isActive }.forEach { item ->
             val timeDiff = item.nextServiceDate - currentTime
@@ -46,16 +48,17 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 timeDiff < 0 -> {
                     val daysOverdue = (-daysLeft)
                     overdueItems.add("• ${item.name} (${daysOverdue} hari terlambat)")
+                    overdueIds.add(item.id)
                 }
                 daysLeft <= upcomingDaysLimit -> {
                     upcomingItems.add("• ${item.name} ($daysLeft hari lagi)")
+                    upcomingIds.add(item.id)
                 }
             }
         }
 
         ensureChannelsCreated()
 
-        // Kirim notifikasi grouped untuk upcoming
         if (upcomingItems.isNotEmpty()) {
             sendGroupedNotification(
                 ids = upcomingItems.indices.map { it + 1000 },
@@ -65,11 +68,11 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 summaryTitle = "🔔 ${upcomingItems.size} Service Akan Segera",
                 summaryText = "${upcomingItems.size} perangkat perlu servis segera",
                 channelId = CHANNEL_ID,
-                iconRes = R.drawable.ic_upcoming
+                iconRes = R.drawable.ic_upcoming,
+                itemIds = upcomingIds
             )
         }
 
-        // Kirim notifikasi grouped untuk overdue
         if (overdueItems.isNotEmpty()) {
             sendGroupedNotification(
                 ids = overdueItems.indices.map { it + 2000 },
@@ -79,7 +82,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 summaryTitle = "⚠️ ${overdueItems.size} Service Terlambat!",
                 summaryText = "${overdueItems.size} perangkat sudah melewati jadwal servis",
                 channelId = CHANNEL_OVERDUE_ID,
-                iconRes = R.drawable.ic_schedule_fixed
+                iconRes = R.drawable.ic_schedule_fixed,
+                itemIds = overdueIds
             )
         }
 
@@ -122,34 +126,49 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
         summaryTitle: String,
         summaryText: String,
         channelId: String,
-        iconRes: Int
+        iconRes: Int,
+        itemIds: List<Long> = emptyList()
     ) {
         val nm = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Intent: tap notifikasi → buka aplikasi
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+        // Summary intent (buka app saja, tanpa item spesifik)
+        val summaryIntent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent = PendingIntent.getActivity(
-            applicationContext, 0, intent,
+        val summaryPendingIntent = PendingIntent.getActivity(
+            applicationContext, summaryId, summaryIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Kirim setiap item sebagai notifikasi individual dalam group
+        // Kirim setiap item sebagai notifikasi individual dengan deep-link ke detail
         titles.forEachIndexed { index, text ->
+            // Buat PendingIntent unik per item dengan item ID
+            val itemIntent = Intent(applicationContext, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                if (itemIds.size > index) {
+                    putExtra("EXTRA_ITEM_ID", itemIds[index])
+                }
+            }
+            val itemPendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                ids[index], // request code unik per item
+                itemIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
             val notification = NotificationCompat.Builder(applicationContext, channelId)
                 .setContentTitle(text.substringBefore("(").trim().removePrefix("• "))
                 .setContentText(text.substringAfter("(").removeSuffix(")").trim())
                 .setSmallIcon(iconRes)
                 .setGroup(groupKey)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(itemPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build()
             nm.notify(ids[index], notification)
         }
 
-        // Kirim summary notification (wajib untuk grouped notifications)
+        // Summary notification
         val inboxStyle = NotificationCompat.InboxStyle()
             .setBigContentTitle(summaryTitle)
             .setSummaryText(summaryText)
@@ -163,7 +182,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
             .setGroup(groupKey)
             .setGroupSummary(true)
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(summaryPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
