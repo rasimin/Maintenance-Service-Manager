@@ -1,3 +1,6 @@
+import java.util.Date
+import java.text.SimpleDateFormat
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,16 +11,6 @@ plugins {
 android {
     namespace = "com.example.servicemaintainreminder"
     compileSdk = 35
-
-    defaultConfig {
-        applicationId = "com.example.servicemaintainreminder"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
 
     buildTypes {
         release {
@@ -35,8 +28,31 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         viewBinding = true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        applicationId = "com.example.servicemaintainreminder"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+
+        val gitCommit = try {
+            val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
+            process.inputStream.bufferedReader().readText().trim()
+        } catch (e: Exception) {
+            "unknown"
+        }
+        val buildTime = SimpleDateFormat("yyyyMMdd-HHmm").format(Date())
+        
+        buildConfigField("String", "GIT_COMMIT", "\"$gitCommit\"")
+        buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
 

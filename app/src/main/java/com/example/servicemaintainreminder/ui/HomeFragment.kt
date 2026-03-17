@@ -153,6 +153,10 @@ class HomeFragment : Fragment() {
         val tvThresholdDesc = dialogView.findViewById<android.widget.TextView>(R.id.tvThresholdDesc)
         val btnChangeThreshold = dialogView.findViewById<android.view.View>(R.id.btnChangeThreshold)
 
+        // — Versioning —
+        val tvAppVersion = dialogView.findViewById<android.widget.TextView>(R.id.tvAppVersion)
+        val tvBuildDate = dialogView.findViewById<android.widget.TextView>(R.id.tvBuildDate)
+        
         val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseSettings)
 
         fun refreshStatus() {
@@ -163,6 +167,10 @@ class HomeFragment : Fragment() {
             val notifMinute = prefs.getInt("notif_minute", 0)
             val daysLimit = prefs.getInt("upcoming_days_limit", 30)
             val accountName = prefs.getString("user_name", "") ?: ""
+
+            // Version info
+            tvAppVersion.text = "Version %s (%s)".format(com.example.servicemaintainreminder.BuildConfig.VERSION_NAME, com.example.servicemaintainreminder.BuildConfig.GIT_COMMIT)
+            tvBuildDate.text = "Built on: %s".format(com.example.servicemaintainreminder.BuildConfig.BUILD_TIME)
 
             // Akun
             tvCurrentAccountName.text = if (accountName.isNotEmpty()) accountName else "Belum diset"
