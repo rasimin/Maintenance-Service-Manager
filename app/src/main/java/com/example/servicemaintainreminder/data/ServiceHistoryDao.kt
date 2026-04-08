@@ -16,4 +16,7 @@ interface ServiceHistoryDao {
 
     @Delete
     suspend fun deleteHistory(history: ServiceHistory)
+
+    @Update
+    suspend fun updateHistory(history: ServiceHistory)
 }

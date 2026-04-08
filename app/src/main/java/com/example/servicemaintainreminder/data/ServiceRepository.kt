@@ -24,4 +24,6 @@ class ServiceRepository(private val itemDao: ItemDao, private val serviceHistory
     suspend fun insertHistory(history: ServiceHistory) = serviceHistoryDao.insertHistory(history)
 
     suspend fun deleteHistory(history: ServiceHistory) = serviceHistoryDao.deleteHistory(history)
+
+    suspend fun updateHistory(history: ServiceHistory) = serviceHistoryDao.updateHistory(history)
 }

@@ -156,10 +156,22 @@ class MainActivity : AppCompatActivity() {
             dots.forEach { it.startAnimation(shake) }
         }
 
-        fun onDigit(d: String) {
+        fun onDigit(d: String, view: android.view.View? = null) {
             if (enteredPin.length < 4) {
+                // Button pop animation
+                view?.animate()?.scaleX(0.9f)?.scaleY(0.9f)?.setDuration(80)?.withEndAction {
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+                }?.start()
+
                 enteredPin += d
                 updateDots()
+                
+                // Dot pop animation
+                val currentDot = dots[enteredPin.length - 1]
+                currentDot.animate().scaleX(1.4f).scaleY(1.4f).setDuration(100).withEndAction {
+                    currentDot.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                }.start()
+
                 tvError.visibility = android.view.View.INVISIBLE
                 if (enteredPin.length == 4) {
                     if (enteredPin == savedPin) {
@@ -172,10 +184,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun onBack() {
+        fun onBack(view: android.view.View? = null) {
+            view?.animate()?.scaleX(0.9f)?.scaleY(0.9f)?.setDuration(80)?.withEndAction {
+                view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+            }?.start()
+
             if (enteredPin.isNotEmpty()) {
+                val currentDot = dots[enteredPin.length - 1]
                 enteredPin = enteredPin.dropLast(1)
                 updateDots()
+                
+                // Dot shrink animation on delete
+                currentDot.animate().scaleX(0.7f).scaleY(0.7f).setDuration(100).withEndAction {
+                    currentDot.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                }.start()
             }
         }
 
@@ -186,9 +208,9 @@ class MainActivity : AppCompatActivity() {
             R.id.btn0 to "0"
         )
         numBtnIds.forEach { (id, digit) ->
-            pinView.findViewById<android.view.View>(id).setOnClickListener { onDigit(digit) }
+            pinView.findViewById<android.view.View>(id).setOnClickListener { onDigit(digit, it) }
         }
-        pinView.findViewById<android.view.View>(R.id.btnBackspace).setOnClickListener { onBack() }
+        pinView.findViewById<android.view.View>(R.id.btnBackspace).setOnClickListener { onBack(it) }
 
         fun showBiometricPrompt() {
             val executor = ContextCompat.getMainExecutor(this)

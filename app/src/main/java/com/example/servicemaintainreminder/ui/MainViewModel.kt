@@ -44,4 +44,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteHistory(history: ServiceHistory) = viewModelScope.launch {
         repository.deleteHistory(history)
     }
+
+    fun updateHistory(history: ServiceHistory) = viewModelScope.launch {
+        repository.updateHistory(history)
+    }
 }

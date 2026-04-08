@@ -407,7 +407,9 @@ class DetailFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        historyAdapter = HistoryAdapter()
+        historyAdapter = HistoryAdapter(
+            onEditClick = { history -> showEditHistoryDialog(history) }
+        )
         binding.rvHistory.adapter = historyAdapter
     }
 
@@ -558,6 +560,61 @@ class DetailFragment : Fragment() {
                 dialog.dismiss()
             } else {
                 Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showEditHistoryDialog(history: ServiceHistory) {
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_history, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        // Reuse the add history layout for editing
+        dialogView.findViewById<TextView>(R.id.tvDialogTitle)?.text = "Edit Service Record"
+        dialogView.findViewById<TextView>(R.id.tvDialogSubtitle)?.text = "You can update the cost and description."
+        
+        val etDesc = dialogView.findViewById<EditText>(R.id.etHistoryDesc)
+        val etCost = dialogView.findViewById<EditText>(R.id.etHistoryCost)
+        val etDate = dialogView.findViewById<EditText>(R.id.etHistoryDate)
+        val btnSave = dialogView.findViewById<View>(R.id.btnSaveHistory)
+        val btnCancel = dialogView.findViewById<View>(R.id.btnCancelHistory)
+
+        CurrencyTextWatcher.attach(etCost)
+
+        // Pre-fill data
+        etDesc.setText(history.description)
+        etCost.setText(history.cost.toLong().toString())
+        etDate.setText(DateUtil.formatDate(history.serviceDate))
+        
+        // Disabled date field for editing since date affects scheduling
+        etDate.isEnabled = false
+        etDate.isClickable = false
+        etDate.setOnClickListener(null)
+        
+        // Set a hint to explain why date is disabled
+        etDate.hint = "Date is fixed to maintain schedule"
+
+        btnSave.setOnClickListener {
+            val desc = etDesc.text.toString()
+            if (desc.isNotEmpty()) {
+                val cost = CurrencyTextWatcher.getRawValue(etCost)
+                val updatedHistory = history.copy(
+                    description = desc,
+                    cost = cost
+                    // date remains the same
+                )
+                viewModel.updateHistory(updatedHistory)
+                Toast.makeText(requireContext(), "Service record updated", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                Toast.makeText(requireContext(), "Please fill the description", Toast.LENGTH_SHORT).show()
             }
         }
 

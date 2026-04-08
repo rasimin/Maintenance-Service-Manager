@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class HistoryAdapter(
-    private val onDeleteClick: (ServiceHistory) -> Unit = {}
+    private val onEditClick: ((ServiceHistory) -> Unit)? = null
 ) : ListAdapter<ServiceHistory, HistoryAdapter.HistoryViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -47,6 +47,10 @@ class HistoryAdapter(
 
             val format = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
             binding.tvHistoryCost.text = format.format(history.cost)
+            
+            binding.root.setOnClickListener {
+                onEditClick?.invoke(history)
+            }
         }
     }
 

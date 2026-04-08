@@ -628,15 +628,20 @@ class HomeFragment : Fragment() {
             dialogView.findViewById<android.view.View>(R.id.setupPinDot4),
         )
 
-        if (isEnableLockFlow) {
-            tvTitle.text = "Create Your PIN"
-            tvSubtitle.text = "Set a 4-digit PIN to lock your app"
+        val oldPin = prefs.getString("app_custom_pin", "") ?: ""
+        // 0 = ENTER_OLD, 1 = ENTER_NEW, 2 = CONFIRM_NEW
+        var currentState = if (isEnableLockFlow || oldPin.isEmpty()) 1 else 0
+
+        if (currentState == 0) {
+            tvTitle.text = "Current PIN"
+            tvSubtitle.text = "Please enter your current PIN first"
         } else {
-            tvTitle.text = "Change Your PIN"
-            tvSubtitle.text = "Enter a new 4-digit PIN"
+            tvTitle.text = "Create PIN"
+            tvSubtitle.text = "Set a 4-digit PIN to lock your app"
         }
 
         var enteredPin = ""
+        var firstEnteredNewPin = ""
         val brandColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.brand_primary)
 
         fun updateDots() {
@@ -647,25 +652,96 @@ class HomeFragment : Fragment() {
             }
         }
 
-        fun onDigit(d: String) {
-            if (enteredPin.length < 4) {
-                enteredPin += d
-                updateDots()
-                if (enteredPin.length == 4) {
-                    prefs.edit().putString("app_custom_pin", enteredPin).apply()
-                    prefs.edit().putBoolean("is_app_lock_enabled", true).apply()
-                    android.widget.Toast.makeText(requireContext(), "PIN saved!", android.widget.Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
-                    onPinSaved?.invoke()
-                }
+        fun shakeDots() {
+            val shake = android.view.animation.TranslateAnimation(0f, 18f, 0f, 0f).apply {
+                duration = 80
+                repeatCount = 5
+                repeatMode = android.view.animation.Animation.REVERSE
             }
-            tvError.visibility = android.view.View.INVISIBLE
+            dots.forEach { it.startAnimation(shake) }
         }
 
-        fun onBack() {
+        fun onDigit(d: String, view: android.view.View? = null) {
+            if (enteredPin.length < 4) {
+                // Button pop animation
+                view?.animate()?.scaleX(0.9f)?.scaleY(0.9f)?.setDuration(80)?.withEndAction {
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+                }?.start()
+
+                enteredPin += d
+                updateDots()
+                
+                // Dot pop animation
+                val currentDot = dots[enteredPin.length - 1]
+                currentDot.animate().scaleX(1.4f).scaleY(1.4f).setDuration(100).withEndAction {
+                    currentDot.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                }.start()
+                
+                if (enteredPin.length == 4) {
+                    view?.postDelayed({
+                        if (currentState == 0) {
+                            if (enteredPin == oldPin) {
+                                currentState = 1
+                                enteredPin = ""
+                                updateDots()
+                                tvTitle.text = "Create New PIN"
+                                tvSubtitle.text = "Enter a new 4-digit PIN"
+                                tvError.visibility = android.view.View.INVISIBLE
+                            } else {
+                                shakeDots()
+                                enteredPin = ""
+                                updateDots()
+                                tvError.text = "Incorrect current PIN"
+                                tvError.visibility = android.view.View.VISIBLE
+                            }
+                        } else if (currentState == 1) {
+                            firstEnteredNewPin = enteredPin
+                            currentState = 2
+                            enteredPin = ""
+                            updateDots()
+                            tvTitle.text = "Confirm PIN"
+                            tvSubtitle.text = "Re-enter your new PIN"
+                            tvError.visibility = android.view.View.INVISIBLE
+                        } else if (currentState == 2) {
+                            if (enteredPin == firstEnteredNewPin) {
+                                prefs.edit().putString("app_custom_pin", enteredPin).apply()
+                                prefs.edit().putBoolean("is_app_lock_enabled", true).apply()
+                                android.widget.Toast.makeText(requireContext(), "✅ PIN saved successfully!", android.widget.Toast.LENGTH_SHORT).show()
+                                dialog.dismiss()
+                                onPinSaved?.invoke()
+                            } else {
+                                shakeDots()
+                                currentState = 1
+                                enteredPin = ""
+                                firstEnteredNewPin = ""
+                                updateDots()
+                                tvTitle.text = "Create PIN"
+                                tvSubtitle.text = "PIN mismatch. Try again."
+                                tvError.text = "PINs do not match"
+                                tvError.visibility = android.view.View.VISIBLE
+                            }
+                        }
+                    }, 150)
+                } else {
+                    tvError.visibility = android.view.View.INVISIBLE
+                }
+            }
+        }
+
+        fun onBack(view: android.view.View? = null) {
+            view?.animate()?.scaleX(0.9f)?.scaleY(0.9f)?.setDuration(80)?.withEndAction {
+                view.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
+            }?.start()
+
             if (enteredPin.isNotEmpty()) {
+                val currentDot = dots[enteredPin.length - 1]
                 enteredPin = enteredPin.dropLast(1)
                 updateDots()
+                
+                // Dot shrink animation on delete
+                currentDot.animate().scaleX(0.7f).scaleY(0.7f).setDuration(100).withEndAction {
+                    currentDot.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                }.start()
             }
         }
 
@@ -676,9 +752,9 @@ class HomeFragment : Fragment() {
             R.id.setupBtn0 to "0"
         )
         btnIds.forEach { (id, digit) ->
-            dialogView.findViewById<android.view.View>(id).setOnClickListener { onDigit(digit) }
+            dialogView.findViewById<android.view.View>(id).setOnClickListener { onDigit(digit, it) }
         }
-        dialogView.findViewById<android.view.View>(R.id.setupBtnBackspace).setOnClickListener { onBack() }
+        dialogView.findViewById<android.view.View>(R.id.setupBtnBackspace).setOnClickListener { onBack(it) }
         btnCancel.setOnClickListener { dialog.dismiss() }
         btnCancel.isVisible = !isEnableLockFlow
 
