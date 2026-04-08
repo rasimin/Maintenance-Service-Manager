@@ -28,6 +28,7 @@ import com.example.servicemaintainreminder.util.DateUtil
 import com.example.servicemaintainreminder.util.CurrencyTextWatcher
 import com.example.servicemaintainreminder.util.ModernMenuItem
 import com.example.servicemaintainreminder.util.ModernMenuUtil
+import com.google.android.gms.ads.AdRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
 import android.graphics.Paint
@@ -71,13 +72,31 @@ class DevicesFragment : Fragment() {
 
         // Setup header back button & title
         binding.ivBackButton.setOnClickListener {
-            findNavController().navigateUp()
+            binding.ivBackButton.animate()
+                .scaleX(0.7f)
+                .scaleY(0.7f)
+                .setDuration(80)
+                .withEndAction {
+                    binding.ivBackButton.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(80)
+                        .withEndAction { findNavController().navigateUp() }
+                        .start()
+                }.start()
         }
         binding.tvHeaderTitle.text = "My Devices"
 
         binding.fabAddDevice.setOnClickListener {
             findNavController().navigate(R.id.action_devicesFragment_to_addItemFragment)
         }
+
+        loadAds()
+    }
+
+    private fun loadAds() {
+        val adRequest = AdRequest.Builder().build()
+        binding.adView.loadAd(adRequest)
     }
 
     private fun setupFilters() {
@@ -120,7 +139,7 @@ class DevicesFragment : Fragment() {
 
         // 1. Filter by Status Chip
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val daysLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+        val daysLimit = prefs.getInt("upcoming_days_limit", 7).toLong()
         val limitInMs = daysLimit * 24 * 60 * 60 * 1000L
 
         filteredList = when (checkedChipId) {
@@ -205,7 +224,7 @@ class DevicesFragment : Fragment() {
                             val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                             val ms = item.nextServiceDate - System.currentTimeMillis()
                             val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
-                            val limit = prefs.getInt("upcoming_days_limit", 30)
+                            val limit = prefs.getInt("upcoming_days_limit", 7)
 
                             // Check if Upcoming (based on rounded days) or Overdue
                             if (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && ds <= limit)) {
@@ -248,7 +267,7 @@ class DevicesFragment : Fragment() {
                 val item = adapter.currentList[position]
                 val ms = item.nextServiceDate - System.currentTimeMillis()
                 val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                val limit = prefs.getInt("upcoming_days_limit", 30)
+                val limit = prefs.getInt("upcoming_days_limit", 7)
                 
                 val isUpcomingOrOverdue = item.isActive && (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && (ms / (24 * 60 * 60 * 1000L)).toInt() <= limit))
                 return if (isUpcomingOrOverdue) {

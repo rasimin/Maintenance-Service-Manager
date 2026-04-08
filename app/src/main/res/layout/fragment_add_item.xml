@@ -424,6 +424,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -441,7 +442,6 @@
                             app:boxStrokeWidth="1dp"
                             app:boxStrokeWidthFocused="1.5dp"
                             app:hintTextColor="@color/brand_primary"
-                            app:startIconDrawable="@drawable/ic_input_info"
                             app:startIconTint="@color/brand_primary">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -454,31 +454,39 @@
                                 android:textSize="14sp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilUnit"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                            android:layout_width="0dp"
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggleUnit"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:hint="Unit"
-                            app:boxCornerRadiusBottomEnd="12dp"
-                            app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxStrokeColor="@color/input_stroke_color"
-                            app:boxStrokeWidth="1dp"
-                            app:boxStrokeWidthFocused="1.5dp"
-                            app:hintTextColor="@color/brand_primary">
+                            app:checkedButton="@+id/btnUnitMonths"
+                            app:singleSelection="true"
+                            app:selectionRequired="true">
 
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerIntervalUnit"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none"
-                                android:textColor="@color/text_primary"
-                                android:textSize="14sp" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnUnitMonths"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="54dp"
+                                android:text="Months"
+                                android:textAllCaps="false"
+                                android:textSize="13sp"
+                                app:cornerRadius="12dp"
+                                app:strokeColor="@color/input_stroke_color" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnUnitDays"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="54dp"
+                                android:text="Days"
+                                android:textAllCaps="false"
+                                android:textSize="13sp"
+                                app:cornerRadius="12dp"
+                                app:strokeColor="@color/input_stroke_color" />
+
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
                     </LinearLayout>
 
                     <!-- ── Estimated Cost per Service ── -->

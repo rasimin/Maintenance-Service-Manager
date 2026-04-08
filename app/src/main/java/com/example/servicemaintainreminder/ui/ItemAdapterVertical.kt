@@ -84,7 +84,7 @@ class ItemAdapterVertical(
 
                 // Update accent bar color and status badge based on urgency
                 val prefs = binding.root.context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                val upcomingLimit = prefs.getInt("upcoming_days_limit", 30)
+                val upcomingLimit = prefs.getInt("upcoming_days_limit", 7)
 
                 when {
                     daysDiff < 0 -> {

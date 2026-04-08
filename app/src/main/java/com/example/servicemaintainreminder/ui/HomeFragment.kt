@@ -76,7 +76,18 @@ class HomeFragment : Fragment() {
     private fun setupHeader() {
         updateGreeting()
         binding.header.cardSettings.setOnClickListener {
-            showSettingsDialog()
+            binding.header.cardSettings.animate()
+                .scaleX(0.85f)
+                .scaleY(0.85f)
+                .setDuration(80)
+                .withEndAction {
+                    binding.header.cardSettings.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(80)
+                        .withEndAction { showSettingsDialog() }
+                        .start()
+                }.start()
         }
     }
 
@@ -165,7 +176,7 @@ class HomeFragment : Fragment() {
             val biometricEnabled = prefs.getBoolean("is_biometric_enabled", false)
             val notifHour = prefs.getInt("notif_hour", 8)
             val notifMinute = prefs.getInt("notif_minute", 0)
-            val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+            val daysLimit = prefs.getInt("upcoming_days_limit", 7)
             val accountName = prefs.getString("user_name", "") ?: ""
 
             // Version info
@@ -773,7 +784,7 @@ class HomeFragment : Fragment() {
         val btnSaveUpcoming = dialogView.findViewById<android.view.View>(R.id.btnSaveUpcoming)
         val btnClose = dialogView.findViewById<android.view.View>(R.id.btnCloseUpcomingDialog)
         
-        val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+        val daysLimit = prefs.getInt("upcoming_days_limit", 7)
         etUpcomingDays.setText(daysLimit.toString())
 
         btnSaveUpcoming.setOnClickListener {
@@ -881,7 +892,7 @@ class HomeFragment : Fragment() {
         viewModel.allItems.value?.let { items ->
             val currentTime = System.currentTimeMillis()
             val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-            val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+            val daysLimit = prefs.getInt("upcoming_days_limit", 7)
             
             val upcoming = items.filter { 
                 if (!it.isActive) return@filter false
@@ -914,7 +925,7 @@ class HomeFragment : Fragment() {
             viewModel.allItems.value?.let { items ->
                 val currentTime = System.currentTimeMillis()
                 val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+                val daysLimit = prefs.getInt("upcoming_days_limit", 7)
                 
                 val urgent = items.filter { 
                     if (!it.isActive) return@filter false
@@ -985,7 +996,7 @@ class HomeFragment : Fragment() {
         val total = activeItems.size
         val currentTime = System.currentTimeMillis()
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val daysLimit = prefs.getInt("upcoming_days_limit", 30)
+        val daysLimit = prefs.getInt("upcoming_days_limit", 7)
 
         val upcoming = activeItems.count { 
             val ms = it.nextServiceDate - currentTime

@@ -20,6 +20,10 @@ import java.util.*
 import android.graphics.Color
 import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 class AddItemFragment : Fragment() {
 
@@ -32,6 +36,8 @@ class AddItemFragment : Fragment() {
     private var itemToEdit: Item? = null
     private var isFixedScheduleSelected = false  // false = Flexible (default)
     private var selectedIcon: String? = null
+    private var mInterstitialAd: InterstitialAd? = null
+    private var deviceCount = 0
 
     // Icons shown inline in scroll row (first 8)
     private val previewIcons = listOf(
@@ -74,7 +80,18 @@ class AddItemFragment : Fragment() {
 
         // Setup header back button & title
         binding.header.ivBackButton.setOnClickListener {
-            findNavController().navigateUp()
+            binding.header.ivBackButton.animate()
+                .scaleX(0.7f)
+                .scaleY(0.7f)
+                .setDuration(80)
+                .withEndAction {
+                    binding.header.ivBackButton.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(80)
+                        .withEndAction { findNavController().navigateUp() }
+                        .start()
+                }.start()
         }
         binding.header.tvHeaderTitle.text = if (isEditMode) "Edit Item" else "Add Item"
 
@@ -105,6 +122,27 @@ class AddItemFragment : Fragment() {
                 .setDuration(200)
                 .start()
         }
+
+        // Amati jumlah perangkat untuk logika iklan
+        viewModel.allItems.observe(viewLifecycleOwner) { items ->
+            deviceCount = items.size
+        }
+
+        loadInterstitialAd()
+    }
+
+    private fun loadInterstitialAd() {
+        val adRequest = AdRequest.Builder().build()
+        // Test ID: ca-app-pub-3940256099942544/1033173712
+        InterstitialAd.load(requireContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    mInterstitialAd = interstitialAd
+                }
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    mInterstitialAd = null
+                }
+            })
     }
 
     private fun setupIconSelection() {
@@ -290,7 +328,12 @@ class AddItemFragment : Fragment() {
                 binding.etName.setText(item.name)
                 binding.spinnerCategory.setText(item.category, false)
                 binding.etIntervalValue.setText(item.serviceIntervalValue.toString())
-                binding.spinnerIntervalUnit.setText(item.serviceIntervalUnit, false)
+                
+                if (item.serviceIntervalUnit.equals("Months", ignoreCase = true)) {
+                    binding.toggleUnit.check(R.id.btnUnitMonths)
+                } else {
+                    binding.toggleUnit.check(R.id.btnUnitDays)
+                }
                 binding.etNote.setText(item.note)
                 binding.switchActive.isChecked = item.isActive
                 isFixedScheduleSelected = item.isFixedSchedule
@@ -313,11 +356,6 @@ class AddItemFragment : Fragment() {
         val categories = arrayOf("AC", "Vehicle", "Electronics", "Machine", "Home Appliance", "Other")
         val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, categories)
         binding.spinnerCategory.setAdapter(categoryAdapter)
-
-        val units = arrayOf("Days", "Months")
-        val unitAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, units)
-        binding.spinnerIntervalUnit.setAdapter(unitAdapter)
-        binding.spinnerIntervalUnit.setText(units[0], false)
     }
 
     private fun setupDatePicker() {
@@ -343,7 +381,7 @@ class AddItemFragment : Fragment() {
         val name = binding.etName.text.toString().trim()
         val category = binding.spinnerCategory.text.toString()
         val intervalValueStr = binding.etIntervalValue.text.toString()
-        val intervalUnit = binding.spinnerIntervalUnit.text.toString()
+        val intervalUnit = if (binding.toggleUnit.checkedButtonId == R.id.btnUnitMonths) "Months" else "Days"
         val note = binding.etNote.text.toString()
 
         if (name.isEmpty() || category.isEmpty() || intervalValueStr.isEmpty() || intervalUnit.isEmpty()) {
@@ -389,6 +427,12 @@ class AddItemFragment : Fragment() {
             viewModel.insertItem(newItem)
             Toast.makeText(requireContext(), "Item saved successfully", Toast.LENGTH_SHORT).show()
         }
+
+        // Munculkan iklan jika jumlah perangkat sudah 4 atau lebih (berlaku untuk simpan baru maupun update)
+        if (deviceCount >= 4) {
+            mInterstitialAd?.show(requireActivity())
+        }
+
         findNavController().navigateUp()
     }
 

@@ -48,6 +48,7 @@ class DetailFragment : Fragment() {
     private var mInterstitialAd: InterstitialAd? = null
     private var currentItem: Item? = null
     private var selectedHistoryDate: Long = System.currentTimeMillis()
+    private var historyCount = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,13 +64,25 @@ class DetailFragment : Fragment() {
         setupRecyclerView()
         setupSwipeToDelete()
         loadInterstitialAd()
+        loadBannerAd()
         observeItem()
         setupPullToEdit()
         setupCardSwipe()
 
         // Setup header back button & title
         binding.header.ivBackButton.setOnClickListener {
-            findNavController().navigateUp()
+            binding.header.ivBackButton.animate()
+                .scaleX(0.7f)
+                .scaleY(0.7f)
+                .setDuration(80)
+                .withEndAction {
+                    binding.header.ivBackButton.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(80)
+                        .withEndAction { findNavController().navigateUp() }
+                        .start()
+                }.start()
         }
         binding.header.tvHeaderTitle.text = "Detail"
 
@@ -141,7 +154,7 @@ class DetailFragment : Fragment() {
             if (item != null) {
                 val diff = item.nextServiceDate - System.currentTimeMillis()
                 val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                val upcomingLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+                val upcomingLimit = prefs.getInt("upcoming_days_limit", 7).toLong()
                 val limitInMs = upcomingLimit * 24 * 60 * 60 * 1000L
                 item.isActive && diff <= limitInMs
             } else {
@@ -290,6 +303,11 @@ class DetailFragment : Fragment() {
             })
     }
 
+    private fun loadBannerAd() {
+        val adRequest = AdRequest.Builder().build()
+        binding.adView.loadAd(adRequest)
+    }
+
     private fun observeItem() {
         viewModel.allItems.observe(viewLifecycleOwner) { items ->
             currentItem = items.find { it.id == args.itemId }
@@ -372,7 +390,7 @@ class DetailFragment : Fragment() {
         val daysDiff = (nextDate - currentTime) / (24 * 60 * 60 * 1000)
 
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val upcomingLimit = prefs.getInt("upcoming_days_limit", 30).toLong()
+        val upcomingLimit = prefs.getInt("upcoming_days_limit", 7).toLong()
 
         when {
             daysDiff < 0 -> {
@@ -396,6 +414,7 @@ class DetailFragment : Fragment() {
     private fun observeHistory(itemId: Long) {
         viewModel.getHistory(itemId).observe(viewLifecycleOwner) { history ->
             historyAdapter.submitList(history)
+            historyCount = history.size
 
             binding.llEmptyHistory.isVisible = history.isEmpty()
             binding.rvHistory.isVisible = history.isNotEmpty()
@@ -671,7 +690,9 @@ class DetailFragment : Fragment() {
 
         Toast.makeText(requireContext(), "Service record saved ✓", Toast.LENGTH_SHORT).show()
 
-        mInterstitialAd?.show(requireActivity())
+        if (historyCount >= 2) {
+            mInterstitialAd?.show(requireActivity())
+        }
         loadInterstitialAd()
     }
 

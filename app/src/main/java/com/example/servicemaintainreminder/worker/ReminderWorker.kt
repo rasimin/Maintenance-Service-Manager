@@ -29,7 +29,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 
         // Ambil threshold dari SharedPreferences (ikut setting user)
         val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val upcomingDaysLimit = prefs.getInt("upcoming_days_limit", 30)
+        val upcomingDaysLimit = prefs.getInt("upcoming_days_limit", 7)
         val limitInMs = upcomingDaysLimit * 24 * 60 * 60 * 1000L
 
         val currentTime = System.currentTimeMillis()
