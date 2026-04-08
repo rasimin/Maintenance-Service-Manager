@@ -32,10 +32,27 @@ class AddItemFragment : Fragment() {
     private var itemToEdit: Item? = null
     private var isFixedScheduleSelected = false  // false = Flexible (default)
     private var selectedIcon: String? = null
-    private val availableIcons = listOf(
-        "ic_ac", "ic_car", "ic_electronic", "ic_machine", 
+
+    // Icons shown inline in scroll row (first 8)
+    private val previewIcons = listOf(
+        "ic_ac", "ic_car", "ic_electronic", "ic_machine",
+        "ic_service", "ic_devices", "ic_clock", "ic_upcoming"
+    )
+
+    // All icons available in the picker
+    private val allIcons = listOf(
+        "ic_ac", "ic_car", "ic_electronic", "ic_machine",
         "ic_service", "ic_devices", "ic_clock", "ic_upcoming",
-        "ic_history", "ic_input_calendar", "ic_input_cost", "ic_input_note"
+        "ic_history", "ic_input_calendar", "ic_input_cost", "ic_input_note",
+        "ic_input_category", "ic_input_edit", "ic_input_info",
+        "ic_dashboard", "ic_lock", "ic_notif_bell", "ic_person",
+        "ic_pin", "ic_search_clean", "ic_fingerprint", "ic_more_vert",
+        "ic_arrow_right", "ic_chevron_left", "ic_chevron_right",
+        "ic_home", "ic_restaurant", "ic_local_cafe", "ic_directions_car",
+        "ic_local_shipping", "ic_flight", "ic_build", "ic_favorite",
+        "ic_star", "ic_thumb_up", "ic_shopping_cart", "ic_account_balance_wallet",
+        "ic_attach_money", "ic_local_mall", "ic_pets", "ic_music_note",
+        "ic_games", "ic_fitness_center", "ic_camera_alt", "ic_brush"
     )
 
     override fun onCreateView(
@@ -78,27 +95,100 @@ class AddItemFragment : Fragment() {
 
         // Format otomatis titik ribuan pada field estimated cost
         CurrencyTextWatcher.attach(binding.etEstimatedCost)
+
+        // Fade scroll hint: hilang saat sudah scroll ke bawah
+        binding.nestedScrollViewAddItem.setOnScrollChangeListener { v, _, scrollY, _, _ ->
+            val scrollView = v as androidx.core.widget.NestedScrollView
+            val isAtBottom = scrollY >= (scrollView.getChildAt(0).measuredHeight - scrollView.measuredHeight - 16)
+            binding.viewScrollFade.animate()
+                .alpha(if (isAtBottom) 0f else 1f)
+                .setDuration(200)
+                .start()
+        }
     }
 
     private fun setupIconSelection() {
         binding.llIconContainer.removeAllViews()
-        availableIcons.forEach { iconName ->
+
+        // Show preview icons inline
+        previewIcons.forEach { iconName ->
             val iconView = layoutInflater.inflate(R.layout.item_icon_choice, binding.llIconContainer, false)
             val ivIcon = iconView.findViewById<android.widget.ImageView>(R.id.ivIconChoice)
             val cardIcon = iconView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardIconChoice)
-            
+
             val resId = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
             ivIcon.setImageResource(if (resId != 0) resId else R.drawable.ic_devices)
-            
+
             updateIconSelectionUI(cardIcon, iconName == selectedIcon)
-            
+
             cardIcon.setOnClickListener {
                 selectedIcon = iconName
-                setupIconSelection() // Refresh selection state
+                setupIconSelection()
             }
-            
+
             binding.llIconContainer.addView(iconView)
         }
+
+        // If an extra icon is selected, show it before the "more" button
+        val isExtraSelected = selectedIcon != null && !previewIcons.contains(selectedIcon)
+        if (isExtraSelected) {
+            val extraView = layoutInflater.inflate(R.layout.item_icon_choice, binding.llIconContainer, false)
+            val ivExtra = extraView.findViewById<android.widget.ImageView>(R.id.ivIconChoice)
+            val cardExtra = extraView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardIconChoice)
+            val resId = resources.getIdentifier(selectedIcon, "drawable", requireContext().packageName)
+            ivExtra.setImageResource(if (resId != 0) resId else R.drawable.ic_devices)
+            updateIconSelectionUI(cardExtra, true)
+            cardExtra.setOnClickListener {
+                showIconPickerBottomSheet()
+            }
+            binding.llIconContainer.addView(extraView)
+        }
+
+        // Add "More" button with custom text layout
+        val moreBtnView = layoutInflater.inflate(R.layout.item_more_button, binding.llIconContainer, false)
+        val cardMore = moreBtnView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardMoreBtn)
+        cardMore.setOnClickListener {
+            showIconPickerBottomSheet()
+        }
+        binding.llIconContainer.addView(moreBtnView)
+    }
+
+    private fun showIconPickerBottomSheet() {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_icon_picker, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        val rv = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvIconPicker)
+        rv.layoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), 5)
+
+        val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+            inner class IconVH(v: android.view.View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v) {
+                val card = v.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardIconChoice)
+                val icon = v.findViewById<android.widget.ImageView>(R.id.ivIconChoice)
+            }
+            override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+                val v = layoutInflater.inflate(R.layout.item_icon_choice, parent, false)
+                return IconVH(v)
+            }
+            override fun getItemCount() = allIcons.size
+            override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+                val vh = holder as IconVH
+                val iconName = allIcons[position]
+                val resId = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
+                vh.icon.setImageResource(if (resId != 0) resId else R.drawable.ic_devices)
+                updateIconSelectionUI(vh.card, iconName == selectedIcon)
+                vh.card.setOnClickListener {
+                    selectedIcon = iconName
+                    notifyDataSetChanged()
+                    setupIconSelection()
+                    dialog.dismiss()
+                }
+            }
+        }
+
+        rv.adapter = adapter
+        dialog.show()
     }
 
     private fun updateIconSelectionUI(card: com.google.android.material.card.MaterialCardView, isSelected: Boolean) {
@@ -141,28 +231,54 @@ class AddItemFragment : Fragment() {
         val inactiveStroke = Color.parseColor("#DEDEDE")
 
         android.transition.TransitionManager.beginDelayedTransition(binding.root as android.view.ViewGroup)
-        binding.llFixedDateHint.visibility = if (isFixed) View.VISIBLE else View.GONE
 
         if (isFixed) {
+            // ── Fixed active ────────────────────────────────────
             binding.cardFixed.setCardBackgroundColor(activeBg)
             binding.cardFixed.strokeColor = activeStroke
             binding.tvFixedLabel.setTextColor(brandColor)
             binding.tvFixedSubLabel.setTextColor(brandColor)
             binding.tvFixedSubLabel.alpha = 0.6f
             binding.ivFixedIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
+
+            // Rolling inactive
             binding.cardFlexible.setCardBackgroundColor(inactiveBg)
             binding.cardFlexible.strokeColor = inactiveStroke
             binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(grayColor)
+
+            // Description box → Fixed style (orange/warm)
+            binding.llScheduleDescription.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(Color.parseColor("#FFF3E0"))
+            binding.tvScheduleDescIcon.text = "📌"
+            binding.tvScheduleDescTitle.text = "Fixed"
+            binding.tvScheduleDescTitle.setTextColor(Color.parseColor("#E67E22"))
+            binding.tvScheduleDescBody.text =
+                "Jadwal berikutnya = Jadwal Sebelumnya + Interval. Jadwal tidak bergeser meski servis terlambat/lebih awal."
+            binding.tvScheduleDescBody.setTextColor(Color.parseColor("#C0622D"))
+
         } else {
+            // ── Rolling active ───────────────────────────────────
             binding.cardFlexible.setCardBackgroundColor(activeBg)
             binding.cardFlexible.strokeColor = activeStroke
             binding.ivFlexibleIcon.imageTintList = android.content.res.ColorStateList.valueOf(brandColor)
+
+            // Fixed inactive
             binding.cardFixed.setCardBackgroundColor(inactiveBg)
             binding.cardFixed.strokeColor = inactiveStroke
             binding.tvFixedLabel.setTextColor(grayColor)
             binding.tvFixedSubLabel.setTextColor(Color.parseColor("#BBBBBB"))
             binding.tvFixedSubLabel.alpha = 1f
             binding.ivFixedIcon.imageTintList = android.content.res.ColorStateList.valueOf(grayColor)
+
+            // Description box → Rolling style (blue/brand)
+            binding.llScheduleDescription.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(Color.parseColor("#EEF2FF"))
+            binding.tvScheduleDescIcon.text = "🔄"
+            binding.tvScheduleDescTitle.text = "Rolling"
+            binding.tvScheduleDescTitle.setTextColor(brandColor)
+            binding.tvScheduleDescBody.text =
+                "Jadwal berikutnya = Tgl Servis Terakhir + Interval. Jadwal mengikuti kapan kamu servis."
+            binding.tvScheduleDescBody.setTextColor(brandColor)
         }
     }
 

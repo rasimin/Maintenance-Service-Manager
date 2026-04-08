@@ -11,9 +11,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
+// Removed foojay resolver to prevent it from picking up incompatible JDKs from other IDEs/extensions
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -24,4 +22,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Service Maintain Reminder"
 include(":app")
- 

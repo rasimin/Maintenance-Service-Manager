@@ -338,7 +338,7 @@ class DetailFragment : Fragment() {
                 android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFF3E0"))
             binding.tvScheduleTypeBadge.setTextColor(android.graphics.Color.parseColor("#E67E22"))
         } else {
-            binding.tvScheduleTypeBadge.text = "🔄 Flexible Schedule"
+            binding.tvScheduleTypeBadge.text = "🔄 Rolling Schedule"
             binding.tvScheduleTypeBadge.backgroundTintList =
                 android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#EEF2FF"))
             binding.tvScheduleTypeBadge.setTextColor(

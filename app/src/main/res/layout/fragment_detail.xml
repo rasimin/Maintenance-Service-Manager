@@ -301,7 +301,7 @@
                             android:textColor="@color/brand_primary"
                             android:textSize="10sp"
                             android:textStyle="bold"
-                            tools:text="🔄 Flexible" />
+                            tools:text="🔄 Rolling" />
                     </LinearLayout>
 
                     <!-- Stats Grid -->

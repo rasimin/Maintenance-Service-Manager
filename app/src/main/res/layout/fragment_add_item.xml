@@ -12,11 +12,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollViewAddItem"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingBottom="88dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomSaveBar"
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <LinearLayout
@@ -203,19 +204,20 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
+                            android:layout_marginBottom="10dp"
                             android:text="Schedule Type"
                             android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:letterSpacing="0.05"
                             android:textStyle="bold" />
 
+                        <!-- Card Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
-                            <!-- Option: Flexible -->
+                            <!-- Option: Rolling -->
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/cardFlexible"
                                 android:layout_width="0dp"
@@ -253,7 +255,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Flexible"
+                                            android:text="Rolling"
                                             android:textColor="@color/brand_primary"
                                             android:textSize="12sp"
                                             android:textStyle="bold" />
@@ -261,7 +263,7 @@
                                         <TextView
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Ikut tanggal service"
+                                            android:text="Ikut tanggal servis"
                                             android:textColor="@color/brand_primary"
                                             android:alpha="0.6"
                                             android:textSize="9sp" />
@@ -333,6 +335,58 @@
                             </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
+
+                        <!-- Dynamic Description Box -->
+                        <LinearLayout
+                            android:id="@+id/llScheduleDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_status_badge"
+                            android:backgroundTint="#EEF2FF"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:id="@+id/tvScheduleDescIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔄"
+                                android:textSize="16sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvScheduleDescTitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Rolling"
+                                    android:textColor="@color/brand_primary"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvScheduleDescBody"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Jadwal berikutnya = Tgl Servis Terakhir + Interval. Jadwal mengikuti kapan kamu servis."
+                                    android:textColor="@color/brand_primary"
+                                    android:alpha="0.75"
+                                    android:textSize="11sp"
+                                    android:lineSpacingExtra="2dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
                     <!-- ── Last Service Date ── -->
@@ -364,38 +418,6 @@
                             android:textColorHint="@color/text_placeholder"
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Info hint: muncul hanya saat Fixed dipilih -->
-                    <LinearLayout
-                        android:id="@+id/llFixedDateHint"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-8dp"
-                        android:background="@drawable/bg_status_badge"
-                        android:backgroundTint="#FFF3E0"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="10dp"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="💡"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="Tanggal ini akan menjadi acuan tetap untuk jadwal berikutnya (Fixed), pastikan tanggal servis terakhir sudah benar."
-                            android:textColor="#C0622D"
-                            android:textSize="11.5sp"
-                            android:lineSpacingExtra="2dp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
 
                     <!-- ── Interval + Unit Row ── -->
                     <LinearLayout
@@ -517,28 +539,57 @@
                             android:textSize="14sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- ── Save Button ── -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSave"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="28dp"
-                        android:text="Save Item"
-                        android:textAllCaps="false"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        app:backgroundTint="@color/brand_primary"
-                        app:cornerRadius="14dp"
-                        app:icon="@android:drawable/ic_menu_save"
-                        app:iconTint="@color/white"
-                        app:iconGravity="textStart"
-                        app:elevation="4dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- ── Sticky Bottom Save Bar ── -->
+    <LinearLayout
+        android:id="@+id/bottomSaveBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Top divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="12dp"
+            android:text="Save Item"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/brand_primary"
+            app:cornerRadius="14dp"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconTint="@color/white"
+            app:iconGravity="textStart"
+            app:elevation="0dp" />
+
+    </LinearLayout>
+
+    <!-- Gradient fade overlay: floats above sticky bar, overlays scroll content -->
+    <View
+        android:id="@+id/viewScrollFade"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_scroll_bottom_fade"
+        android:importantForAccessibility="no"
+        android:elevation="7dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomSaveBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
