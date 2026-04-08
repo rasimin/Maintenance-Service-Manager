@@ -30,7 +30,7 @@
                 android:background="@drawable/bg_circle_indicator"
                 android:backgroundTint="@color/glass_white"
                 android:padding="10dp"
-                android:src="@android:drawable/ic_menu_revert"
+                android:src="@drawable/ic_chevron_left"
                 app:tint="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
