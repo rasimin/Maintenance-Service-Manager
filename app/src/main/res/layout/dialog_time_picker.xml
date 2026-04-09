@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Pilih Jam Notifikasi"
+        android:text="Select Reminder Time"
         android:textColor="#1A1A2E"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="Tentukan jam berapa pengingat akan dikirim setiap harinya."
+        android:text="Set the time when the reminder will be sent every day."
         android:textColor="#8A8A9A"
         android:textSize="13sp" />
 
@@ -90,7 +90,7 @@
             android:layout_height="54dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Batal"
+            android:text="Cancel"
             android:textColor="#8A8A9A"
             android:textAllCaps="false"
             app:cornerRadius="16dp"
@@ -103,7 +103,7 @@
             android:layout_height="54dp"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="Simpan"
+            android:text="Save"
             android:textAllCaps="false"
             app:backgroundTint="@color/brand_primary"
             app:cornerRadius="16dp" />

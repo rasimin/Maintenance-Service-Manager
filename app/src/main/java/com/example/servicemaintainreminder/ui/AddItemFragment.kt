@@ -291,7 +291,7 @@ class AddItemFragment : Fragment() {
             binding.tvScheduleDescTitle.text = "Fixed"
             binding.tvScheduleDescTitle.setTextColor(Color.parseColor("#E67E22"))
             binding.tvScheduleDescBody.text =
-                "Jadwal berikutnya = Jadwal Sebelumnya + Interval. Jadwal tidak bergeser meski servis terlambat/lebih awal."
+                "Next schedule = Previous Schedule + Interval. Schedule does not shift even if service is late/early."
             binding.tvScheduleDescBody.setTextColor(Color.parseColor("#C0622D"))
 
         } else {
@@ -315,7 +315,7 @@ class AddItemFragment : Fragment() {
             binding.tvScheduleDescTitle.text = "Rolling"
             binding.tvScheduleDescTitle.setTextColor(brandColor)
             binding.tvScheduleDescBody.text =
-                "Jadwal berikutnya = Tgl Servis Terakhir + Interval. Jadwal mengikuti kapan kamu servis."
+                "Next schedule = Last Service Date + Interval. Schedule follows when you perform service."
             binding.tvScheduleDescBody.setTextColor(brandColor)
         }
     }

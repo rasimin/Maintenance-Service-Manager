@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (!isGranted) {
-            Toast.makeText(this, "Izin notifikasi diperlukan agar pengingat servis berfungsi.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Notification permission is required for service reminders to work.", Toast.LENGTH_LONG).show()
         }
     }
 

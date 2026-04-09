@@ -312,7 +312,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Belum ada data."
+                    android:text="No data yet."
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -384,7 +384,7 @@
                 android:layout_height="54dp"
                 app:iconifiedByDefault="false"
                 app:queryBackground="@android:color/transparent"
-                app:queryHint="Cari perangkat..."
+                app:queryHint="Search devices..."
                 app:searchHintIcon="@null"
                 app:searchIcon="@drawable/ic_search_clean" />
 

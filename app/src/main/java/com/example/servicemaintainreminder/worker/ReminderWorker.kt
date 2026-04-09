@@ -48,17 +48,17 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 daysLeft < 0 -> {
                     // Terlambat
                     val daysOverdue = -daysLeft
-                    overdueItems.add("• ${item.name} ($daysOverdue hari terlambat)")
+                    overdueItems.add("• ${item.name} ($daysOverdue days overdue)")
                     overdueIds.add(item.id)
                 }
                 daysLeft == 0 -> {
                     // Hari ini (Hari H!)
-                    upcomingItems.add("• ${item.name} (HARI INI!)")
+                    upcomingItems.add("• ${item.name} (TODAY!)")
                     upcomingIds.add(item.id)
                 }
                 daysLeft <= upcomingDaysLimit -> {
                     // Masih ada sisa hari
-                    upcomingItems.add("• ${item.name} ($daysLeft hari lagi)")
+                    upcomingItems.add("• ${item.name} ($daysLeft days left)")
                     upcomingIds.add(item.id)
                 }
             }
@@ -72,8 +72,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 titles = upcomingItems,
                 groupKey = GROUP_UPCOMING,
                 summaryId = 9001,
-                summaryTitle = "🔔 ${upcomingItems.size} Service Akan Segera",
-                summaryText = "${upcomingItems.size} perangkat perlu servis segera",
+                summaryTitle = "🔔 ${upcomingItems.size} Upcoming Services",
+                summaryText = "${upcomingItems.size} devices need service soon",
                 channelId = CHANNEL_ID,
                 iconRes = R.drawable.ic_upcoming,
                 itemIds = upcomingIds
@@ -86,8 +86,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
                 titles = overdueItems,
                 groupKey = GROUP_OVERDUE,
                 summaryId = 9002,
-                summaryTitle = "⚠️ ${overdueItems.size} Service Terlambat!",
-                summaryText = "${overdueItems.size} perangkat sudah melewati jadwal servis",
+                summaryTitle = "⚠️ ${overdueItems.size} Overdue Services!",
+                summaryText = "${overdueItems.size} devices have passed their schedule",
                 channelId = CHANNEL_OVERDUE_ID,
                 iconRes = R.drawable.ic_schedule_fixed,
                 itemIds = overdueIds
@@ -106,7 +106,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
             "Upcoming Service Reminder",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Reminder untuk servis yang akan datang"
+            description = "Reminder for upcoming services"
             enableLights(true)
             enableVibration(true)
         }
@@ -116,7 +116,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
             "Overdue Service Alert",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Alert untuk servis yang sudah terlambat"
+            description = "Alert for overdue services"
             enableLights(true)
             enableVibration(true)
         }

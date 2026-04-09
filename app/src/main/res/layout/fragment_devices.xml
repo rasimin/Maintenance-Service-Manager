@@ -70,7 +70,7 @@
                     android:layout_height="match_parent"
                     app:iconifiedByDefault="false"
                     app:queryBackground="@android:color/transparent"
-                    app:queryHint="Cari perangkat..."
+                    app:queryHint="Search devices..."
                     app:searchHintIcon="@null"
                     app:searchIcon="@drawable/ic_search_clean" />
 

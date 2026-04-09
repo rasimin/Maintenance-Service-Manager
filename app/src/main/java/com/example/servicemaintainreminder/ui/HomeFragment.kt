@@ -184,10 +184,10 @@ class HomeFragment : Fragment() {
             tvBuildDate.text = "Built on: %s".format(com.example.servicemaintainreminder.BuildConfig.BUILD_TIME)
 
             // Akun
-            tvCurrentAccountName.text = if (accountName.isNotEmpty()) accountName else "Belum diset"
+            tvCurrentAccountName.text = if (accountName.isNotEmpty()) accountName else "Not set"
 
             // Dashboard
-            tvThresholdDesc.text = "Tampilkan item dalam $daysLimit hari ke depan"
+            tvThresholdDesc.text = "Show items within next $daysLimit days"
 
             // Notifikasi
             val isNotifEnabled = prefs.getBoolean("is_notif_enabled", true)
@@ -204,7 +204,7 @@ class HomeFragment : Fragment() {
             d1?.visibility = visibility
             d2?.visibility = visibility
 
-            tvNotifTimeDesc.text = "Dikirim setiap hari pukul %02d:%02d".format(notifHour, notifMinute)
+            tvNotifTimeDesc.text = "Sent daily at %02d:%02d".format(notifHour, notifMinute)
 
             // Keamanan
             var isProgrammaticLockChange = switchAppLock.tag as? Boolean ?: false
@@ -214,10 +214,10 @@ class HomeFragment : Fragment() {
             llSecurityStatus.isVisible = isLocked
 
             if (pinSet) {
-                tvPinStatus.text = "Sudah diset"
+                tvPinStatus.text = "Set"
                 tvPinStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
             } else {
-                tvPinStatus.text = "Belum diset"
+                tvPinStatus.text = "Not set"
                 tvPinStatus.setTextColor(android.graphics.Color.parseColor("#E74C3C"))
             }
 
@@ -228,10 +228,10 @@ class HomeFragment : Fragment() {
             }
 
             if (biometricEnabled) {
-                tvBiometricStatus.text = "Aktif"
+                tvBiometricStatus.text = "Active"
                 tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#27AE60"))
             } else {
-                tvBiometricStatus.text = "Nonaktif"
+                tvBiometricStatus.text = "Inactive"
                 tvBiometricStatus.setTextColor(android.graphics.Color.parseColor("#9CA3AF"))
             }
         }
@@ -296,11 +296,11 @@ class HomeFragment : Fragment() {
                             switchBiometric.isChecked = true
                             isProgrammaticBiometricChange = false
                             refreshStatus()
-                            android.widget.Toast.makeText(requireContext(), "✅ Biometrik diaktifkan", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(requireContext(), "✅ Biometric enabled", android.widget.Toast.LENGTH_SHORT).show()
                         }
                         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                             super.onAuthenticationError(errorCode, errString)
-                            android.widget.Toast.makeText(requireContext(), "Biometrik tidak dikonfirmasi", android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(requireContext(), "Biometric not confirmed", android.widget.Toast.LENGTH_SHORT).show()
                         }
                         override fun onAuthenticationFailed() { super.onAuthenticationFailed() }
                     })
@@ -308,7 +308,7 @@ class HomeFragment : Fragment() {
                     .setTitle("Konfirmasi Biometrik")
                     .setSubtitle("Autentikasi untuk mengaktifkan login biometrik")
                     .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                    .setNegativeButtonText("Batal")
+                    .setNegativeButtonText("Cancel")
                     .build()
                 biometricPrompt.authenticate(promptInfo)
             } else {
@@ -370,7 +370,7 @@ class HomeFragment : Fragment() {
                                 }
                                 startActivity(intent)
                             }
-                            .setNegativeButton("Batal") { _, _ -> 
+                            .setNegativeButton("Cancel") { _, _ -> 
                                 switchExactAlarm.isChecked = false
                             }
                             .show()
@@ -378,10 +378,10 @@ class HomeFragment : Fragment() {
                     }
                 }
                 prefs.edit().putBoolean("is_exact_alarm_enabled", true).apply()
-                android.widget.Toast.makeText(requireContext(), "🚀 Pengingat Real-time diaktifkan!", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(requireContext(), "🚀 Real-time reminder enabled!", android.widget.Toast.LENGTH_SHORT).show()
             } else {
                 prefs.edit().putBoolean("is_exact_alarm_enabled", false).apply()
-                android.widget.Toast.makeText(requireContext(), "Pengingat kembali ke mode hemat baterai.", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(requireContext(), "Reminder reverted to battery saver mode.", android.widget.Toast.LENGTH_SHORT).show()
             }
 
             // Reschedule regardless of exact or periodic
@@ -394,7 +394,7 @@ class HomeFragment : Fragment() {
             val testRequest = androidx.work.OneTimeWorkRequestBuilder<com.example.servicemaintainreminder.worker.ReminderWorker>()
                 .build()
             androidx.work.WorkManager.getInstance(requireContext()).enqueue(testRequest)
-            android.widget.Toast.makeText(requireContext(), "🔔 Mengirim notifikasi test...", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(requireContext(), "🔔 Sending test notification...", android.widget.Toast.LENGTH_SHORT).show()
         }
 
         // ── Dashboard ──
@@ -449,7 +449,7 @@ class HomeFragment : Fragment() {
 
             android.widget.Toast.makeText(
                 requireContext(),
-                "Notifikasi setiap hari pukul %02d:%02d".format(selectedHour, selectedMinute),
+                "Notification daily at %02d:%02d".format(selectedHour, selectedMinute),
                 android.widget.Toast.LENGTH_SHORT
             ).show()
 

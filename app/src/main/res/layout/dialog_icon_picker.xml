@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="16dp"
-        android:text="Pilih Icon"
+        android:text="Select Icon"
         android:textColor="#1A1A2E"
         android:textSize="16sp"
         android:textStyle="bold" />
