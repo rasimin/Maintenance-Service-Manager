@@ -59,10 +59,7 @@ class ItemAdapter(private val onItemClick: (Item) -> Unit) :
             }
 
 
-            // Hitung sisa hari
-            val currentTime = System.currentTimeMillis()
-            val msLeft = item.nextServiceDate - currentTime
-            val daysLeft = (msLeft / (24 * 60 * 60 * 1000L)).toInt()
+            val daysLeft = DateUtil.getDaysDifference(item.nextServiceDate)
 
             // Tentukan teks, warna, dan accent berdasarkan urgensi
             val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)

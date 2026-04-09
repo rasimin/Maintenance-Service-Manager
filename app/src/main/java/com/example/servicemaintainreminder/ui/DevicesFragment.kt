@@ -144,13 +144,11 @@ class DevicesFragment : Fragment() {
 
         filteredList = when (checkedChipId) {
             R.id.chipUpcoming -> filteredList.filter {
-                val currentTime = System.currentTimeMillis()
-                val ms = it.nextServiceDate - currentTime
-                val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
-                it.isActive && ms >= 0 && ds <= daysLimit
+                val ds = DateUtil.getDaysDifference(it.nextServiceDate)
+                it.isActive && ds in 0..daysLimit
             }
             R.id.chipOverdue -> filteredList.filter {
-                it.isActive && it.nextServiceDate < System.currentTimeMillis()
+                it.isActive && DateUtil.getDaysDifference(it.nextServiceDate) < 0
             }
             else -> filteredList // All
         }
@@ -222,12 +220,11 @@ class DevicesFragment : Fragment() {
                         }
                         2 -> {
                             val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                            val ms = item.nextServiceDate - System.currentTimeMillis()
-                            val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
+                            val ds = DateUtil.getDaysDifference(item.nextServiceDate)
                             val limit = prefs.getInt("upcoming_days_limit", 7)
 
-                            // Check if Upcoming (based on rounded days) or Overdue
-                            if (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && ds <= limit)) {
+                            // Check if Upcoming or Overdue
+                            if (ds <= limit) {
                                 val position = adapter.currentList.indexOf(item)
                                 showAddHistoryConfirmDialog(item, position)
                             } else {
@@ -265,11 +262,11 @@ class DevicesFragment : Fragment() {
             override fun getSwipeDirs(r: RecyclerView, v: RecyclerView.ViewHolder): Int {
                 val position = v.adapterPosition
                 val item = adapter.currentList[position]
-                val ms = item.nextServiceDate - System.currentTimeMillis()
+                val ds = DateUtil.getDaysDifference(item.nextServiceDate)
                 val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                 val limit = prefs.getInt("upcoming_days_limit", 7)
                 
-                val isUpcomingOrOverdue = item.isActive && (item.nextServiceDate < System.currentTimeMillis() || (ms >= 0 && (ms / (24 * 60 * 60 * 1000L)).toInt() <= limit))
+                val isUpcomingOrOverdue = item.isActive && ds <= limit
                 return if (isUpcomingOrOverdue) {
                     ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
                 } else {

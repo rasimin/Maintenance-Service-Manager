@@ -386,8 +386,7 @@ class DetailFragment : Fragment() {
     }
 
     private fun updateStatusIndicator(nextDate: Long) {
-        val currentTime = System.currentTimeMillis()
-        val daysDiff = (nextDate - currentTime) / (24 * 60 * 60 * 1000)
+        val daysDiff = DateUtil.getDaysDifference(nextDate)
 
         val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val upcomingLimit = prefs.getInt("upcoming_days_limit", 7).toLong()

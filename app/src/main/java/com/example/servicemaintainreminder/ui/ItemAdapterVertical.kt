@@ -68,9 +68,7 @@ class ItemAdapterVertical(
                 binding.ivItemIcon.setImageResource(iconRes)
             }
 
-            val currentTime = System.currentTimeMillis()
-            val timeDiff = item.nextServiceDate - currentTime
-            val daysDiff = (timeDiff / (24 * 60 * 60 * 1000)).toInt()
+            val daysDiff = DateUtil.getDaysDifference(item.nextServiceDate)
 
             if (item.isActive) {
                 // ACTIVE STATE STYLING

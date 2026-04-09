@@ -8,6 +8,11 @@ plugins {
     alias(libs.plugins.navigation.safeargs)
 }
 
+// Explicitly set the Java Toolchain to 17
+kotlin {
+    jvmToolchain(21)
+}
+
 android {
     namespace = "com.example.servicemaintainreminder"
     compileSdk = 35
@@ -21,12 +26,10 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     buildFeatures {

@@ -896,9 +896,8 @@ class HomeFragment : Fragment() {
             
             val upcoming = items.filter { 
                 if (!it.isActive) return@filter false
-                val ms = it.nextServiceDate - currentTime
-                val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
-                ms >= 0 && ds <= daysLimit 
+                val ds = DateUtil.getDaysDifference(it.nextServiceDate)
+                ds in 0..daysLimit 
             }
                 .sortedBy { it.nextServiceDate }
                 .take(10)
@@ -929,9 +928,8 @@ class HomeFragment : Fragment() {
                 
                 val urgent = items.filter { 
                     if (!it.isActive) return@filter false
-                    val ms = it.nextServiceDate - currentTime
-                    val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
-                    ms >= 0 && ds <= daysLimit
+                    val ds = DateUtil.getDaysDifference(it.nextServiceDate)
+                    ds in 0..daysLimit
                 }
                 binding.tvUpcomingHeader.text = "Upcoming Maintenance"
                 val sorted = urgent.sortedBy { it.nextServiceDate }
@@ -941,10 +939,9 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.cardOverdue.setOnClickListener {
+            binding.cardOverdue.setOnClickListener {
             viewModel.allItems.value?.let { items ->
-                val currentTime = System.currentTimeMillis()
-                val overdue = items.filter { it.isActive && it.nextServiceDate < currentTime }
+                val overdue = items.filter { it.isActive && DateUtil.getDaysDifference(it.nextServiceDate) < 0 }
                 binding.tvUpcomingHeader.text = "Overdue Items"
                 val sorted = overdue.sortedBy { it.nextServiceDate }
                 binding.rvItems.isVisible = sorted.isNotEmpty()
@@ -999,11 +996,10 @@ class HomeFragment : Fragment() {
         val daysLimit = prefs.getInt("upcoming_days_limit", 7)
 
         val upcoming = activeItems.count { 
-            val ms = it.nextServiceDate - currentTime
-            val ds = (ms / (24 * 60 * 60 * 1000L)).toInt()
-            ms >= 0 && ds <= daysLimit 
+            val ds = DateUtil.getDaysDifference(it.nextServiceDate)
+            ds in 0..daysLimit 
         }
-        val overdue = activeItems.count { it.nextServiceDate < currentTime }
+        val overdue = activeItems.count { DateUtil.getDaysDifference(it.nextServiceDate) < 0 }
 
         binding.tvTotalItems.text = total.toString()
         binding.tvUpcomingService.text = upcoming.toString()

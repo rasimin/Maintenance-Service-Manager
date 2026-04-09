@@ -13,6 +13,7 @@ import androidx.work.ListenableWorker.Result
 import com.example.servicemaintainreminder.MainActivity
 import com.example.servicemaintainreminder.R
 import com.example.servicemaintainreminder.data.AppDatabase
+import com.example.servicemaintainreminder.util.DateUtil
 
 class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -41,8 +42,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
         val overdueIds = mutableListOf<Long>()
 
         items.filter { it.isActive }.forEach { item ->
-            val timeDiff = item.nextServiceDate - currentTime
-            val daysLeft = (timeDiff / (24 * 60 * 60 * 1000L)).toInt()
+            val daysLeft = DateUtil.getDaysDifference(item.nextServiceDate)
 
             when {
                 daysLeft < 0 -> {

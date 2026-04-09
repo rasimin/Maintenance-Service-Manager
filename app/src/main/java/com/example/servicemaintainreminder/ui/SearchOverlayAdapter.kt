@@ -66,8 +66,7 @@ class SearchOverlayAdapter(
                 flIconBackground.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#8E75FF"))
             }
 
-            val msLeft = item.nextServiceDate - System.currentTimeMillis()
-            val daysLeft = (msLeft / (24 * 60 * 60 * 1000L)).toInt()
+            val daysLeft = DateUtil.getDaysDifference(item.nextServiceDate)
 
             val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
             val upcomingLimit = prefs.getInt("upcoming_days_limit", 7)

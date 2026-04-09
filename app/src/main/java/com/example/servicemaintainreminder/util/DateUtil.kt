@@ -20,4 +20,24 @@ object DateUtil {
         }
         return calendar.timeInMillis
     }
+
+    fun getDaysDifference(targetTimestamp: Long): Int {
+        val target = Calendar.getInstance().apply {
+            timeInMillis = targetTimestamp
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val diffMillis = target.timeInMillis - today.timeInMillis
+        return (diffMillis / (24 * 60 * 60 * 1000)).toInt()
+    }
 }
